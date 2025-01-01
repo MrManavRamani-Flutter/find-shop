@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 
-import '../../data/global_data.dart';
-
+import '../../data/store_data.dart';
 import '../customer/views/customer_profile_screen.dart';
 import '../login_screen.dart';
 import 'views/admins/admins_screen.dart';
@@ -13,8 +12,14 @@ import 'views/shops/shop_owners_screen.dart';
 class AdminScreen extends StatelessWidget {
   const AdminScreen({super.key});
 
-  int _getUserCount(String role) {
-    return users.where((user) => user['role'] == role).length;
+  // Get count of users based on user type
+  int _getUserCount(String userType) {
+    return GlobalData.users.where((user) => user.userType == userType).length;
+  }
+
+  // Get count of products or services based on product type
+  int _getProductCount(String productType) {
+    return GlobalData.products.where((product) => product.productType == productType).length;
   }
 
   void _showLogoutDialog(BuildContext context) {
@@ -117,160 +122,99 @@ class AdminScreen extends StatelessWidget {
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
-        child: ValueListenableBuilder<List<Map<String, dynamic>>>(
-          valueListenable: globalProducts,
-          builder: (context, products, child) {
-            return ValueListenableBuilder<List<Map<String, dynamic>>>(
-              valueListenable: globalServices,
-              builder: (context, services, child) {
-                return GridView.count(
-                  crossAxisCount: 2,
-                  crossAxisSpacing: 16,
-                  mainAxisSpacing: 16,
-                  children: [
-                    GestureDetector(
-                      onTap: () {
-                        // Navigate to Customers screen
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => CustomerScreen(),
-                          ),
-                        );
-                      },
-                      child: _buildDashboardCard(
-                        title: "Customers",
-                        count: _getUserCount("Customer"),
-                        icon: Icons.person,
-                        color: Colors.teal.shade600,
-                      ),
-                    ),
-                    GestureDetector(
-                      onTap: () {
-                        // Navigate to Shop Owners screen
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => const ShopOwnersScreen(),
-                          ),
-                        );
-                      },
-                      child: _buildDashboardCard(
-                        title: "Shop Owners",
-                        count: _getUserCount("ShopOwner"),
-                        icon: Icons.store,
-                        color: Colors.orange.shade600,
-                      ),
-                    ),
-                    GestureDetector(
-                      onTap: () {
-                        // Navigate to Admins screen
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => const AdminsScreen(),
-                          ),
-                        );
-                      },
-                      child: _buildDashboardCard(
-                        title: "Admins",
-                        count: _getUserCount("Admin"),
-                        icon: Icons.admin_panel_settings,
-                        color: Colors.red.shade600,
-                      ),
-                    ),
-                    GestureDetector(
-                      onTap: () {
-                        // Navigate to Products screen
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => const ProductsScreen(),
-                          ),
-                        );
-                      },
-                      child: _buildDashboardCard(
-                        title: "Products",
-                        count: products.length,
-                        icon: Icons.shopping_bag,
-                        color: Colors.blue.shade600,
-                      ),
-                    ),
-                    GestureDetector(
-                      onTap: () {
-                        // Navigate to Services screen
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => const ServicesScreen(),
-                          ),
-                        );
-                      },
-                      child: _buildDashboardCard(
-                        title: "Services",
-                        count: services.length,
-                        icon: Icons.design_services,
-                        color: Colors.purple.shade600,
-                      ),
-                    ),
-                  ],
+        child: GridView.count(
+          crossAxisCount: 2,
+          crossAxisSpacing: 16,
+          mainAxisSpacing: 16,
+          children: [
+            GestureDetector(
+              onTap: () {
+                // Navigate to Customers screen
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => CustomerScreen(),
+                  ),
                 );
               },
-            );
-          },
+              child: _buildDashboardCard(
+                title: "Customers",
+                count: _getUserCount("Customer"),
+                icon: Icons.person,
+                color: Colors.teal.shade600,
+              ),
+            ),
+            GestureDetector(
+              onTap: () {
+                // Navigate to Shop Owners screen
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => const ShopOwnersScreen(),
+                  ),
+                );
+              },
+              child: _buildDashboardCard(
+                title: "Shop Owners",
+                count: _getUserCount("ShopOwner"),
+                icon: Icons.store,
+                color: Colors.orange.shade600,
+              ),
+            ),
+            GestureDetector(
+              onTap: () {
+                // Navigate to Admins screen
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => const AdminsScreen(),
+                  ),
+                );
+              },
+              child: _buildDashboardCard(
+                title: "Admins",
+                count: _getUserCount("Admin"),
+                icon: Icons.admin_panel_settings,
+                color: Colors.red.shade600,
+              ),
+            ),
+            GestureDetector(
+              onTap: () {
+                // Navigate to Products screen
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => const ProductsScreen(),
+                  ),
+                );
+              },
+              child: _buildDashboardCard(
+                title: "Products",
+                count: _getProductCount("product"),
+                icon: Icons.shopping_bag,
+                color: Colors.blue.shade600,
+              ),
+            ),
+            GestureDetector(
+              onTap: () {
+                // Navigate to Services screen
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => const ServicesScreen(),
+                  ),
+                );
+              },
+              child: _buildDashboardCard(
+                title: "Services",
+                count: _getProductCount("service"),
+                icon: Icons.design_services,
+                color: Colors.purple.shade600,
+              ),
+            ),
+          ],
         ),
       ),
-
-      // body: Padding(
-      //   padding: const EdgeInsets.all(16.0),
-      //   child: ValueListenableBuilder<List<Map<String, dynamic>>>(
-      //     valueListenable: globalProducts,
-      //     builder: (context, products, child) {
-      //       return ValueListenableBuilder<List<Map<String, dynamic>>>(
-      //         valueListenable: globalServices,
-      //         builder: (context, services, child) {
-      //           return GridView.count(
-      //             crossAxisCount: 2,
-      //             crossAxisSpacing: 16,
-      //             mainAxisSpacing: 16,
-      //             children: [
-      //               _buildDashboardCard(
-      //                 title: "Customers",
-      //                 count: _getUserCount("Customer"),
-      //                 icon: Icons.person,
-      //                 color: Colors.teal.shade600,
-      //               ),
-      //               _buildDashboardCard(
-      //                 title: "Shop Owners",
-      //                 count: _getUserCount("ShopOwner"),
-      //                 icon: Icons.store,
-      //                 color: Colors.orange.shade600,
-      //               ),
-      //               _buildDashboardCard(
-      //                 title: "Admins",
-      //                 count: _getUserCount("Admin"),
-      //                 icon: Icons.admin_panel_settings,
-      //                 color: Colors.red.shade600,
-      //               ),
-      //               _buildDashboardCard(
-      //                 title: "Products",
-      //                 count: products.length,
-      //                 icon: Icons.shopping_bag,
-      //                 color: Colors.blue.shade600,
-      //               ),
-      //               _buildDashboardCard(
-      //                 title: "Services",
-      //                 count: services.length,
-      //                 icon: Icons.design_services,
-      //                 color: Colors.purple.shade600,
-      //               ),
-      //             ],
-      //           );
-      //         },
-      //       );
-      //     },
-      //   ),
-      // ),
     );
   }
 

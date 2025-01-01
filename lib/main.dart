@@ -1,6 +1,5 @@
+import 'package:find_shop/views/splash_screen.dart';
 import 'package:flutter/material.dart';
-
-import 'views/admin/admin_screen.dart';
 
 void main() {
   runApp(const FindShopApp());
@@ -14,7 +13,7 @@ class FindShopApp extends StatelessWidget {
     return const MaterialApp(
       debugShowCheckedModeBanner: false,
       title: 'Find Shop',
-      home: AdminScreen(),
+      home: SplashScreen(),
     );
   }
 }
