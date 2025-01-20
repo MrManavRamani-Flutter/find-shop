@@ -1,6 +1,8 @@
 import 'package:path/path.dart';
 import 'package:sqflite/sqflite.dart';
 
+import '../models/user_model/user.dart';
+
 class DatabaseHelper {
   // Singleton instance
   static final DatabaseHelper _instance = DatabaseHelper._internal();
@@ -369,6 +371,40 @@ class DatabaseHelper {
     });
 
     print('Static data inserted successfully!');
+  }
+
+  // Update customer details
+  Future<void> updateCustomer(User customer) async {
+    final db = await database;
+    await db.update(
+      'users',
+      {
+        'username': customer.username,
+        'email': customer.email,
+        'contact': customer.contact,
+      },
+      where: 'user_id = ?',
+      whereArgs: [customer.userId],
+    );
+  }
+
+  // Fetch customers from the database
+  Future<List<User>> fetchCustomers() async {
+    final db = await database;
+    final List<Map<String, dynamic>> maps = await db.query('users');
+
+    return List.generate(maps.length, (i) {
+      return User(
+        userId: maps[i]['user_id'],
+        username: maps[i]['username'],
+        email: maps[i]['email'],
+        contact: maps[i]['contact'],
+        userType: maps[i]['user_type'],
+        status: maps[i]['status'],
+        password: maps[i]['password'],
+        createdAt: maps[i]['createdAt'],
+      );
+    });
   }
 
   // Close the database

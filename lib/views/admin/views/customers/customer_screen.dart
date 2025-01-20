@@ -1,22 +1,30 @@
-import 'package:find_shop/data/global_data.dart';
 import 'package:flutter/material.dart';
+import '../../../../models/user_model/user.dart';
+import '../../../../data/store_data.dart';
+import 'customer_details_screen.dart';
 
-class CustomerScreen extends StatelessWidget {
-  // Filter users by role 'Customer'
-  final List<Map<String, String>> customers =
-      users.where((user) => user['role'] == 'Customer').toList();
-
-  CustomerScreen({super.key});
+class CustomerListScreen extends StatelessWidget {
+  const CustomerListScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
+    // Filter users by role 'Customer'
+    final List<User> customers = GlobalData.users
+        .where((user) => user.userType.toLowerCase() == 'customer')
+        .toList();
+
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Customer List'),
+        title: const Text('Customer List',
+          style: TextStyle(color: Colors.white),
+        ),
+        iconTheme: const IconThemeData(color: Colors.white),
+        backgroundColor: Colors.teal,
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
-        child: ListView.builder(
+        child: customers.isNotEmpty
+            ? ListView.builder(
           itemCount: customers.length,
           itemBuilder: (context, index) {
             final customer = customers[index];
@@ -27,55 +35,40 @@ class CustomerScreen extends StatelessWidget {
                 leading: CircleAvatar(
                   backgroundColor: Colors.teal,
                   child: Text(
-                    customer['username']![0].toUpperCase(),
+                    customer.username[0].toUpperCase(),
                     style: const TextStyle(color: Colors.white),
                   ),
                 ),
                 title: Text(
-                  customer['username']!,
+                  customer.username,
                   style: const TextStyle(
                     fontWeight: FontWeight.bold,
                   ),
                 ),
-                subtitle: const Text('Role: Customer'),
-                trailing: IconButton(
-                  icon: const Icon(Icons.info_outline),
-                  onPressed: () {
-                    _showCustomerDetails(context, customer);
-                  },
-                ),
+                subtitle: Text('Role: ${customer.userType}'),
+                trailing: const Icon(Icons.arrow_forward_ios),
+                onTap: () {
+                  // Navigate to the customer details screen
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => CustomerDetailsScreen(
+                        customer: customer,
+                      ),
+                    ),
+                  );
+                },
               ),
             );
           },
+        )
+            : const Center(
+          child: Text(
+            'No customers available',
+            style: TextStyle(fontSize: 16, color: Colors.grey),
+          ),
         ),
       ),
-    );
-  }
-
-  // Show detailed info about the customer in a dialog
-  void _showCustomerDetails(
-      BuildContext context, Map<String, String> customer) {
-    showDialog(
-      context: context,
-      builder: (context) {
-        return AlertDialog(
-          title: Text('Customer: ${customer['username']}'),
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text('Username: ${customer['username']}'),
-              Text('Role: ${customer['role']}'),
-            ],
-          ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.of(context).pop(),
-              child: const Text('Close'),
-            ),
-          ],
-        );
-      },
     );
   }
 }

@@ -82,4 +82,92 @@ class DataFetcher {
       return ShopReview.fromMap(maps[index]);
     });
   }
+
+  // Update user
+  Future<int> updateUser(User user) async {
+    final db = await _dbHelper.database;
+    return await db.update(
+      'users',
+      user.toMap(),
+      where: 'id = ?',
+      whereArgs: [user.userId],
+    );
+  }
+
+  // Update shop
+  Future<int> updateShop(Shop shop) async {
+    final db = await _dbHelper.database;
+    return await db.update(
+      'shops',
+      shop.toMap(),
+      where: 'id = ?',
+      whereArgs: [shop.shopId],
+    );
+  }
+
+  // Update area
+  Future<int> updateArea(Area area) async {
+    final db = await _dbHelper.database;
+    return await db.update(
+      'areas',
+      area.toMap(),
+      where: 'id = ?',
+      whereArgs: [area.areaId],
+    );
+  }
+
+  // Update category
+  Future<int> updateCategory(Category category) async {
+    final db = await _dbHelper.database;
+    return await db.update(
+      'categories',
+      category.toMap(),
+      where: 'id = ?',
+      whereArgs: [category.catId],
+    );
+  }
+
+  // Update product
+  Future<int> updateProduct(Product product) async {
+    final db = await _dbHelper.database;
+    return await db.update(
+      'products',
+      product.toMap(),
+      where: 'id = ?',
+      whereArgs: [product.productId],
+    );
+  }
+
+  // Update favorite shop
+  Future<int> updateFavoriteShop(FavoriteShop favoriteShop) async {
+    final db = await _dbHelper.database;
+    return await db.update(
+      'favorite_shop',
+      favoriteShop.toMap(),
+      where: 'id = ?',
+      whereArgs: [favoriteShop.favId],
+    );
+  }
+
+  // Update search
+  Future<int> updateSearch(Search search) async {
+    final db = await _dbHelper.database;
+    return await db.update(
+      'search',
+      search.toMap(),
+      where: 'id = ?',
+      whereArgs: [search.searchId],
+    );
+  }
+
+  // Update shop review
+  Future<int> updateShopReview(ShopReview shopReview) async {
+    final db = await _dbHelper.database;
+    return await db.update(
+      'shop_reviews',
+      shopReview.toMap(),
+      where: 'id = ?',
+      whereArgs: [shopReview.reviewId],
+    );
+  }
 }

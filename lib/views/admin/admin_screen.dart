@@ -19,7 +19,9 @@ class AdminScreen extends StatelessWidget {
 
   // Get count of products or services based on product type
   int _getProductCount(String productType) {
-    return GlobalData.products.where((product) => product.productType == productType).length;
+    return GlobalData.products
+        .where((product) => product.productType == productType)
+        .length;
   }
 
   void _showLogoutDialog(BuildContext context) {
@@ -133,7 +135,7 @@ class AdminScreen extends StatelessWidget {
                 Navigator.push(
                   context,
                   MaterialPageRoute(
-                    builder: (context) => CustomerScreen(),
+                    builder: (context) => const CustomerListScreen(),
                   ),
                 );
               },
