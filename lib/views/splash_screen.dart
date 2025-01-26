@@ -14,6 +14,7 @@ class SplashScreen extends StatefulWidget {
 
 class SplashScreenState extends State<SplashScreen> {
   late final DatabaseHelper _dbHelper;
+  double _progress = 0.0;
 
   @override
   void initState() {
@@ -24,18 +25,22 @@ class SplashScreenState extends State<SplashScreen> {
 
   Future<void> _initializeApp() async {
     try {
-      // Get shared preferences instance
       final prefs = await SharedPreferences.getInstance();
-
-      // Check if the database has already been initialized
       final isDbInitialized = prefs.getBool('isDbInitialized') ?? false;
 
       if (!isDbInitialized) {
-        // Initialize the database and insert static data
-        await _dbHelper.database;
-        await _dbHelper.insertStaticData();
+        // Simulating database creation with progress
+        for (int i = 0; i <= 100; i += 20) {
+          await Future.delayed(const Duration(milliseconds: 500));
+          setState(() {
+            _progress = i / 100;
+          });
+        }
 
-        // Update the shared preference flag
+        // Initialize the database
+        await _dbHelper.database;
+
+        // Mark database as initialized
         await prefs.setBool('isDbInitialized', true);
 
         if (mounted) {
@@ -45,11 +50,11 @@ class SplashScreenState extends State<SplashScreen> {
         }
       }
 
-      // Fetch data every time the app opens
+      // Fetch necessary data
       fetchDataAndStore();
 
-      // Navigate to the login screen after a delay
-      await Future.delayed(const Duration(seconds: 3));
+      // Navigate to login page after short delay
+      await Future.delayed(const Duration(seconds: 1));
       if (mounted) {
         Navigator.pushReplacement(
           context,
@@ -93,7 +98,27 @@ class SplashScreenState extends State<SplashScreen> {
               ),
             ),
             const SizedBox(height: 20),
-            const CircularProgressIndicator(),
+            _progress > 0
+                ? Column(
+              children: [
+                LinearProgressIndicator(
+                  value: _progress,
+                  minHeight: 8,
+                  backgroundColor: Colors.grey[300],
+                  color: Colors.teal,
+                ),
+                const SizedBox(height: 10),
+                Text(
+                  "${(_progress * 100).toInt()}% Completed",
+                  style: const TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.w500,
+                    color: Colors.teal,
+                  ),
+                ),
+              ],
+            )
+                : const CircularProgressIndicator(),
           ],
         ),
       ),

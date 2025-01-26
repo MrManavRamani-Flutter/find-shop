@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../../../data/store_data.dart';
-import '../../../../database_helper/database_helper.dart';
+// import '../../../../database_helper/database_helper.dart';
 import '../../../../models/user_model/user.dart';
 
 class EditCustomerScreen extends StatefulWidget {
@@ -13,7 +13,7 @@ class EditCustomerScreen extends StatefulWidget {
 }
 
 class _EditCustomerScreenState extends State<EditCustomerScreen> {
-  late final DatabaseHelper _dbHelper;
+  // late final DatabaseHelper _dbHelper;
 
   final _formKey = GlobalKey<FormState>();
   late TextEditingController _usernameController;
@@ -23,7 +23,7 @@ class _EditCustomerScreenState extends State<EditCustomerScreen> {
   @override
   void initState() {
     super.initState();
-    _dbHelper = DatabaseHelper();
+    // _dbHelper = DatabaseHelper();
     _usernameController = TextEditingController(text: widget.customer.username);
     _emailController = TextEditingController(text: widget.customer.email);
     _contactController = TextEditingController(text: widget.customer.contact);
@@ -44,7 +44,7 @@ class _EditCustomerScreenState extends State<EditCustomerScreen> {
         email: _emailController.text,
         contact: _contactController.text,
       );
-      await _dbHelper.updateCustomer(updatedCustomer);
+      // await _dbHelper.updateCustomer(updatedCustomer);
       // Fetch data every time the app opens
       fetchDataAndStore();
       Navigator.pop(context, updatedCustomer);  // Return updated customer to previous screen
