@@ -1,19 +1,35 @@
-import 'package:find_shop/views/splash_screen.dart';
+import 'screens/auth/register_screen.dart';
+import 'screens/customer/home_screen.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'providers/auth_provider.dart';
+import 'screens/auth/login_screen.dart';
 
 void main() {
-  runApp(const FindShopApp());
+  runApp(
+    MultiProvider(
+      providers: [
+        ChangeNotifierProvider(create: (_) => AuthProvider()),
+      ],
+      child: const MyApp(),
+    ),
+  );
 }
 
-class FindShopApp extends StatelessWidget {
-  const FindShopApp({super.key});
+class MyApp extends StatelessWidget {
+  const MyApp({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return const MaterialApp(
-      debugShowCheckedModeBanner: false,
+    return MaterialApp(
       title: 'Find Shop',
-      home: SplashScreen(),
+      debugShowCheckedModeBanner: false,
+      home: const LoginScreen(),
+      routes: {
+        '/home': (context) => const HomeScreen(),
+        '/register':(context) => const RegisterScreen(),
+        '/login':(context)=> const LoginScreen(),
+      },
     );
   }
 }
