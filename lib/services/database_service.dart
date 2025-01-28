@@ -1,6 +1,8 @@
 import 'package:sqflite/sqflite.dart';
 import 'package:path/path.dart';
 
+import '../models/user_model.dart';
+
 class DatabaseService {
   Database? _database;
 
@@ -62,5 +64,29 @@ class DatabaseService {
   Future<List<Map<String, dynamic>>> getRoles() async {
     final db = await database;
     return await db.query('roles');
+  }
+
+  Future<List<UserModel>> getShopOwners() async {
+    final db = await database;
+
+    // Fetch all users with role_id corresponding to "Shop Owner"
+    final List<Map<String, dynamic>> shopOwners = await db.query(
+      'users',
+      where: 'role_id = ?',
+      whereArgs: [2], // Assuming 2 is the role_id for "Shop Owner"
+    );
+
+    // Convert the database rows into a list of UserModel objects
+    return shopOwners.map((owner) => UserModel.fromMap(owner)).toList();
+  }
+
+  Future<void> updateShopOwnerStatus(int id, int status) async {
+    final db = await database;
+    await db.update(
+      'users',
+      {'status': status},
+      where: 'user_id = ?',
+      whereArgs: [id],
+    );
   }
 }

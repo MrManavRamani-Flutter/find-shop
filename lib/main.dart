@@ -1,3 +1,8 @@
+import 'package:find_shop/screens/admin/manage_users.dart';
+
+import 'providers/shop_owner_provider.dart';
+import 'providers/user_count_provider.dart';
+import 'screens/admin/dashboard.dart';
 import 'screens/auth/register_screen.dart';
 import 'screens/customer/home_screen.dart';
 import 'package:flutter/material.dart';
@@ -10,6 +15,8 @@ void main() {
     MultiProvider(
       providers: [
         ChangeNotifierProvider(create: (_) => AuthProvider()),
+        ChangeNotifierProvider(create: (_) => UserCountProvider()),
+        ChangeNotifierProvider(create: (_) => ShopOwnerProvider()),
       ],
       child: const MyApp(),
     ),
@@ -24,11 +31,17 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: 'Find Shop',
       debugShowCheckedModeBanner: false,
-      home: const LoginScreen(),
+      initialRoute: '/adminDashboard',
       routes: {
+        // Auth Login screen design....
+        '/register': (context) => const RegisterScreen(),
+        '/login': (context) => const LoginScreen(),
+        // Customer screen Design....
         '/home': (context) => const HomeScreen(),
-        '/register':(context) => const RegisterScreen(),
-        '/login':(context)=> const LoginScreen(),
+        //   Admin Screen Design....
+        '/adminDashboard': (context) => const AdminDashboard(),
+        '/manage_users': (context) => const ManageUsers(),
+        // ShopOwner Screen Design....
       },
     );
   }

@@ -15,13 +15,15 @@ class AuthProvider with ChangeNotifier {
   }
 
   // Register user
-  Future<bool> registerUser(String username, String email, String password, String contact, int roleId) async {
+  Future<bool> registerUser(String username, String email, String password,
+      String contact, int roleId) async {
     final db = await _dbService.database;
 
-    final existingUser = await db.query('users', where: 'email = ?', whereArgs: [email]);
+    final existingUser =
+        await db.query('users', where: 'email = ?', whereArgs: [email]);
 
     if (existingUser.isNotEmpty) {
-      return false;  // Email already exists
+      return false; // Email already exists
     }
 
     final newUser = {
@@ -30,7 +32,7 @@ class AuthProvider with ChangeNotifier {
       'password': password,
       'contact': contact,
       'role_id': roleId,
-      'status': 1,
+      'status': (roleId == 2 || roleId == 3) ? 0 : 1,
       'created_at': DateTime.now().toIso8601String(),
     };
 
