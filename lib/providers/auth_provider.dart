@@ -2,19 +2,36 @@ import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../models/user_model.dart';
 import '../services/database_service.dart';
+import '../services/tables/role_service.dart';
 
 class AuthProvider with ChangeNotifier {
   final DatabaseService _dbService = DatabaseService();
+  late final RoleService _roleService;
   UserModel? _currentUser;
 
   UserModel? get currentUser => _currentUser;
 
-  // Fetch roles from the database
-  Future<List<Map<String, dynamic>>> fetchRoles() async {
-    return await _dbService.getRoles();
+  // Constructor with initialization
+  AuthProvider() {
+    _initialize();
   }
 
-  // Register user
+  Future<void> _initialize() async {
+    final db = await _dbService.database;
+    _roleService = RoleService(db);
+    notifyListeners(); // Notify listeners after initialization
+  }
+
+  // Fetch roles from the database using RoleService
+  Future<List<Map<String, dynamic>>> fetchRoles() async {
+    if (_roleService.toString().isEmpty) {
+      await _initialize();
+    }
+    return await _roleService.getRoles();
+  }
+
+
+  // Register user and insert into database
   Future<bool> registerUser(String username, String email, String password,
       String contact, int roleId) async {
     final db = await _dbService.database;
@@ -32,7 +49,7 @@ class AuthProvider with ChangeNotifier {
       'password': password,
       'contact': contact,
       'role_id': roleId,
-      'status': (roleId == 2 || roleId == 3) ? 0 : 1,
+      'status': (roleId == 2 || roleId == 3) ? 0 : 1, // Status based on role
       'created_at': DateTime.now().toIso8601String(),
     };
 
@@ -40,7 +57,7 @@ class AuthProvider with ChangeNotifier {
     return true;
   }
 
-  // Login user
+  // Login user by verifying email and password
   Future<bool> login(String email, String password) async {
     final db = await _dbService.database;
     final result = await db.query(
@@ -75,7 +92,7 @@ class AuthProvider with ChangeNotifier {
     return false;
   }
 
-  // Check if user is logged in
+  // Check if user is already logged in using SharedPreferences
   Future<void> checkLoggedInUser() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
 
@@ -88,38 +105,27 @@ class AuthProvider with ChangeNotifier {
         contact: '',
         roleId: prefs.getInt('role_id') ?? 0,
         status: 1,
+        // Set status to 1 by default
         createdAt: '',
       );
       notifyListeners();
     }
   }
 
-  // Logout user
+  // Logout user and clear SharedPreferences
   Future<void> logout() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
-    await prefs.clear();
-    _currentUser = null;
+    await prefs.clear(); // Clear saved user data
+    _currentUser = null; // Reset current user
     notifyListeners();
   }
 
-  // Insert default roles when app is first opened
+  // Insert default roles when the app is first opened
   Future<void> insertDefaultRoles() async {
-    final db = await _dbService.database;
-
-    // Check if roles already exist
-    final existingRoles = await db.query('roles');
-
-    if (existingRoles.isEmpty) {
-      // Insert default roles
-      const defaultRoles = [
-        {'role_name': 'Customer'},
-        {'role_name': 'Shop Owner'},
-        {'role_name': 'Admin'},
-      ];
-
-      for (var role in defaultRoles) {
-        await db.insert('roles', role);
-      }
+    try {
+      await _roleService.insertDefaultRoles(); // Insert default roles if needed
+    } catch (e) {
+      throw Exception("Failed to insert default roles: $e");
     }
   }
 }

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import '../../providers/shop_owner_provider.dart';
+import '../../../providers/shop_owner_provider.dart';
 import 'shop_owner_details_screen.dart';
 
 class ShopOwnerListScreen extends StatelessWidget {

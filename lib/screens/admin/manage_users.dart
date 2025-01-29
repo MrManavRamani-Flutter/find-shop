@@ -1,7 +1,9 @@
+import 'package:find_shop/screens/admin/user_screen/customer_list_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../providers/shop_owner_provider.dart';
-import 'shop_owner_list_screen.dart'; // Import the Shop Owner List Screen
+import '../../providers/customer_provider.dart';
+import 'user_screen/shop_owner_list_screen.dart';
 
 class ManageUsers extends StatefulWidget {
   const ManageUsers({super.key});
@@ -15,11 +17,12 @@ class ManageUsersState extends State<ManageUsers> {
   void initState() {
     super.initState();
 
-    // Fetch shop owners on screen load
+    // Fetch data on screen load
     Future.delayed(Duration.zero, () {
       if (mounted) {
         Provider.of<ShopOwnerProvider>(context, listen: false)
             .fetchShopOwners();
+        Provider.of<CustomerProvider>(context, listen: false).fetchCustomers();
       }
     });
   }
@@ -27,6 +30,7 @@ class ManageUsersState extends State<ManageUsers> {
   @override
   Widget build(BuildContext context) {
     final shopOwnerProvider = Provider.of<ShopOwnerProvider>(context);
+    final customerProvider = Provider.of<CustomerProvider>(context);
 
     return Scaffold(
       appBar: AppBar(
@@ -45,26 +49,35 @@ class ManageUsersState extends State<ManageUsers> {
       body: SingleChildScrollView(
         child: Padding(
           padding: const EdgeInsets.all(20.0),
-          child: _buildUserCountSection(shopOwnerProvider: shopOwnerProvider),
+          child: _buildUserCountSection(
+            shopOwnerProvider: shopOwnerProvider,
+            customerProvider: customerProvider,
+          ),
         ),
       ),
     );
   }
 
-  Widget _buildUserCountSection(
-      {required ShopOwnerProvider shopOwnerProvider}) {
+  Widget _buildUserCountSection({
+    required ShopOwnerProvider shopOwnerProvider,
+    required CustomerProvider customerProvider,
+  }) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
         Expanded(
           child: _buildCountTile(
             title: "Customers",
-            count: 0,
-            // Placeholder, replace with actual customer count if available
+            count: customerProvider.customers.length,
             icon: Icons.person,
             onTap: () {
               // Navigate to the Customer List Screen
-              // Replace with your actual customer list screen
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => const CustomerListScreen(),
+                ),
+              );
             },
           ),
         ),
@@ -99,8 +112,9 @@ class ManageUsersState extends State<ManageUsers> {
       onTap: onTap,
       child: Card(
         elevation: 6,
-        shape:
-            RoundedRectangleBorder(borderRadius: BorderRadius.circular(20.0)),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(20.0),
+        ),
         child: Padding(
           padding: const EdgeInsets.symmetric(vertical: 24, horizontal: 16),
           child: Column(
