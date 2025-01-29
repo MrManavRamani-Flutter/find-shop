@@ -1,51 +1,59 @@
-import 'package:find_shop/screens/admin/manage_users.dart';
-import 'package:find_shop/screens/intro_screen/splash_screen.dart';
-
-import 'providers/customer_provider.dart';
-import 'providers/shop_owner_provider.dart';
-import 'screens/admin/dashboard.dart';
-import 'screens/auth/register_screen.dart';
-import 'screens/customer/home_screen.dart';
+import 'package:find_shop/database/app_database.dart';
+import 'package:find_shop/screens/admin/home_screen.dart';
+import 'package:find_shop/screens/customer/home_screen.dart';
+import 'package:find_shop/screens/customer/profile_screen.dart';
+import 'package:find_shop/screens/register_screen.dart';
+import 'package:find_shop/screens/shop_owner/home_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'providers/auth_provider.dart';
-import 'screens/auth/login_screen.dart';
+import 'utils/shared_preferences_helper.dart';
+import 'providers/user_provider.dart';
+import 'providers/role_provider.dart';
+import 'screens/splash_screen.dart';
+import 'screens/login_screen.dart';
 
-void main() {
-  runApp(
-    MultiProvider(
-      providers: [
-        ChangeNotifierProvider(create: (_) => AuthProvider()),
-        ChangeNotifierProvider(create: (_) => CustomerProvider()),
-        ChangeNotifierProvider(create: (_) => ShopOwnerProvider()),
-      ],
-      child: const MyApp(),
-    ),
-  );
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+
+  // Initialize the database
+  await AppDatabase().database;
+
+  // Initialize SharedPreferences and check if the user is logged in
+  bool isLoggedIn = await SharedPreferencesHelper().isLoggedIn();
+
+  runApp(MyApp(isLoggedIn: isLoggedIn));
 }
 
 class MyApp extends StatelessWidget {
-  const MyApp({super.key});
+  final bool isLoggedIn;
+
+  const MyApp({super.key, required this.isLoggedIn});
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Find Shop',
-      debugShowCheckedModeBanner: false,
-      initialRoute: '/login',
-      routes: {
-        // Intro SplashScreen
-        '/splash': (context) => const SplashScreen(),
-        // Auth Login screen design....
-        '/register': (context) => const RegisterScreen(),
-        '/login': (context) => const LoginScreen(),
-        // Customer screen Design....
-        '/home': (context) => const HomeScreen(),
-        //   Admin Screen Design....
-        '/adminDashboard': (context) => const AdminDashboard(),
-        '/manage_users': (context) => const ManageUsers(),
-        // ShopOwner Screen Design....
-      },
+    return MultiProvider(
+      providers: [
+        ChangeNotifierProvider(create: (_) => UserProvider()),
+        ChangeNotifierProvider(create: (_) => RoleProvider()),
+      ],
+      child: MaterialApp(
+        title: 'Find Shop',
+        theme: ThemeData(
+          primarySwatch: Colors.blue,
+        ),
+        // Navigate based on login status
+        initialRoute: isLoggedIn ? '/' : '/login',
+        routes: {
+          '/': (context) => const SplashScreen(),
+          '/login': (context) => const LoginScreen(),
+          '/register': (context) => const RegisterScreen(),
+          '/customer_profile': (context) => const CustomerProfileScreen(),
+          '/customer_home': (context) => const CustomerHomeScreen(),
+          '/shop_home': (context) => const ShopOwnerHomeScreen(),
+          '/dashboard': (context) => const AdminHomeScreen(),
+        },
+        debugShowCheckedModeBanner: false,
+      ),
     );
   }
 }
