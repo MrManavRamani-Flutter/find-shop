@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import '../models/user.dart';
 import '../database/user_database_helper.dart';
-import '../utils/shared_preferences_helper.dart'; // Importing SharedPreferencesHelper
+import '../utils/shared_preferences_helper.dart';
 
 class UserProvider with ChangeNotifier {
   List<User> _users = [];

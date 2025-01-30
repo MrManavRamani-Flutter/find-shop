@@ -17,6 +17,27 @@ class AreaDatabaseHelper {
     });
   }
 
+  // Fetch a area by their ID
+  Future<Area?> getAreaById(int areaId) async {
+    final db = await AppDatabase().database;
+    try {
+      final result = await db.query(
+        tableName,
+        where: 'area_id = ?',
+        whereArgs: [areaId],
+      );
+
+      // If a area is found, return the area object
+      if (result.isNotEmpty) {
+        return Area.fromMap(result.first);
+      } else {
+        return null; // Return null if area is not found
+      }
+    } catch (e) {
+      throw Exception('Error fetching area by ID: $e');
+    }
+  }
+
   Future<int> updateArea(Area area) async {
     final db = await AppDatabase().database;
     return await db.update(tableName, area.toMap(), where: 'area_id = ?', whereArgs: [area.areaId]);

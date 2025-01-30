@@ -122,6 +122,11 @@ class AdminDashboardBody extends StatelessWidget {
             icon: Icons.store,
             onTap: () => Navigator.pushNamed(context, '/shop_owners_list'),
           ),
+          AdminDashboardCard(
+            title: 'City Areas',
+            icon: Icons.location_on,
+            onTap: () => Navigator.pushNamed(context, '/areas_list'),
+          ),
         ],
       ),
     );

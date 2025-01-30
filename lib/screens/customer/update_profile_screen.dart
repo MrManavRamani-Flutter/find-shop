@@ -95,7 +95,7 @@ class UpdateProfileScreenState extends State<UpdateProfileScreen> {
                         .updateUser(widget.user);
 
                     // After successful update, go back to the profile screen
-                    if (mounted) {
+                    if (context.mounted) {
                       Navigator.pop(context);
                     }
                   } else {
