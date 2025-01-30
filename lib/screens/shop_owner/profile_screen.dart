@@ -1,11 +1,11 @@
 import 'package:find_shop/providers/user_provider.dart';
-import 'package:find_shop/screens/customer/update_profile_screen.dart';
+import 'package:find_shop/screens/shop_owner/update_profile_screen.dart';
 import 'package:find_shop/utils/shared_preferences_helper.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-class CustomerProfileScreen extends StatelessWidget {
-  const CustomerProfileScreen({super.key});
+class ShopOwnerProfileScreen extends StatelessWidget {
+  const ShopOwnerProfileScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -29,14 +29,13 @@ class CustomerProfileScreen extends StatelessWidget {
       appBar: AppBar(
         leading: GestureDetector(
           onTap: () {
-            Navigator.pushReplacementNamed(context, '/customer_home');
+            Navigator.pushReplacementNamed(context, '/shop_home');
           },
           child: const Icon(
             Icons.arrow_back,
             color: Colors.white,
           ),
         ),
-
         title: const Text('Profile',style: TextStyle(color: Colors.white),),
         centerTitle: true,
         iconTheme: const IconThemeData(color: Colors.white),

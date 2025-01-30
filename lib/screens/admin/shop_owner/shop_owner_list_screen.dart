@@ -1,0 +1,139 @@
+import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:find_shop/models/user.dart';
+import 'package:find_shop/providers/user_provider.dart';
+
+class ShopOwnerListScreen extends StatelessWidget {
+  const ShopOwnerListScreen({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return DefaultTabController(
+      length: 4,
+      child: Scaffold(
+        appBar: AppBar(
+          title: const Text('Shop Owners'),
+          bottom: const TabBar(
+            labelColor: Colors.black,
+            unselectedLabelColor: Colors.black45,
+            indicatorColor: Colors.black,
+            tabs: [
+              Tab(text: "Pending"),
+              Tab(text: "Approved"),
+              Tab(text: "Rejected"),
+              Tab(text: "Others"),
+            ],
+          ),
+        ),
+        body: const TabBarView(
+          children: [
+            ShopOwnerList(status: 3), // Pending
+            ShopOwnerList(status: 1), // Approved
+            ShopOwnerList(status: 2), // Rejected
+            ShopOwnerList(status: 0), // Others
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class ShopOwnerList extends StatelessWidget {
+  final int status;
+
+  const ShopOwnerList({super.key, required this.status});
+
+  @override
+  Widget build(BuildContext context) {
+    return Consumer<UserProvider>(
+      builder: (context, userProvider, child) {
+        // Fetch live data from UserProvider
+        userProvider.fetchUsers(); // Fetch live data
+
+        List<User> shopOwners = userProvider.users
+            .where((user) => user.roleId == 2 && user.status == status)
+            .toList();
+
+        if (shopOwners.isEmpty) {
+          return const Center(
+            child: Text(
+              "No Shop Owners Found",
+              style: TextStyle(fontSize: 16, color: Colors.grey),
+            ),
+          );
+        }
+
+        return ListView.builder(
+          padding: const EdgeInsets.all(16.0),
+          itemCount: shopOwners.length,
+          itemBuilder: (context, index) {
+            var owner = shopOwners[index];
+            return ShopOwnerCard(
+              name: owner.username,
+              email: owner.email,
+              contact: owner.contact,
+              status: owner.status,
+            );
+          },
+        );
+      },
+    );
+  }
+}
+
+class ShopOwnerCard extends StatelessWidget {
+  final String name;
+  final String email;
+  final String contact;
+  final int status;
+
+  const ShopOwnerCard({
+    super.key,
+    required this.name,
+    required this.email,
+    required this.contact,
+    required this.status,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Card(
+      elevation: 4,
+      margin: const EdgeInsets.symmetric(vertical: 8),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+      child: ListTile(
+        leading: CircleAvatar(
+          backgroundColor: _getStatusColor(status).withOpacity(0.2),
+          child: Icon(
+            Icons.storefront,
+            color: _getStatusColor(status),
+          ),
+        ),
+        title: Text(
+          name,
+          style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+        ),
+        subtitle: Text(email),
+        trailing: Text(
+          contact,
+          style: const TextStyle(color: Colors.black54, fontSize: 14),
+        ),
+      ),
+    );
+  }
+
+  Color _getStatusColor(int status) {
+    switch (status) {
+      case 3:
+        return Colors.orange; // Pending
+      case 1:
+        return Colors.green; // Approved
+      case 2:
+        return Colors.red; // Rejected
+      case 0:
+        return Colors.blueGrey; // Others
+      default:
+        return Colors.grey;
+    }
+  }
+}

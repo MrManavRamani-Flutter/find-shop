@@ -7,7 +7,11 @@ class UserProvider with ChangeNotifier {
   List<User> _users = [];
   User? _loggedInUser;
 
-  // Getters for users and loggedInUser
+  UserProvider() {
+    fetchUsers();
+  }
+
+  //   Getters for users and loggedInUser
   List<User> get users => _users;
 
   User? get loggedInUser => _loggedInUser;

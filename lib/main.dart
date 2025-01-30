@@ -1,9 +1,13 @@
 import 'package:find_shop/database/app_database.dart';
+import 'package:find_shop/screens/admin/customer/customer_list_screen.dart';
 import 'package:find_shop/screens/admin/home_screen.dart';
+import 'package:find_shop/screens/admin/profile_screen.dart';
+import 'package:find_shop/screens/admin/shop_owner/shop_owner_list_screen.dart';
 import 'package:find_shop/screens/customer/home_screen.dart';
 import 'package:find_shop/screens/customer/profile_screen.dart';
 import 'package:find_shop/screens/register_screen.dart';
 import 'package:find_shop/screens/shop_owner/home_screen.dart';
+import 'package:find_shop/screens/shop_owner/profile_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'utils/shared_preferences_helper.dart';
@@ -44,13 +48,28 @@ class MyApp extends StatelessWidget {
         // Navigate based on login status
         initialRoute: isLoggedIn ? '/splash' : '/login',
         routes: {
+          // basic screen -------
           '/splash': (context) => const SplashScreen(),
           '/login': (context) => const LoginScreen(),
           '/register': (context) => const RegisterScreen(),
-          '/customer_profile': (context) => const CustomerProfileScreen(),
+          // ---------------------------------------------------------------
+
+          // Customer Screen --------
           '/customer_home': (context) => const CustomerHomeScreen(),
+          '/customer_profile': (context) => const CustomerProfileScreen(),
+          // ---------------------------------------------------------------
+
+          // Shop Owner Screen -------
           '/shop_home': (context) => const ShopOwnerHomeScreen(),
+          '/shop_profile': (context) => const ShopOwnerProfileScreen(),
+          // ---------------------------------------------------------------
+
+          // Admin Screen --------
           '/dashboard': (context) => const AdminHomeScreen(),
+          '/admin_profile': (context) => const AdminProfileScreen(),
+          '/customers_list': (context) => const CustomersListScreen(),
+          '/shop_owners_list':(context)=>const ShopOwnerListScreen(),
+          // ---------------------------------------------------------------
         },
         debugShowCheckedModeBanner: false,
       ),

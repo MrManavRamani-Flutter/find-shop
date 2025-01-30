@@ -89,7 +89,7 @@ class CustomerHomeScreen extends StatelessWidget {
         return InkWell(
           onTap: () {
             if (loggedInUser != null) {
-              Navigator.pushNamed(context, '/customer_profile');
+              Navigator.pushReplacementNamed(context, '/customer_profile');
             }
           },
           child: UserAccountsDrawerHeader(

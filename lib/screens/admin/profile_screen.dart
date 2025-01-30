@@ -1,11 +1,11 @@
 import 'package:find_shop/providers/user_provider.dart';
-import 'package:find_shop/screens/customer/update_profile_screen.dart';
+import 'package:find_shop/screens/admin/update_profile_screen.dart';
 import 'package:find_shop/utils/shared_preferences_helper.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-class CustomerProfileScreen extends StatelessWidget {
-  const CustomerProfileScreen({super.key});
+class AdminProfileScreen extends StatelessWidget {
+  const AdminProfileScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -29,15 +29,17 @@ class CustomerProfileScreen extends StatelessWidget {
       appBar: AppBar(
         leading: GestureDetector(
           onTap: () {
-            Navigator.pushReplacementNamed(context, '/customer_home');
+            Navigator.pushReplacementNamed(context, '/dashboard');
           },
           child: const Icon(
             Icons.arrow_back,
             color: Colors.white,
           ),
         ),
-
-        title: const Text('Profile',style: TextStyle(color: Colors.white),),
+        title: const Text(
+          'Profile',
+          style: TextStyle(color: Colors.white),
+        ),
         centerTitle: true,
         iconTheme: const IconThemeData(color: Colors.white),
         backgroundColor: Colors.blueAccent, // Blue accent color for app bar
@@ -132,8 +134,8 @@ class CustomerProfileScreen extends StatelessWidget {
                   },
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Colors.blueAccent, // Blue background color
-                    padding:
-                        const EdgeInsets.symmetric(horizontal: 40, vertical: 18),
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 40, vertical: 18),
                     shape: RoundedRectangleBorder(
                       borderRadius:
                           BorderRadius.circular(30), // Rounded button edges
@@ -160,10 +162,10 @@ class CustomerProfileScreen extends StatelessWidget {
                     SharedPreferencesHelper().clearUserData();
                     SharedPreferencesHelper().clearAuthToken();
                     SharedPreferencesHelper().clearLoginStatus();
-        
+
                     // Log out the user by updating the user provider
                     await userProvider.logOut();
-        
+
                     if (context.mounted) // Redirect to the login screen
                     {
                       Navigator.pushReplacementNamed(context, '/login');
@@ -171,8 +173,8 @@ class CustomerProfileScreen extends StatelessWidget {
                   },
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Colors.blueAccent, // Blue background color
-                    padding:
-                        const EdgeInsets.symmetric(horizontal: 40, vertical: 18),
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 40, vertical: 18),
                     shape: RoundedRectangleBorder(
                       borderRadius:
                           BorderRadius.circular(30), // Rounded button edges
