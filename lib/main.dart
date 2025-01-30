@@ -42,9 +42,9 @@ class MyApp extends StatelessWidget {
           primarySwatch: Colors.blue,
         ),
         // Navigate based on login status
-        initialRoute: isLoggedIn ? '/' : '/login',
+        initialRoute: isLoggedIn ? '/splash' : '/login',
         routes: {
-          '/': (context) => const SplashScreen(),
+          '/splash': (context) => const SplashScreen(),
           '/login': (context) => const LoginScreen(),
           '/register': (context) => const RegisterScreen(),
           '/customer_profile': (context) => const CustomerProfileScreen(),

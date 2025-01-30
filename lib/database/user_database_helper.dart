@@ -4,69 +4,97 @@ import '../models/user.dart';
 class UserDatabaseHelper {
   static const String tableName = 'users';
 
+  // Insert a new user into the database
   Future<int> insertUser(User user) async {
     final db = await AppDatabase().database;
-    return await db.insert(tableName, user.toMap());
+    try {
+      return await db.insert(tableName, user.toMap());
+    } catch (e) {
+      throw Exception('Error inserting user: $e');
+    }
   }
 
+  // Fetch all users from the database
   Future<List<User>> getUsers() async {
     final db = await AppDatabase().database;
-    final List<Map<String, dynamic>> maps = await db.query(tableName);
-    return List.generate(maps.length, (i) {
-      return User.fromMap(maps[i]);
-    });
+    try {
+      final List<Map<String, dynamic>> maps = await db.query(tableName);
+      return List.generate(maps.length, (i) {
+        return User.fromMap(maps[i]);
+      });
+    } catch (e) {
+      throw Exception('Error fetching users: $e');
+    }
   }
 
+  // Fetch a user by their ID
   Future<User?> getUserById(int userId) async {
     final db = await AppDatabase().database;
+    try {
+      final result = await db.query(
+        tableName,
+        where: 'user_id = ?',
+        whereArgs: [userId],
+      );
 
-    // Query the database to fetch the user with the specified userId
-    final result = await db.query(
-      tableName,
-      where: 'user_id = ?',
-      whereArgs: [userId],
-    );
-
-    // Check if a user was found
-    if (result.isNotEmpty) {
-      // If found, return the user by mapping the result to the User model
-      return User.fromMap(result.first);
-    } else {
-      // If no user found, return null
-      return null;
+      // If a user is found, return the user object
+      if (result.isNotEmpty) {
+        return User.fromMap(result.first);
+      } else {
+        return null; // Return null if user is not found
+      }
+    } catch (e) {
+      throw Exception('Error fetching user by ID: $e');
     }
   }
 
+  // Update an existing user in the database
   Future<int> updateUser(User user) async {
     final db = await AppDatabase().database;
-    return await db.update(
-      tableName,
-      user.toMap(),
-      where: 'user_id = ?',
-      whereArgs: [user.userId],
-    );
+    try {
+      return await db.update(
+        tableName,
+        user.toMap(),
+        where: 'user_id = ?',
+        whereArgs: [user.userId],
+      );
+    } catch (e) {
+      throw Exception('Error updating user: $e');
+    }
   }
 
+  // Delete a user by their ID
   Future<int> deleteUser(int userId) async {
     final db = await AppDatabase().database;
-    return await db.delete(
-      tableName,
-      where: 'user_id = ?',
-      whereArgs: [userId],
-    );
+    try {
+      return await db.delete(
+        tableName,
+        where: 'user_id = ?',
+        whereArgs: [userId],
+      );
+    } catch (e) {
+      throw Exception('Error deleting user: $e');
+    }
   }
 
+  // Fetch a user by their username
   Future<User?> getUserByUsername(String username) async {
     final db = await AppDatabase().database;
-    List<Map<String, dynamic>> result = await db.query(
-      tableName,
-      where: 'username = ?',
-      whereArgs: [username],
-    );
+    try {
+      final result = await db.query(
+        tableName,
+        where: 'username = ?',
+        whereArgs: [username],
+      );
 
-    if (result.isNotEmpty) {
-      return User.fromMap(result.first);
+      // If user is found, return the user object
+      if (result.isNotEmpty) {
+        return User.fromMap(result.first);
+      } else {
+        return null; // Return null if no user found
+      }
+    } catch (e) {
+      throw Exception('Error fetching user by username: $e');
     }
-    return null;
   }
 }

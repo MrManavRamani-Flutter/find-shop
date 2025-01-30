@@ -1,11 +1,11 @@
 class User {
   final int userId;
-  final String username;
-  final String email;
+  String username;
+  String email;
   final String password;
   final String contact;
   final int roleId;
-  final int status; 
+  final int status;
   final String createdAt;
 
   User({
@@ -30,6 +30,14 @@ class User {
       status: map['status'],
       createdAt: map['created_at'],
     );
+  }
+
+  void updateUsername(String newUsername) {
+    username = newUsername;
+  }
+
+  void updateEmail(String newEmail) {
+    email = newEmail;
   }
 
   Map<String, dynamic> toMap() {
