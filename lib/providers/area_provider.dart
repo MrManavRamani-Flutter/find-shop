@@ -38,7 +38,8 @@ class AreaProvider with ChangeNotifier {
   Future<void> fetchAreasByQuery(String query) async {
     final areasList = await AreaDatabaseHelper().getAreas(); // Fetch areas
     _areas = areasList
-        .where((area) => area.areaName.toLowerCase().contains(query.toLowerCase()))
+        .where(
+            (area) => area.areaName.toLowerCase().contains(query.toLowerCase()))
         .toList(); // Filter by query
     notifyListeners(); // Notify listeners after updating the list
   }

@@ -1,6 +1,8 @@
 import 'package:find_shop/database/app_database.dart';
 import 'package:find_shop/providers/area_provider.dart';
+import 'package:find_shop/providers/category_provider.dart';
 import 'package:find_shop/screens/admin/area/area_list_screen.dart';
+import 'package:find_shop/screens/admin/category/category_list_screen.dart';
 import 'package:find_shop/screens/admin/customer/customer_list_screen.dart';
 import 'package:find_shop/screens/admin/home_screen.dart';
 import 'package:find_shop/screens/admin/profile_screen.dart';
@@ -42,6 +44,7 @@ class MyApp extends StatelessWidget {
         ChangeNotifierProvider(create: (_) => UserProvider()),
         ChangeNotifierProvider(create: (_) => RoleProvider()),
         ChangeNotifierProvider(create: (_) => AreaProvider()),
+        ChangeNotifierProvider(create: (_) => CategoryProvider()),
       ],
       child: MaterialApp(
         title: 'Find Shop',
@@ -73,6 +76,7 @@ class MyApp extends StatelessWidget {
           '/customers_list': (context) => const CustomersListScreen(),
           '/shop_owners_list': (context) => const ShopOwnerListScreen(),
           '/areas_list': (context) => const AreaListScreen(),
+          '/categories_list': (context) => const CategoryListScreen(),
           // ---------------------------------------------------------------
         },
         debugShowCheckedModeBanner: false,

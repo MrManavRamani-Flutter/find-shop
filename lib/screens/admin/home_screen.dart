@@ -123,9 +123,14 @@ class AdminDashboardBody extends StatelessWidget {
             onTap: () => Navigator.pushNamed(context, '/shop_owners_list'),
           ),
           AdminDashboardCard(
-            title: 'City Areas',
+            title: 'Registered Areas',
             icon: Icons.location_on,
             onTap: () => Navigator.pushNamed(context, '/areas_list'),
+          ),
+          AdminDashboardCard(
+            title: 'Shop Category',
+            icon: Icons.category,
+            onTap: () => Navigator.pushNamed(context, '/categories_list'),
           ),
         ],
       ),

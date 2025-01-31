@@ -1,9 +1,18 @@
 class Category {
-  final int catId;
-  final String catName;
-  final String catDesc;
+  int? catId;
+  String catName;
+  String catDesc;
 
-  Category({required this.catId, required this.catName, required this.catDesc});
+  Category({this.catId, required this.catName, required this.catDesc});
+
+  // Setters
+  set setCatName(String name) {
+    catName = name;
+  }
+
+  set setCatDesc(String desc) {
+    catDesc = desc;
+  }
 
   factory Category.fromMap(Map<String, dynamic> map) {
     return Category(
