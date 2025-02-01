@@ -1,17 +1,17 @@
 class Shop {
-  final int shopId;
-  final String shopName;
-  final String address;
-  final String mapAddress;
-  final int areaId;
-  final int userId;
-  final String createdAt;
+  int? shopId;
+  String shopName;
+  String address;
+  String? mapAddress;
+  int areaId;
+  int userId;
+  String createdAt;
 
   Shop({
-    required this.shopId,
+    this.shopId,
     required this.shopName,
     required this.address,
-    required this.mapAddress,
+    this.mapAddress,
     required this.areaId,
     required this.userId,
     required this.createdAt,

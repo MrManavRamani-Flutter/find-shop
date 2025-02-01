@@ -1,10 +1,10 @@
 class ShopCategory {
-  final int shopCatId;
-  final int shopId;
-  final int catId;
+  int? shopCatId;
+  int shopId;
+  int catId;
 
   ShopCategory({
-    required this.shopCatId,
+    this.shopCatId,
     required this.shopId,
     required this.catId,
   });

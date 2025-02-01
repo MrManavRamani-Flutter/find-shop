@@ -63,6 +63,21 @@ class UserDatabaseHelper {
     }
   }
 
+  // Update the user's status in the database
+  Future<int> updateUserStatus(int userId, int status) async {
+    final db = await AppDatabase().database;
+    try {
+      return await db.update(
+        tableName,
+        {'status': status}, // Update only the status column
+        where: 'user_id = ?',
+        whereArgs: [userId],
+      );
+    } catch (e) {
+      throw Exception('Error updating user status: $e');
+    }
+  }
+
   // Delete a user by their ID
   Future<int> deleteUser(int userId) async {
     final db = await AppDatabase().database;

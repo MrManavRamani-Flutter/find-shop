@@ -1,6 +1,7 @@
 import 'package:find_shop/screens/admin/home_screen.dart';
 import 'package:find_shop/screens/customer/home_screen.dart';
 import 'package:find_shop/screens/shop_owner/home_screen.dart';
+import 'package:find_shop/screens/shop_owner/shop_setup_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:find_shop/screens/login_screen.dart';
 import 'package:find_shop/utils/shared_preferences_helper.dart';
@@ -43,11 +44,26 @@ class SplashScreenState extends State<SplashScreen> {
   }
 
   Widget _getHomeScreen(int roleId) {
+    if (roleId == 2) {
+      return FutureBuilder<int?>(
+        future: SharedPreferencesHelper().getUserStatus(),
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.done) {
+            int? userStatus = snapshot.data;
+            return userStatus == 0
+                ? const ShopSetupScreen()
+                : const ShopOwnerHomeScreen();
+          }
+          return const Scaffold(
+            body: Center(child: CircularProgressIndicator()),
+          );
+        },
+      );
+    }
+
     switch (roleId) {
       case 1: // Customer
         return const CustomerHomeScreen();
-      case 2: // Shop Owner
-        return const ShopOwnerHomeScreen();
       case 3: // Admin
         return const AdminHomeScreen();
       default:

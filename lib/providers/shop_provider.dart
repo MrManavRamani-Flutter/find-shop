@@ -13,9 +13,10 @@ class ShopProvider with ChangeNotifier {
     notifyListeners();
   }
 
-  Future<void> addShop(Shop shop) async {
-    await ShopDatabaseHelper().insertShop(shop);
+  Future<int> addShop(Shop shop) async {
+    final shopId = await ShopDatabaseHelper().insertShop(shop);
     await fetchShops();
+    return shopId;
   }
 
   Future<void> updateShop(Shop shop) async {

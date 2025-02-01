@@ -1,3 +1,4 @@
+import 'package:find_shop/database/user_database_helper.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class SharedPreferencesHelper {
@@ -28,6 +29,19 @@ class SharedPreferencesHelper {
     await prefs.setInt(_keyUserStatus, status);
   }
 
+  Future<void> updateUserStatus(int status) async {
+    final prefs = await SharedPreferences.getInstance();
+    int? userId = prefs.getInt('user_id');
+
+    if (userId != null) {
+      // Update status in database
+      await UserDatabaseHelper().updateUserStatus(userId, status);
+
+      // Update status in shared preferences
+      await prefs.setInt('user_status', status);
+    }
+  }
+
   // Save authentication token to SharedPreferences
   Future<void> saveAuthToken(String token) async {
     final prefs = await SharedPreferences.getInstance();
@@ -46,19 +60,43 @@ class SharedPreferencesHelper {
     return prefs.getInt(_keyUserId);
   }
 
-  // Check if the user is logged in by checking SharedPreferences
+  // Check if the user is logged in
   Future<bool> isLoggedIn() async {
     final prefs = await SharedPreferences.getInstance();
     return prefs.getBool(_keyLoggedIn) ?? false;
   }
 
-  // Get user role from SharedPreferences
+  // Get user role
   Future<int?> getUserRole() async {
     final prefs = await SharedPreferences.getInstance();
     return prefs.getInt(_keyRoleId);
   }
 
-  // Clear all user data from SharedPreferences
+  // Get user status
+  Future<int?> getUserStatus() async {
+    final prefs = await SharedPreferences.getInstance();
+    return prefs.getInt(_keyUserStatus);
+  }
+
+  // Get user username
+  Future<String?> getUsername() async {
+    final prefs = await SharedPreferences.getInstance();
+    return prefs.getString(_keyUsername);
+  }
+
+  // Get user email
+  Future<String?> getEmail() async {
+    final prefs = await SharedPreferences.getInstance();
+    return prefs.getString(_keyEmail);
+  }
+
+  // Get user password
+  Future<String?> getPassword() async {
+    final prefs = await SharedPreferences.getInstance();
+    return prefs.getString(_keyPassword);
+  }
+
+  // Clear all user data
   Future<void> clearUserData() async {
     final prefs = await SharedPreferences.getInstance();
     await prefs.remove(_keyUserId);
@@ -69,13 +107,13 @@ class SharedPreferencesHelper {
     await prefs.remove(_keyUserStatus);
   }
 
-  // Clear authentication token from SharedPreferences
+  // Clear authentication token
   Future<void> clearAuthToken() async {
     final prefs = await SharedPreferences.getInstance();
     await prefs.remove(_keyAuthToken);
   }
 
-  // Clear login status from SharedPreferences
+  // Clear login status
   Future<void> clearLoginStatus() async {
     final prefs = await SharedPreferences.getInstance();
     await prefs.remove(_keyLoggedIn);

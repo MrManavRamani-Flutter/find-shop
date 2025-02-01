@@ -16,6 +16,7 @@ class LoginScreenState extends State<LoginScreen> {
   final _passwordController = TextEditingController();
   final _formKey = GlobalKey<FormState>();
   bool _isLoading = false;
+  bool _isPasswordVisible = false;
 
   Future<void> _login() async {
     if (_formKey.currentState!.validate()) {
@@ -90,8 +91,8 @@ class LoginScreenState extends State<LoginScreen> {
                       Text(
                         'Welcome Back!',
                         style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                              fontWeight: FontWeight.bold,
-                            ),
+                          fontWeight: FontWeight.bold,
+                        ),
                       ),
                       const SizedBox(height: 20),
                       // Username Field
@@ -113,16 +114,28 @@ class LoginScreenState extends State<LoginScreen> {
                         },
                       ),
                       const SizedBox(height: 16),
-                      // Password Field
+                      // Password Field with Toggle
                       TextFormField(
                         controller: _passwordController,
-                        obscureText: true,
+                        obscureText: !_isPasswordVisible,
                         decoration: InputDecoration(
                           labelText: 'Password',
                           prefixIcon: const Icon(Icons.lock),
                           border: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(12),
                             borderSide: const BorderSide(color: Colors.grey),
+                          ),
+                          suffixIcon: IconButton(
+                            icon: Icon(
+                              _isPasswordVisible
+                                  ? Icons.visibility
+                                  : Icons.visibility_off,
+                            ),
+                            onPressed: () {
+                              setState(() {
+                                _isPasswordVisible = !_isPasswordVisible;
+                              });
+                            },
                           ),
                         ),
                         validator: (value) {
@@ -137,19 +150,19 @@ class LoginScreenState extends State<LoginScreen> {
                       _isLoading
                           ? const Center(child: CircularProgressIndicator())
                           : ElevatedButton(
-                              onPressed: _login,
-                              style: ElevatedButton.styleFrom(
-                                minimumSize: const Size(double.infinity, 50),
-                                backgroundColor: Theme.of(context).primaryColor,
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(12),
-                                ),
-                              ),
-                              child: const Text(
-                                'Login',
-                                style: TextStyle(color: Colors.white),
-                              ),
-                            ),
+                        onPressed: _login,
+                        style: ElevatedButton.styleFrom(
+                          minimumSize: const Size(double.infinity, 50),
+                          backgroundColor: Theme.of(context).primaryColor,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                        ),
+                        child: const Text(
+                          'Login',
+                          style: TextStyle(color: Colors.white),
+                        ),
+                      ),
                       const SizedBox(height: 20),
                       // Register Section
                       Row(
