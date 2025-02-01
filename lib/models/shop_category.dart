@@ -9,6 +9,19 @@ class ShopCategory {
     required this.catId,
   });
 
+  // Setters
+  set setShopCatId(int? id) {
+    shopCatId = id;
+  }
+
+  set setShopId(int id) {
+    shopId = id;
+  }
+
+  set setCatId(int id) {
+    catId = id;
+  }
+
   factory ShopCategory.fromMap(Map<String, dynamic> map) {
     return ShopCategory(
       shopCatId: map['shop_cat_id'],

@@ -1,3 +1,4 @@
+import 'package:find_shop/screens/admin/shop_owner/shop_owner_detail_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:find_shop/models/user.dart';
@@ -47,8 +48,7 @@ class ShopOwnerList extends StatelessWidget {
   Widget build(BuildContext context) {
     return Consumer<UserProvider>(
       builder: (context, userProvider, child) {
-        // Fetch live data from UserProvider
-        userProvider.fetchUsers(); // Fetch live data
+        userProvider.fetchUsers(); // Fetch latest data
 
         List<User> shopOwners = userProvider.users
             .where((user) => user.roleId == 2 && user.status == status)
@@ -67,13 +67,7 @@ class ShopOwnerList extends StatelessWidget {
           padding: const EdgeInsets.all(16.0),
           itemCount: shopOwners.length,
           itemBuilder: (context, index) {
-            var owner = shopOwners[index];
-            return ShopOwnerCard(
-              name: owner.username,
-              email: owner.email,
-              contact: owner.contact,
-              status: owner.status,
-            );
+            return ShopOwnerCard(owner: shopOwners[index]);
           },
         );
       },
@@ -82,18 +76,9 @@ class ShopOwnerList extends StatelessWidget {
 }
 
 class ShopOwnerCard extends StatelessWidget {
-  final String name;
-  final String email;
-  final String contact;
-  final int status;
+  final User owner;
 
-  const ShopOwnerCard({
-    super.key,
-    required this.name,
-    required this.email,
-    required this.contact,
-    required this.status,
-  });
+  const ShopOwnerCard({super.key, required this.owner});
 
   @override
   Widget build(BuildContext context) {
@@ -103,21 +88,32 @@ class ShopOwnerCard extends StatelessWidget {
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
       child: ListTile(
         leading: CircleAvatar(
-          backgroundColor: _getStatusColor(status).withOpacity(0.2),
+          backgroundColor: _getStatusColor(owner.status).withOpacity(0.2),
           child: Icon(
             Icons.storefront,
-            color: _getStatusColor(status),
+            color: _getStatusColor(owner.status),
           ),
         ),
         title: Text(
-          name,
+          owner.username,
           style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
         ),
-        subtitle: Text(email),
+        subtitle: Text(owner.email),
         trailing: Text(
-          contact,
+          owner.contact,
           style: const TextStyle(color: Colors.black54, fontSize: 14),
         ),
+        onTap: () {
+          if (owner.status == 3) {
+            // Navigate only for pending users
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => ShopOwnerDetailScreen(owner: owner),
+              ),
+            );
+          }
+        },
       ),
     );
   }

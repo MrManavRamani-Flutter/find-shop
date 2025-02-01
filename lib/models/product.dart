@@ -1,9 +1,9 @@
 class Product {
-  final int proId;
-  final String proName;
-  final String proDesc;
-  final double price;
-  final int shopId;
+  int proId;
+  String proName;
+  String proDesc;
+  double price;
+  int shopId;
 
   Product({
     required this.proId,
@@ -12,6 +12,27 @@ class Product {
     required this.price,
     required this.shopId,
   });
+
+  // Setters
+  set setProId(int id) {
+    proId = id;
+  }
+
+  set setProName(String name) {
+    proName = name;
+  }
+
+  set setProDesc(String desc) {
+    proDesc = desc;
+  }
+
+  set setPrice(double newPrice) {
+    price = newPrice;
+  }
+
+  set setShopId(int id) {
+    shopId = id;
+  }
 
   factory Product.fromMap(Map<String, dynamic> map) {
     return Product(

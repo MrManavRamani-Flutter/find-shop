@@ -13,6 +13,18 @@ class ShopProvider with ChangeNotifier {
     notifyListeners();
   }
 
+// Fetch a specific shop by userId
+  Shop getShopByUserId(int userId) {
+    return _shops.firstWhere(
+      (shop) => shop.userId == userId,
+      orElse: () => Shop(
+        shopId: -1,
+        shopName: 'No Shop Found',
+        userId: userId,
+      ),
+    );
+  }
+
   Future<int> addShop(Shop shop) async {
     final shopId = await ShopDatabaseHelper().insertShop(shop);
     await fetchShops();

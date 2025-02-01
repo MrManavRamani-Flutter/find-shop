@@ -1,21 +1,71 @@
 class Shop {
   int? shopId;
-  String shopName;
-  String address;
+  String? shopName;
+  String? address;
   String? mapAddress;
-  int areaId;
-  int userId;
-  String createdAt;
+  int? areaId;
+  int? userId;
+  String? createdAt;
 
   Shop({
     this.shopId,
-    required this.shopName,
-    required this.address,
+    this.shopName,
+    this.address,
     this.mapAddress,
-    required this.areaId,
-    required this.userId,
-    required this.createdAt,
+    this.areaId,
+    this.userId,
+    this.createdAt,
   });
+
+  // Setters
+  set setShopId(int? id) {
+    shopId = id;
+  }
+
+  set setShopName(String? name) {
+    shopName = name;
+  }
+
+  set setAddress(String? addr) {
+    address = addr;
+  }
+
+  set setMapAddress(String? mapAddr) {
+    mapAddress = mapAddr;
+  }
+
+  set setAreaId(int? area) {
+    areaId = area;
+  }
+
+  set setUserId(int? user) {
+    userId = user;
+  }
+
+  set setCreatedAt(String? created) {
+    createdAt = created;
+  }
+
+  // CopyWith method
+  Shop copyWith({
+    int? shopId,
+    String? shopName,
+    String? address,
+    String? mapAddress,
+    int? areaId,
+    int? userId,
+    String? createdAt,
+  }) {
+    return Shop(
+      shopId: shopId ?? this.shopId,
+      shopName: shopName ?? this.shopName,
+      address: address ?? this.address,
+      mapAddress: mapAddress ?? this.mapAddress,
+      areaId: areaId ?? this.areaId,
+      userId: userId ?? this.userId,
+      createdAt: createdAt ?? this.createdAt,
+    );
+  }
 
   factory Shop.fromMap(Map<String, dynamic> map) {
     return Shop(
