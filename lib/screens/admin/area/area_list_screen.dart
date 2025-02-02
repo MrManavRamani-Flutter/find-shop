@@ -19,6 +19,9 @@ class AreaListScreenState extends State<AreaListScreen> {
 
     return Scaffold(
       appBar: AppBar(
+        leading: InkWell(onTap: () {
+          Navigator.of(context).pushReplacementNamed('/dashboard');
+        }, child: const Icon(Icons.arrow_back)),
         title: const Text('Area List', style: TextStyle(color: Colors.white)),
         centerTitle: true,
         iconTheme: const IconThemeData(color: Colors.white),

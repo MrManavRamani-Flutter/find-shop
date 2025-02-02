@@ -19,6 +19,9 @@ class CategoryListScreenState extends State<CategoryListScreen> {
 
     return Scaffold(
       appBar: AppBar(
+        leading: InkWell(onTap: () {
+          Navigator.of(context).pushReplacementNamed('/dashboard');
+        }, child: const Icon(Icons.arrow_back)),
         title: const Text(
           'Category List', style: TextStyle(color: Colors.white)),
         centerTitle: true,

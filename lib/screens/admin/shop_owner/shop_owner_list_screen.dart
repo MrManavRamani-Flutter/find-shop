@@ -13,10 +13,18 @@ class ShopOwnerListScreen extends StatelessWidget {
       length: 4,
       child: Scaffold(
         appBar: AppBar(
-          title: const Text('Shop Owners'),
+          leading: InkWell(
+              onTap: () {
+                Navigator.of(context).pushReplacementNamed('/dashboard');
+              },
+              child: const Icon(Icons.arrow_back)),
+          centerTitle: true,
+          iconTheme: const IconThemeData(color: Colors.white),
+          backgroundColor: Colors.blueAccent,
+          title: const Text('Shop Owners',style: TextStyle(color: Colors.white),),
           bottom: const TabBar(
-            labelColor: Colors.black,
-            unselectedLabelColor: Colors.black45,
+            labelColor: Colors.white,
+            unselectedLabelColor: Colors.white54,
             indicatorColor: Colors.black,
             tabs: [
               Tab(text: "Pending"),

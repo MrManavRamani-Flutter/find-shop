@@ -19,7 +19,6 @@ class AdminHomeScreen extends StatelessWidget {
   }
 }
 
-// Drawer Widget
 class AdminDrawer extends StatelessWidget {
   final UserProvider userProvider;
 
@@ -29,11 +28,23 @@ class AdminDrawer extends StatelessWidget {
   Widget build(BuildContext context) {
     return Drawer(
       child: Column(
-        children: <Widget>[
+        children: [
           AdminDrawerHeader(userProvider: userProvider),
-          _buildDrawerItem(context, 'Profile', '/admin_profile'),
-          _buildDrawerItem(context, 'Settings', '/settings'),
-          const Spacer(),
+          Expanded(
+            child: ListView(
+              padding: EdgeInsets.zero,
+              children: [
+                _buildDrawerItem(context, 'Dashboard', '/dashboard'),
+                _buildDrawerItem(context, 'Customers', '/customers_list'),
+                _buildDrawerItem(context, 'Shop Owners', '/shop_owners_list'),
+                _buildDrawerItem(context, 'Registered Areas', '/areas_list'),
+                _buildDrawerItem(context, 'Shop Category', '/categories_list'),
+                _buildDrawerItem(context, 'Shop List', '/shop_list'),
+                _buildDrawerItem(context, 'Profile', '/admin_profile'),
+                _buildDrawerItem(context, 'Settings', '/settings'),
+              ],
+            ),
+          ),
           _buildLogoutButton(context, userProvider),
         ],
       ),
@@ -48,19 +59,22 @@ class AdminDrawer extends StatelessWidget {
   }
 
   Widget _buildLogoutButton(BuildContext context, UserProvider userProvider) {
-    return ListTile(
-      title: const Text('Logout', style: TextStyle(color: Colors.white)),
-      tileColor: Colors.red,
-      onTap: () async {
-        await SharedPreferencesHelper().clearUserData();
-        await SharedPreferencesHelper().clearAuthToken();
-        await SharedPreferencesHelper().clearLoginStatus();
-        await userProvider.logOut();
+    return Container(
+      width: double.infinity,
+      color: Colors.red,
+      child: ListTile(
+        title: const Text('Logout', style: TextStyle(color: Colors.white)),
+        onTap: () async {
+          await SharedPreferencesHelper().clearUserData();
+          await SharedPreferencesHelper().clearAuthToken();
+          await SharedPreferencesHelper().clearLoginStatus();
+          await userProvider.logOut();
 
-        if (context.mounted) {
-          Navigator.pushReplacementNamed(context, '/login');
-        }
-      },
+          if (context.mounted) {
+            Navigator.pushReplacementNamed(context, '/login');
+          }
+        },
+      ),
     );
   }
 }
@@ -119,7 +133,7 @@ class AdminDashboardBody extends StatelessWidget {
           ),
           AdminDashboardCard(
             title: 'Shop Owners',
-            icon: Icons.store,
+            icon: Icons.contact_mail_outlined,
             onTap: () => Navigator.pushNamed(context, '/shop_owners_list'),
           ),
           AdminDashboardCard(
@@ -131,6 +145,11 @@ class AdminDashboardBody extends StatelessWidget {
             title: 'Shop Category',
             icon: Icons.category,
             onTap: () => Navigator.pushNamed(context, '/categories_list'),
+          ),
+          AdminDashboardCard(
+            title: 'Shop List',
+            icon: Icons.storefront_rounded,
+            onTap: () => Navigator.pushNamed(context, '/shop_list'),
           ),
         ],
       ),

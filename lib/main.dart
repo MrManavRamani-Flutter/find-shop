@@ -8,6 +8,7 @@ import 'package:find_shop/screens/admin/category/category_list_screen.dart';
 import 'package:find_shop/screens/admin/customer/customer_list_screen.dart';
 import 'package:find_shop/screens/admin/home_screen.dart';
 import 'package:find_shop/screens/admin/profile_screen.dart';
+import 'package:find_shop/screens/admin/shop/shop_list_screen.dart';
 import 'package:find_shop/screens/admin/shop_owner/shop_owner_list_screen.dart';
 import 'package:find_shop/screens/customer/home_screen.dart';
 import 'package:find_shop/screens/customer/profile_screen.dart';
@@ -81,6 +82,7 @@ class MyApp extends StatelessWidget {
           '/shop_owners_list': (context) => const ShopOwnerListScreen(),
           '/areas_list': (context) => const AreaListScreen(),
           '/categories_list': (context) => const CategoryListScreen(),
+          '/shop_list': (context) => const ShopListScreen(),
           // ---------------------------------------------------------------
         },
         debugShowCheckedModeBanner: false,

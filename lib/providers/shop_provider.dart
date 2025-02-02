@@ -1,3 +1,4 @@
+import 'package:find_shop/database/user_database_helper.dart';
 import 'package:flutter/material.dart';
 import '../models/shop.dart';
 import '../database/shop_database_helper.dart';
@@ -10,6 +11,23 @@ class ShopProvider with ChangeNotifier {
   Future<void> fetchShops() async {
     final shopsList = await ShopDatabaseHelper().getShops();
     _shops = shopsList;
+    notifyListeners();
+  }
+
+  Future<void> fetchShopsByUserStatus() async {
+    final allShops = await ShopDatabaseHelper().getShops();
+    final allUsers = await UserDatabaseHelper().getUsers(); // Fetch all users
+
+    // Filter only users with roleId == 2 and status == 1
+    final validUserIds = allUsers
+        .where((user) => user.roleId == 2 && user.status == 1)
+        .map((user) => user.userId)
+        .toSet(); // Use a set for quick lookup
+
+    // Filter shops based on valid users
+    _shops =
+        allShops.where((shop) => validUserIds.contains(shop.userId)).toList();
+
     notifyListeners();
   }
 

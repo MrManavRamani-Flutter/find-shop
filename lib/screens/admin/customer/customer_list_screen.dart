@@ -30,7 +30,13 @@ class CustomersListScreenState extends State<CustomersListScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Customers List'),
+        leading: InkWell(onTap: () {
+        Navigator.of(context).pushReplacementNamed('/dashboard');
+      }, child: const Icon(Icons.arrow_back)),
+        centerTitle: true,
+        iconTheme: const IconThemeData(color: Colors.white),
+        backgroundColor: Colors.blueAccent,
+        title: const Text('Customers List',style: TextStyle(color: Colors.white),),
         actions: [
           IconButton(
             icon: const Icon(Icons.search),
