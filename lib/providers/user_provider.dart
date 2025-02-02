@@ -6,6 +6,7 @@ import '../utils/shared_preferences_helper.dart';
 class UserProvider with ChangeNotifier {
   List<User> _users = [];
   User? _loggedInUser;
+  User? _selectedUser;
 
   UserProvider() {
     fetchUsers();
@@ -15,6 +16,7 @@ class UserProvider with ChangeNotifier {
   List<User> get users => _users;
 
   User? get loggedInUser => _loggedInUser;
+  User? get selectedUser => _selectedUser;
 
   // Fetching all users from the database
   Future<void> fetchUsers() async {
@@ -22,6 +24,13 @@ class UserProvider with ChangeNotifier {
     _users = usersList;
     notifyListeners();
   }
+
+  // Fetch a specific user by their ID and store it in selectedUser
+  Future<void> fetchUserById(int userId) async {
+    _selectedUser = await UserDatabaseHelper().getUserById(userId);
+    notifyListeners();
+  }
+
 
   // Adding a new user
   Future<void> addUser(User user) async {
@@ -34,6 +43,22 @@ class UserProvider with ChangeNotifier {
     await UserDatabaseHelper().updateUser(user);
     await fetchUsers();
   }
+
+  // In UserProvider class
+  Future<void> updateUserStatus(int userId, int status) async {
+    try {
+      // Update user status in the database
+      await UserDatabaseHelper().updateUserStatus(userId, status);
+
+      // After updating the status, fetch the users again to reflect the changes
+      await fetchUsers();
+
+      notifyListeners(); // Notify listeners after updating the status
+    } catch (e) {
+      throw Exception('Error updating user status: $e');
+    }
+  }
+
 
   // Deleting a user by userId
   Future<void> deleteUser(int userId) async {
