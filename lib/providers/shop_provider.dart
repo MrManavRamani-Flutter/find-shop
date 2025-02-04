@@ -6,6 +6,7 @@ import '../database/shop_database_helper.dart';
 class ShopProvider with ChangeNotifier {
   List<Shop> _shops = [];
   Shop? shop;
+
   List<Shop> get shops => _shops;
 
   Future<void> fetchShops() async {
@@ -14,7 +15,7 @@ class ShopProvider with ChangeNotifier {
     notifyListeners();
   }
 
-  Future<void> fetchShopsByUserStatus() async {
+  Future<void> fetchShopsByUserStatus() async   {
     final allShops = await ShopDatabaseHelper().getShops();
     final allUsers = await UserDatabaseHelper().getUsers(); // Fetch all users
 
@@ -42,6 +43,7 @@ class ShopProvider with ChangeNotifier {
       ),
     );
   }
+
   Future<void> fetchShopByUserId(int userId) async {
     final fetchedShop = await ShopDatabaseHelper().getShopByUserID(userId);
     if (fetchedShop != null) {

@@ -10,8 +10,10 @@ import 'package:find_shop/screens/admin/home_screen.dart';
 import 'package:find_shop/screens/admin/profile_screen.dart';
 import 'package:find_shop/screens/admin/shop/shop_list_screen.dart';
 import 'package:find_shop/screens/admin/shop_owner/shop_owner_list_screen.dart';
+import 'package:find_shop/screens/customer/area_screens/area_list_screen.dart';
 import 'package:find_shop/screens/customer/home_screen.dart';
 import 'package:find_shop/screens/customer/profile_screen.dart';
+import 'package:find_shop/screens/customer/shops/shop_list_screen.dart';
 import 'package:find_shop/screens/register_screen.dart';
 import 'package:find_shop/screens/shop_owner/home_screen.dart';
 import 'package:find_shop/screens/shop_owner/profile_screen.dart';
@@ -68,6 +70,8 @@ class MyApp extends StatelessWidget {
           // Customer Screen --------
           '/customer_home': (context) => const CustomerHomeScreen(),
           '/customer_profile': (context) => const CustomerProfileScreen(),
+          '/customer_area_list': (context) => const CustomerAreaListScreen(),
+          '/customer_shop_list': (context) => const CustomerShopListScreen(),
           // ---------------------------------------------------------------
 
           // Shop Owner Screen -------
