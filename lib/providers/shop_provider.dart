@@ -5,7 +5,7 @@ import '../database/shop_database_helper.dart';
 
 class ShopProvider with ChangeNotifier {
   List<Shop> _shops = [];
-
+  Shop? shop;
   List<Shop> get shops => _shops;
 
   Future<void> fetchShops() async {
@@ -41,6 +41,13 @@ class ShopProvider with ChangeNotifier {
         userId: userId,
       ),
     );
+  }
+  Future<void> fetchShopByUserId(int userId) async {
+    final fetchedShop = await ShopDatabaseHelper().getShopByUserID(userId);
+    if (fetchedShop != null) {
+      shop = fetchedShop;
+      notifyListeners(); // Notify listeners when the shop data changes
+    }
   }
 
   Future<int> addShop(Shop shop) async {

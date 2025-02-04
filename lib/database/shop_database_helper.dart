@@ -17,6 +17,19 @@ class ShopDatabaseHelper {
     });
   }
 
+  Future<Shop?> getShopByUserID(int userId) async {
+    final db = await AppDatabase().database;
+    final List<Map<String, dynamic>> result =
+    await db.query(tableName, where: 'user_id = ?', whereArgs: [userId]);
+
+    if (result.isNotEmpty) {
+      return Shop.fromMap(result.first); // Convert first result to Shop object
+    } else {
+      return null; // Return null if no shop found
+    }
+  }
+
+
   Future<int> updateShop(Shop shop) async {
     final db = await AppDatabase().database;
     return await db.update(tableName, shop.toMap(), where: 'shop_id = ?', whereArgs: [shop.shopId]);

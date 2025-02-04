@@ -1,3 +1,4 @@
+import 'package:find_shop/screens/admin/shop/shop_detail_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:find_shop/providers/shop_provider.dart';
@@ -46,6 +47,14 @@ class ShopListScreen extends StatelessWidget {
                       elevation: 4,
                       margin: const EdgeInsets.all(20),
                       child: ListTile(
+                        onTap: () {
+                          Navigator.of(context).push(
+                            MaterialPageRoute(
+                              builder: (context) => ShopDetailScreen(
+                                  shopId: shop.shopId!, userId: shop.userId!),
+                            ),
+                          );
+                        },
                         contentPadding: const EdgeInsets.symmetric(
                             vertical: 10.0, horizontal: 16.0),
                         leading: const CircleAvatar(
@@ -68,18 +77,6 @@ class ShopListScreen extends StatelessWidget {
                             fontSize: 14.0,
                             color: Colors.black54,
                           ),
-                        ),
-                        trailing: ElevatedButton(
-                          onPressed: () {},
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: Colors.blueAccent,
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(8.0),
-                            ),
-                            padding: const EdgeInsets.symmetric(
-                                vertical: 8.0, horizontal: 16.0),
-                          ),
-                          child: const Text('View Details',style: TextStyle(color: Colors.white),),
                         ),
                       ),
                     );

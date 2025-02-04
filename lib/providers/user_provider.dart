@@ -16,6 +16,7 @@ class UserProvider with ChangeNotifier {
   List<User> get users => _users;
 
   User? get loggedInUser => _loggedInUser;
+
   User? get selectedUser => _selectedUser;
 
   // Fetching all users from the database
@@ -31,6 +32,10 @@ class UserProvider with ChangeNotifier {
     notifyListeners();
   }
 
+// Fetch a specific user by userId
+  User getUserByUserId(int userId) {
+    return _users.firstWhere((user) => user.userId == userId);
+  }
 
   // Adding a new user
   Future<void> addUser(User user) async {
@@ -58,7 +63,6 @@ class UserProvider with ChangeNotifier {
       throw Exception('Error updating user status: $e');
     }
   }
-
 
   // Deleting a user by userId
   Future<void> deleteUser(int userId) async {

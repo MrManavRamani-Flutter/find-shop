@@ -3,37 +3,54 @@ import 'package:find_shop/database/category_database_helper.dart';
 import 'package:find_shop/models/category.dart';
 
 class CategoryProvider with ChangeNotifier {
-  List<Category> _categories = [];
+  final List<Category> _categories = [];
 
-  // Constructor to fetch categories upon initialization
   CategoryProvider() {
-    fetchCategories();
+    Future.microtask(
+        () => fetchCategories()); // Async call in constructor safely
   }
 
   List<Category> get categories => _categories;
 
   // Fetch categories from the database
   Future<void> fetchCategories() async {
-    final categoriesList = await CategoryDatabaseHelper().getCategories();
-    _categories = categoriesList;
-    notifyListeners();
+    try {
+      final categoriesList = await CategoryDatabaseHelper().getCategories();
+      _categories.clear();
+      _categories.addAll(categoriesList);
+      notifyListeners();
+    } catch (error) {
+      debugPrint('Error fetching categories: $error');
+    }
   }
 
   // Add a new category
   Future<void> addCategory(Category category) async {
-    await CategoryDatabaseHelper().insertCategory(category);
-    await fetchCategories(); // Refresh the category list
+    try {
+      await CategoryDatabaseHelper().insertCategory(category);
+      await fetchCategories();
+    } catch (error) {
+      debugPrint('Error adding category: $error');
+    }
   }
 
   // Update an existing category
   Future<void> updateCategory(Category category) async {
-    await CategoryDatabaseHelper().updateCategory(category);
-    await fetchCategories(); // Refresh the category list
+    try {
+      await CategoryDatabaseHelper().updateCategory(category);
+      await fetchCategories();
+    } catch (error) {
+      debugPrint('Error updating category: $error');
+    }
   }
 
   // Delete a category
   Future<void> deleteCategory(int categoryId) async {
-    await CategoryDatabaseHelper().deleteCategory(categoryId);
-    await fetchCategories(); // Refresh the category list
+    try {
+      await CategoryDatabaseHelper().deleteCategory(categoryId);
+      await fetchCategories();
+    } catch (error) {
+      debugPrint('Error deleting category: $error');
+    }
   }
 }
