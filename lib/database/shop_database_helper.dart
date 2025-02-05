@@ -20,7 +20,7 @@ class ShopDatabaseHelper {
   Future<Shop?> getShopByUserID(int userId) async {
     final db = await AppDatabase().database;
     final List<Map<String, dynamic>> result =
-    await db.query(tableName, where: 'user_id = ?', whereArgs: [userId]);
+        await db.query(tableName, where: 'user_id = ?', whereArgs: [userId]);
 
     if (result.isNotEmpty) {
       return Shop.fromMap(result.first); // Convert first result to Shop object
@@ -29,14 +29,28 @@ class ShopDatabaseHelper {
     }
   }
 
+  Future<List<Shop>> getShopsByCategory(int categoryId) async {
+    final db = await AppDatabase().database;
+    final List<Map<String, dynamic>> results = await db.rawQuery('''
+      SELECT shops.* FROM shops
+      INNER JOIN shop_categories ON shops.shop_id = shop_categories.shop_id
+      WHERE shop_categories.cat_id = ?
+    ''', [categoryId]);
+
+    return List.generate(results.length, (i) {
+      return Shop.fromMap(results[i]);
+    });
+  }
 
   Future<int> updateShop(Shop shop) async {
     final db = await AppDatabase().database;
-    return await db.update(tableName, shop.toMap(), where: 'shop_id = ?', whereArgs: [shop.shopId]);
+    return await db.update(tableName, shop.toMap(),
+        where: 'shop_id = ?', whereArgs: [shop.shopId]);
   }
 
   Future<int> deleteShop(int shopId) async {
     final db = await AppDatabase().database;
-    return await db.delete(tableName, where: 'shop_id = ?', whereArgs: [shopId]);
+    return await db
+        .delete(tableName, where: 'shop_id = ?', whereArgs: [shopId]);
   }
 }

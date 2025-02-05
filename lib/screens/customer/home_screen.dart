@@ -1,3 +1,6 @@
+import 'package:find_shop/models/category.dart';
+import 'package:find_shop/providers/category_provider.dart';
+import 'package:find_shop/screens/customer/category_screens/customer_category_shop_list_screen.dart';
 import 'package:find_shop/screens/customer/shops/shop_detail_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -18,6 +21,7 @@ class CustomerHomeScreen extends StatefulWidget {
 
 class _CustomerHomeScreenState extends State<CustomerHomeScreen> {
   List<Shop> filteredShops = [];
+  List<Category> categories = [];
 
   @override
   void initState() {
@@ -26,14 +30,18 @@ class _CustomerHomeScreenState extends State<CustomerHomeScreen> {
   }
 
   void fetchShops() async {
+    final userLoginProvider = Provider.of<UserProvider>(context, listen: false);
     final shopProvider = Provider.of<ShopProvider>(context, listen: false);
     final userProvider = Provider.of<UserProvider>(context, listen: false);
-    // Login User data for use this...
-    final userLoginProvider = Provider.of<UserProvider>(context, listen: false);
+    final categoryProvider =
+        Provider.of<CategoryProvider>(context, listen: false);
+
     userLoginProvider.fetchLoggedInUser();
+
     await Future.wait([
       shopProvider.fetchShops(),
       userProvider.fetchUsers(),
+      categoryProvider.fetchCategories(),
     ]);
 
     setState(() {
@@ -41,6 +49,7 @@ class _CustomerHomeScreenState extends State<CustomerHomeScreen> {
         final User user = userProvider.getUserByUserId(shop.userId!);
         return user.status == 1 || user.status == 3;
       }).toList();
+      categories = categoryProvider.categories;
     });
   }
 
@@ -52,6 +61,9 @@ class _CustomerHomeScreenState extends State<CustomerHomeScreen> {
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
+          _buildSectionTitle('Categories', '/customer_category_list'),
+          _buildCategoryList(context),
+          const SizedBox(height: 10),
           _buildSectionTitle('Available Areas', '/customer_area_list'),
           _buildAreaList(context),
           const SizedBox(height: 10),
@@ -105,6 +117,39 @@ class _CustomerHomeScreenState extends State<CustomerHomeScreen> {
         itemCount: filteredShops.length,
         itemBuilder: (ctx, index) =>
             _buildShopCard(filteredShops[index], context),
+      ),
+    );
+  }
+
+  Widget _buildCategoryList(BuildContext context) {
+    return SizedBox(
+      height: 80,
+      child: ListView.builder(
+        scrollDirection: Axis.horizontal,
+        itemCount: categories.length,
+        itemBuilder: (context, index) {
+          final category = categories[index];
+          return Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 8.0),
+            child: InkWell(
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => CustomerCategoryShopListScreen(
+                      selectedCategory: category,
+                    ),
+                  ),
+                );
+              },
+              child: Chip(
+                label: Text(category.catName),
+                backgroundColor: Colors.blueAccent,
+                labelStyle: const TextStyle(color: Colors.white),
+              ),
+            ),
+          );
+        },
       ),
     );
   }
@@ -206,10 +251,12 @@ class _CustomerHomeScreenState extends State<CustomerHomeScreen> {
       child: Column(
         children: [
           _buildDrawerHeader(context),
+          _buildDrawerItem(Icons.category, 'Category List',
+              '/customer_category_list', context),
           _buildDrawerItem(
-              Icons.location_on, 'Area List', '/customer_area_list'),
-          _buildDrawerItem(
-              Icons.storefront_rounded, 'Shop List', '/customer_shop_list'),
+              Icons.location_on, 'Area List', '/customer_area_list', context),
+          _buildDrawerItem(Icons.storefront_rounded, 'Shop List',
+              '/customer_shop_list', context),
           const Spacer(),
           _buildLogoutItem(context),
         ],
@@ -236,7 +283,8 @@ class _CustomerHomeScreenState extends State<CustomerHomeScreen> {
   }
 
   // Drawer item UI
-  Widget _buildDrawerItem(IconData icon, String title, String route) {
+  Widget _buildDrawerItem(
+      IconData icon, String title, String route, BuildContext context) {
     return Card(
       elevation: 6,
       margin: const EdgeInsets.all(10),
@@ -244,7 +292,9 @@ class _CustomerHomeScreenState extends State<CustomerHomeScreen> {
         leading: Icon(icon, color: Colors.blue),
         title: Text(title),
         onTap: () {
-          Navigator.pushNamed(context, route);
+          Navigator.pushNamed(context, route).then(
+            (value) => Navigator.pop(context),
+          );
         },
       ),
     );

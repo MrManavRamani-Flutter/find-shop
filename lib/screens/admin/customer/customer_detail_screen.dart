@@ -28,7 +28,8 @@ class CustomerDetailScreenState extends State<CustomerDetailScreen> {
     _showStatusChangeDialog(context, userProvider);
   }
 
-  void _showStatusChangeDialog(BuildContext context, UserProvider userProvider) {
+  void _showStatusChangeDialog(
+      BuildContext context, UserProvider userProvider) {
     showDialog(
       context: context,
       builder: (BuildContext context) {
@@ -59,13 +60,13 @@ class CustomerDetailScreenState extends State<CustomerDetailScreen> {
                     _user = _user.copyWith(status: newStatus);
                   });
 
-                  Navigator.of(context).pop();  // Close dialog after processing
+                  Navigator.of(context).pop();
                 } catch (e) {
                   // Handle any errors during the status update
                   ScaffoldMessenger.of(context).showSnackBar(
                     SnackBar(content: Text('Error updating status: $e')),
                   );
-                  Navigator.of(context).pop();  // Close dialog even if an error occurs
+                  Navigator.of(context).pop();
                 }
               },
               child: const Text('Confirm'),
@@ -80,7 +81,8 @@ class CustomerDetailScreenState extends State<CustomerDetailScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Customer Details', style: TextStyle(color: Colors.white)),
+        title: const Text('Customer Details',
+            style: TextStyle(color: Colors.white)),
         backgroundColor: Colors.blueAccent,
         centerTitle: true,
         iconTheme: const IconThemeData(color: Colors.white),
@@ -99,7 +101,8 @@ class CustomerDetailScreenState extends State<CustomerDetailScreen> {
             const SizedBox(height: 12),
             Card(
               elevation: 4,
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+              shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12)),
               child: Padding(
                 padding: const EdgeInsets.all(20.0),
                 child: Column(
@@ -108,19 +111,24 @@ class CustomerDetailScreenState extends State<CustomerDetailScreen> {
                     _buildDetailRow(Icons.person, "Username", _user.username),
                     _buildDetailRow(Icons.email, "Email", _user.email),
                     _buildDetailRow(Icons.phone, "Contact", _user.contact),
-                    _buildDetailRow(Icons.badge, "Role ID", _user.roleId.toString()),
+                    _buildDetailRow(
+                        Icons.badge, "Role ID", _user.roleId.toString()),
                     const SizedBox(height: 12),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.start,
                       children: [
-                        Icon(Icons.verified, color: _user.status == 1 ? Colors.green : Colors.red),
+                        Icon(Icons.verified,
+                            color:
+                                _user.status == 1 ? Colors.green : Colors.red),
                         const SizedBox(width: 8),
                         Text(
                           _user.status == 1 ? "Active" : "Blocked",
                           style: TextStyle(
                             fontSize: 16,
                             fontWeight: FontWeight.bold,
-                            color: _user.status == 1 ? Colors.green[700] : Colors.red[700],
+                            color: _user.status == 1
+                                ? Colors.green[700]
+                                : Colors.red[700],
                           ),
                         ),
                       ],
@@ -135,13 +143,18 @@ class CustomerDetailScreenState extends State<CustomerDetailScreen> {
               child: ElevatedButton(
                 onPressed: _toggleBlockStatus,
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: _user.status == 1 ? Colors.red : Colors.green,
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                  backgroundColor:
+                      _user.status == 1 ? Colors.red : Colors.green,
+                  shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12)),
                   padding: const EdgeInsets.symmetric(vertical: 14),
                 ),
                 child: Text(
                   _user.status == 1 ? "Block User" : "Unblock User",
-                  style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.white),
+                  style: const TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.white),
                 ),
               ),
             ),

@@ -12,7 +12,13 @@ class AdminHomeScreen extends StatelessWidget {
     userProvider.fetchLoggedInUser();
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Welcome to Find Shop')),
+      appBar: AppBar(
+        title: const Text('Welcome to Find Shop',
+            style: TextStyle(color: Colors.white)),
+        centerTitle: true,
+        iconTheme: const IconThemeData(color: Colors.white),
+        backgroundColor: Colors.blueAccent,
+        ),
       drawer: AdminDrawer(userProvider: userProvider),
       body: const AdminDashboardBody(),
     );
