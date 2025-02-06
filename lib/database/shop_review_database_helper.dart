@@ -9,6 +9,19 @@ class ShopReviewDatabaseHelper {
     return await db.insert(tableName, shopReview.toMap());
   }
 
+  // Modify the method to filter reviews based on shopId
+  Future<List<ShopReview>> getShopReviewsByShopId(int shopId) async {
+    final db = await AppDatabase().database;
+    final List<Map<String, dynamic>> maps = await db.query(
+      tableName,
+      where: 'shop_id = ?',
+      whereArgs: [shopId],
+    );
+    return List.generate(maps.length, (i) {
+      return ShopReview.fromMap(maps[i]);
+    });
+  }
+
   Future<List<ShopReview>> getShopReviews() async {
     final db = await AppDatabase().database;
     final List<Map<String, dynamic>> maps = await db.query(tableName);

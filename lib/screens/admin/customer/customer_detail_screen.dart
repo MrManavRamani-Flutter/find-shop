@@ -59,14 +59,17 @@ class CustomerDetailScreenState extends State<CustomerDetailScreen> {
                   setState(() {
                     _user = _user.copyWith(status: newStatus);
                   });
-
-                  Navigator.of(context).pop();
+                  if (context.mounted) {
+                    Navigator.of(context).pop();
+                  }
                 } catch (e) {
-                  // Handle any errors during the status update
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(content: Text('Error updating status: $e')),
-                  );
-                  Navigator.of(context).pop();
+                  if (context.mounted) {
+                    // Handle any errors during the status update
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(content: Text('Error updating status: $e')),
+                    );
+                    Navigator.of(context).pop();
+                  }
                 }
               },
               child: const Text('Confirm'),

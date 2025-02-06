@@ -305,9 +305,15 @@ class _CustomerHomeScreenState extends State<CustomerHomeScreen> {
         leading: Icon(icon, color: Colors.blue),
         title: Text(title),
         onTap: () {
-          Navigator.pushNamed(context, route).then(
-            (value) => Navigator.pop(context),
-          );
+          if (mounted) {
+            Navigator.pushNamed(context, route).then(
+              (value) {
+                if (context.mounted) {
+                  Navigator.pop(context);
+                }
+              },
+            );
+          }
         },
       ),
     );
@@ -330,7 +336,9 @@ class _CustomerHomeScreenState extends State<CustomerHomeScreen> {
         await SharedPreferencesHelper().clearUserData();
         await SharedPreferencesHelper().clearAuthToken();
         await SharedPreferencesHelper().clearLoginStatus();
-        await Provider.of<UserProvider>(context, listen: false).logOut();
+        if (context.mounted) {
+          await Provider.of<UserProvider>(context, listen: false).logOut();
+        }
         if (context.mounted) {
           Navigator.pushReplacementNamed(context, '/login');
         }

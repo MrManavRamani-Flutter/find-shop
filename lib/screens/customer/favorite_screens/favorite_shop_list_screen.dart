@@ -46,22 +46,22 @@ class _CustomerFavoriteShopListScreenState
     final allShops = shopProvider.shops;
 
     _favoriteShopList = allShops
-        .where((shop) =>
-        favoriteShops.any((fav) => fav.shopId == shop.shopId))
+        .where((shop) => favoriteShops.any((fav) => fav.shopId == shop.shopId))
         .toList();
 
     if (_isLoading) {
       return const Center(child: CircularProgressIndicator());
     }
+    // this code not proper design.....*
 
-    if (_favoriteShopList.isEmpty) {
-      return const Center(
-        child: Text(
-          'No favorite shops yet',
-          style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
-        ),
-      );
-    }
+    // if (_favoriteShopList.isEmpty) {
+    //   return const Center(
+    //     child: Text(
+    //       'No favorite shops yet',
+    //       style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
+    //     ),
+    //   );
+    // }
 
     return Scaffold(
       appBar: AppBar(
@@ -73,51 +73,61 @@ class _CustomerFavoriteShopListScreenState
         iconTheme: const IconThemeData(color: Colors.white),
         backgroundColor: Colors.blueAccent,
       ),
-      body: ListView.builder(
-        padding: const EdgeInsets.all(16),
-        itemCount: _favoriteShopList.length,
-        itemBuilder: (context, index) {
-          final shop = _favoriteShopList[index];
+      body: _favoriteShopList.isEmpty
+          ? const Center(
+              child: Text(
+                'No favorite shops yet',
+                style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
+              ),
+            )
+          : ListView.builder(
+              padding: const EdgeInsets.all(16),
+              itemCount: _favoriteShopList.length,
+              itemBuilder: (context, index) {
+                final shop = _favoriteShopList[index];
 
-          return Card(
-            elevation: 2,
-            margin: const EdgeInsets.symmetric(vertical: 8),
-            child: ListTile(
-              leading: const Icon(Icons.storefront_rounded,
-                  color: Colors.blueAccent),
-              title: Text(
-                shop.shopName ?? 'No Name',
-                style: const TextStyle(
-                    fontSize: 16, fontWeight: FontWeight.w500),
-              ),
-              subtitle: Text(shop.address ?? 'No Address available'),
-              trailing: IconButton(
-                icon: const Icon(Icons.favorite, color: Colors.red),
-                onPressed: () async {
-                  await favoriteShopProvider.toggleFavoriteShop(shop.shopId!);
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(
-                      content: Text('Removed from favorites'),
-                      duration: Duration(seconds: 2),
+                return Card(
+                  elevation: 2,
+                  margin: const EdgeInsets.symmetric(vertical: 8),
+                  child: ListTile(
+                    leading: const Icon(Icons.storefront_rounded,
+                        color: Colors.blueAccent),
+                    title: Text(
+                      shop.shopName ?? 'No Name',
+                      style: const TextStyle(
+                          fontSize: 16, fontWeight: FontWeight.w500),
                     ),
-                  );
-                },
-              ),
-              onTap: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => CustomerShopDetailScreen(
-                      shopId: shop.shopId!,
-                      shopUserId: shop.userId!,
+                    subtitle: Text(shop.address ?? 'No Address available'),
+                    trailing: IconButton(
+                      icon: const Icon(Icons.favorite, color: Colors.red),
+                      onPressed: () async {
+                        await favoriteShopProvider
+                            .toggleFavoriteShop(shop.shopId!);
+                        if (context.mounted) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(
+                              content: Text('Removed from favorites'),
+                              duration: Duration(seconds: 2),
+                            ),
+                          );
+                        }
+                      },
                     ),
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => CustomerShopDetailScreen(
+                            shopId: shop.shopId!,
+                            shopUserId: shop.userId!,
+                          ),
+                        ),
+                      );
+                    },
                   ),
                 );
               },
             ),
-          );
-        },
-      ),
     );
   }
 }

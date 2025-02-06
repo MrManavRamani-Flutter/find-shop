@@ -130,20 +130,21 @@ class ShopOwnerDetailScreen extends StatelessWidget {
   }
 
   // Method to update user status (Approve or Reject)
-  void _updateUserStatus(BuildContext context, UserProvider userProvider,
-      int newStatus) async {
+  void _updateUserStatus(
+      BuildContext context, UserProvider userProvider, int newStatus) async {
     final updatedOwner =
-    owner.copyWith(status: newStatus); // Create a copy with updated status
+        owner.copyWith(status: newStatus); // Create a copy with updated status
 
     await userProvider
         .updateUser(updatedOwner); // Update user status in the database
-
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(
-          newStatus == 1 ? 'User approved!' : 'User rejected!',
+    if (context.mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            newStatus == 1 ? 'User approved!' : 'User rejected!',
+          ),
         ),
-      ),
-    );
+      );
+    }
   }
 }

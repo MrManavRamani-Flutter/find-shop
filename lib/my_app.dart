@@ -3,6 +3,7 @@ import 'package:find_shop/providers/category_provider.dart';
 import 'package:find_shop/providers/favorite_shop_provider.dart';
 import 'package:find_shop/providers/shop_category_provider.dart';
 import 'package:find_shop/providers/shop_provider.dart';
+import 'package:find_shop/providers/shop_review_provider.dart';
 import 'package:find_shop/screens/admin/area/area_list_screen.dart';
 import 'package:find_shop/screens/admin/category/category_list_screen.dart';
 import 'package:find_shop/screens/admin/customer/customer_list_screen.dart';
@@ -15,6 +16,7 @@ import 'package:find_shop/screens/customer/category_screens/category_list_screen
 import 'package:find_shop/screens/customer/favorite_screens/favorite_shop_list_screen.dart';
 import 'package:find_shop/screens/customer/home_screen.dart';
 import 'package:find_shop/screens/customer/profile_screen.dart';
+import 'package:find_shop/screens/customer/review_screen/add_review_screen.dart';
 import 'package:find_shop/screens/customer/shops/shop_list_screen.dart';
 import 'package:find_shop/screens/register_screen.dart';
 import 'package:find_shop/screens/shop_owner/home_screen.dart';
@@ -42,6 +44,7 @@ class MyApp extends StatelessWidget {
         ChangeNotifierProvider(create: (_) => CategoryProvider()),
         ChangeNotifierProvider(create: (_) => ShopCategoryProvider()),
         ChangeNotifierProvider(create: (_) => FavoriteShopProvider()),
+        ChangeNotifierProvider(create: (_) => ShopReviewProvider()),
       ],
       child: MaterialApp(
         title: 'Find Shop',
@@ -66,6 +69,8 @@ class MyApp extends StatelessWidget {
           '/customer_shop_list': (context) => const CustomerShopListScreen(),
           '/customer_favorite_list': (context) =>
               const CustomerFavoriteShopListScreen(),
+          '/customer_add_review': (context) => CustomerAddReviewScreen(
+              shopId: ModalRoute.of(context)!.settings.arguments as int),
           // ---------------------------------------------------------------
 
           // Shop Owner Screen -------

@@ -60,21 +60,24 @@ class ShopSetupScreenState extends State<ShopSetupScreen> {
     final shopProvider = Provider.of<ShopProvider>(context, listen: false);
     int shopId = await shopProvider.addShop(newShop);
 
-    final shopCategoryProvider =
-        Provider.of<ShopCategoryProvider>(context, listen: false);
-    await shopCategoryProvider.addShopCategory(
-      ShopCategory(shopId: shopId, catId: _selectedCategoryId!),
-    );
-
+    if (mounted) {
+      final shopCategoryProvider =
+          Provider.of<ShopCategoryProvider>(context, listen: false);
+      await shopCategoryProvider.addShopCategory(
+        ShopCategory(shopId: shopId, catId: _selectedCategoryId!),
+      );
+    }
     await SharedPreferencesHelper().updateUserStatus(3);
 
     setState(() => _isLoading = false);
-
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('Shop added successfully!')),
-    );
-
-    Navigator.pushReplacementNamed(context, '/shop_home');
+    if (mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Shop added successfully!')),
+      );
+    }
+    if (mounted) {
+      Navigator.pushReplacementNamed(context, '/shop_home');
+    }
   }
 
   @override

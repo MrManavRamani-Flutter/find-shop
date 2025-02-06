@@ -157,8 +157,10 @@ class _CustomerShopListScreenState extends State<CustomerShopListScreen> {
                 final message = isFavorite
                     ? 'Removed from favorites'
                     : 'Added to favorites';
-                ScaffoldMessenger.of(context)
-                    .showSnackBar(SnackBar(content: Text(message)));
+                if (context.mounted) {
+                  ScaffoldMessenger.of(context)
+                      .showSnackBar(SnackBar(content: Text(message)));
+                }
               },
             ),
             subtitle: Text(shop.address ?? 'No Address available'),

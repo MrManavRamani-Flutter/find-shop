@@ -1,5 +1,5 @@
 class ShopReview {
-  final int revId;
+  int? revId;
   final String comment;
   final double rating;
   final int shopId;
@@ -7,7 +7,7 @@ class ShopReview {
   final String reviewDate;
 
   ShopReview({
-    required this.revId,
+    this.revId,
     required this.comment,
     required this.rating,
     required this.shopId,
