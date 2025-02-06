@@ -1,12 +1,12 @@
-import 'package:find_shop/providers/favorite_shop_provider.dart';
-import 'package:find_shop/screens/customer/shops/shop_detail_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:find_shop/providers/favorite_shop_provider.dart';
 import 'package:find_shop/providers/shop_provider.dart';
 import 'package:find_shop/providers/user_provider.dart';
 import 'package:find_shop/models/area.dart';
 import 'package:find_shop/models/shop.dart';
 import 'package:find_shop/models/user.dart';
+import 'package:find_shop/screens/customer/shops/shop_detail_screen.dart';
 
 class AreaWiseShopListScreen extends StatefulWidget {
   final Area area;
@@ -14,47 +14,55 @@ class AreaWiseShopListScreen extends StatefulWidget {
   const AreaWiseShopListScreen({super.key, required this.area});
 
   @override
-  AreaWiseShopListScreenState createState() => AreaWiseShopListScreenState();
+  State<AreaWiseShopListScreen> createState() => _AreaWiseShopListScreenState();
 }
 
-class AreaWiseShopListScreenState extends State<AreaWiseShopListScreen> {
+class _AreaWiseShopListScreenState extends State<AreaWiseShopListScreen> {
   final TextEditingController _searchController = TextEditingController();
   List<Shop> filteredShops = [];
-  late FavoriteShopProvider _favoriteShopProvider;
+  int? loggedInUserId;
 
   @override
   void initState() {
     super.initState();
-    _fetchShops();
-    _favoriteShopProvider =
-        Provider.of<FavoriteShopProvider>(context, listen: false);
+    _fetchData();
     _searchController.addListener(() {
       _filterShops(_searchController.text);
     });
   }
 
-  void _fetchShops() async {
+  void _fetchData() async {
     final shopProvider = Provider.of<ShopProvider>(context, listen: false);
     final userProvider = Provider.of<UserProvider>(context, listen: false);
+    final favoriteShopProvider = Provider.of<FavoriteShopProvider>(context, listen: false);
 
     await Future.wait([
       shopProvider.fetchShops(),
       userProvider.fetchUsers(),
+      favoriteShopProvider.fetchFavoriteShopsByUserId(),
     ]);
+
+    setState(() {
+      loggedInUserId = userProvider.loggedInUser?.userId;
+      _updateFilteredShops();
+    });
+  }
+
+  void _updateFilteredShops() {
+    final shopProvider = Provider.of<ShopProvider>(context, listen: false);
+    final userProvider = Provider.of<UserProvider>(context, listen: false);
 
     setState(() {
       filteredShops = shopProvider.shops.where((shop) {
         final User user = userProvider.getUserByUserId(shop.userId!);
-        return shop.areaId == widget.area.areaId &&
-            (user.status == 1 || user.status == 3);
+        return shop.areaId == widget.area.areaId && (user.status == 1 || user.status == 3);
       }).toList();
     });
   }
 
-  // Check if the shop is in the favorites list
   bool isShopFavorite(int shopId) {
-    return _favoriteShopProvider.favoriteShops
-        .any((favorite) => favorite.shopId == shopId);
+    final favoriteShopProvider = Provider.of<FavoriteShopProvider>(context, listen: false);
+    return favoriteShopProvider.favoriteShops.any((favorite) => favorite.shopId == shopId);
   }
 
   void _filterShops(String query) {
@@ -64,8 +72,7 @@ class AreaWiseShopListScreenState extends State<AreaWiseShopListScreen> {
     setState(() {
       filteredShops = shopProvider.shops.where((shop) {
         final User user = userProvider.getUserByUserId(shop.userId!);
-        return shop.areaId == widget.area.areaId &&
-            (user.status == 1 || user.status == 3) &&
+        return shop.areaId == widget.area.areaId && (user.status == 1 || user.status == 3) &&
             shop.shopName!.toLowerCase().contains(query.toLowerCase());
       }).toList();
     });
@@ -87,9 +94,9 @@ class AreaWiseShopListScreenState extends State<AreaWiseShopListScreen> {
           prefixIcon: const Icon(Icons.search, color: Colors.blueAccent),
           suffixIcon: _searchController.text.isNotEmpty
               ? IconButton(
-                  icon: const Icon(Icons.clear, color: Colors.grey),
-                  onPressed: () => _searchController.clear(),
-                )
+            icon: const Icon(Icons.clear, color: Colors.grey),
+            onPressed: () => _searchController.clear(),
+          )
               : null,
           border: OutlineInputBorder(
             borderRadius: BorderRadius.circular(12.0),
@@ -107,8 +114,7 @@ class AreaWiseShopListScreenState extends State<AreaWiseShopListScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(widget.area.areaName,
-            style: const TextStyle(color: Colors.white)),
+        title: Text(widget.area.areaName, style: const TextStyle(color: Colors.white)),
         centerTitle: true,
         iconTheme: const IconThemeData(color: Colors.white),
         backgroundColor: Colors.blueAccent,
@@ -120,58 +126,54 @@ class AreaWiseShopListScreenState extends State<AreaWiseShopListScreen> {
             child: filteredShops.isEmpty
                 ? const Center(child: Text("No shops found"))
                 : ListView.builder(
-                    itemCount: filteredShops.length,
-                    itemBuilder: (context, index) {
-                      final shop = filteredShops[index];
-                      bool isFavorite = isShopFavorite(shop.shopId!);
-                      return Card(
-                        elevation: 4,
-                        margin: const EdgeInsets.all(10),
-                        child: ListTile(
-                          leading: const Icon(Icons.storefront_rounded,
-                              color: Colors.blue),
-                          title: Text(shop.shopName ?? 'Unknown Shop'),
-                          subtitle: Text(shop.address ?? 'No Address'),
-                          trailing: IconButton(
-                            icon: Icon(
-                              isFavorite
-                                  ? Icons.favorite
-                                  : Icons.favorite_border_outlined,
-                              color: isFavorite
-                                  ? Colors.red
-                                  : Colors
-                                      .black, // Update color based on favorite status
-                            ),
-                            onPressed: () async {
-                              // Toggle the favorite status of the shop
-                              await _favoriteShopProvider
-                                  .toggleFavoriteShop(shop.shopId!);
+              itemCount: filteredShops.length,
+              itemBuilder: (context, index) {
+                final shop = filteredShops[index];
+                bool isFavorite = isShopFavorite(shop.shopId!);
 
-                              // Fetch the updated favorite list
-                              setState(() {});
+                return Card(
+                  elevation: 4,
+                  margin: const EdgeInsets.all(10),
+                  child: ListTile(
+                    leading: const Icon(Icons.storefront_rounded, color: Colors.blue),
+                    title: Text(shop.shopName ?? 'Unknown Shop'),
+                    subtitle: Text(shop.address ?? 'No Address'),
+                    trailing: IconButton(
+                      icon: Icon(
+                        isFavorite ? Icons.favorite : Icons.favorite_border_outlined,
+                        color: isFavorite ? Colors.red : Colors.black,
+                      ),
+                      onPressed: () async {
+                        final favoriteShopProvider =
+                        Provider.of<FavoriteShopProvider>(context, listen: false);
+                        await favoriteShopProvider.toggleFavoriteShop(shop.shopId!);
+                        setState(() {});
 
-                              // Show snack bar message
-                              final message = isFavorite
-                                  ? 'Removed from favorites'
-                                  : 'Added to favorites';
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                  SnackBar(content: Text(message)));
-                            },
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            content: Text(isFavorite
+                                ? 'Removed from favorites'
+                                : 'Added to favorites'),
+                            duration: const Duration(seconds: 2),
                           ),
-                          onTap: () {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) => CustomerShopDetailScreen(
-                                    shopId: shop.shopId!,
-                                    shopUserId: shop.userId!),
-                              ),
-                            );
-                          },
+                        );
+                      },
+                    ),
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => CustomerShopDetailScreen(
+                            shopId: shop.shopId!,
+                            shopUserId: shop.userId!,
+                          ),
                         ),
                       );
                     },
                   ),
+                );
+              },
+            ),
           ),
         ],
       ),

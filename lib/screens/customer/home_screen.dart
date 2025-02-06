@@ -26,10 +26,10 @@ class _CustomerHomeScreenState extends State<CustomerHomeScreen> {
   @override
   void initState() {
     super.initState();
-    fetchShops();
+    fetchAllData();
   }
 
-  void fetchShops() async {
+  void fetchAllData() async {
     final userLoginProvider = Provider.of<UserProvider>(context, listen: false);
     final shopProvider = Provider.of<ShopProvider>(context, listen: false);
     final userProvider = Provider.of<UserProvider>(context, listen: false);
@@ -233,10 +233,14 @@ class _CustomerHomeScreenState extends State<CustomerHomeScreen> {
               children: [
                 const Icon(Icons.location_on, color: Colors.blue, size: 32),
                 const SizedBox(height: 8),
-                Text(area.areaName,
-                    textAlign: TextAlign.center,
-                    style: const TextStyle(
-                        fontSize: 16, fontWeight: FontWeight.bold)),
+                Text(
+                  area.areaName,
+                  textAlign: TextAlign.center,
+                  style: const TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
               ],
             ),
           ),
@@ -251,12 +255,14 @@ class _CustomerHomeScreenState extends State<CustomerHomeScreen> {
       child: Column(
         children: [
           _buildDrawerHeader(context),
+          _buildDrawerItem(Icons.storefront_rounded, 'Shop List',
+              '/customer_shop_list', context),
           _buildDrawerItem(Icons.category, 'Category List',
               '/customer_category_list', context),
           _buildDrawerItem(
               Icons.location_on, 'Area List', '/customer_area_list', context),
-          _buildDrawerItem(Icons.storefront_rounded, 'Shop List',
-              '/customer_shop_list', context),
+          _buildDrawerItem(
+              Icons.favorite, 'Favorite', '/customer_favorite_list', context),
           _buildDrawerItem(
               Icons.account_box, 'Profile', '/customer_profile', context),
           const Spacer(),

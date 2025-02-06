@@ -15,7 +15,7 @@ class ShopProvider with ChangeNotifier {
     notifyListeners();
   }
 
-  Future<void> fetchShopsByUserStatus() async   {
+  Future<void> fetchShopsByUserStatus() async {
     final allShops = await ShopDatabaseHelper().getShops();
     final allUsers = await UserDatabaseHelper().getUsers(); // Fetch all users
 
