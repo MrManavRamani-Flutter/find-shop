@@ -1,3 +1,4 @@
+import 'package:find_shop/providers/favorite_shop_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:find_shop/providers/shop_provider.dart';
@@ -12,10 +13,10 @@ import 'package:find_shop/models/area.dart';
 
 class CustomerShopDetailScreen extends StatefulWidget {
   final int shopId;
-  final int userId;
+  final int shopUserId;
 
   const CustomerShopDetailScreen(
-      {super.key, required this.shopId, required this.userId});
+      {super.key, required this.shopId, required this.shopUserId});
 
   @override
   CustomerShopDetailScreenState createState() =>
@@ -28,16 +29,21 @@ class CustomerShopDetailScreenState extends State<CustomerShopDetailScreen> {
   late ShopCategoryProvider _shopCategoryProvider;
   late CategoryProvider _categoryProvider;
   late AreaProvider _areaProvider;
+  late FavoriteShopProvider
+      _favoriteShopProvider;
 
   bool _isLoading = true;
   Shop? _shop;
   User? _user;
   Category? _category;
   Area? _area;
+  bool isFavorite = false;
 
   @override
   void initState() {
     super.initState();
+    _favoriteShopProvider =
+        Provider.of<FavoriteShopProvider>(context, listen: false);
     WidgetsBinding.instance.addPostFrameCallback((_) => _fetchData());
   }
 
@@ -49,15 +55,15 @@ class CustomerShopDetailScreenState extends State<CustomerShopDetailScreen> {
     _categoryProvider = Provider.of<CategoryProvider>(context, listen: false);
     _areaProvider = Provider.of<AreaProvider>(context, listen: false);
 
-    await _shopProvider.fetchShopByUserId(widget.userId);
+    await _shopProvider.fetchShopByUserId(widget.shopUserId);
     await _userProvider.fetchUsers();
     await _categoryProvider.fetchCategories();
     await _shopCategoryProvider.fetchCategoriesForShop(widget.shopId);
-    await _areaProvider.fetchAreas(); // Fetch areas
+    await _areaProvider.fetchAreas();
 
     setState(() {
       _shop = _shopProvider.shop;
-      _user = _userProvider.getUserByUserId(widget.userId);
+      _user = _userProvider.getUserByUserId(widget.shopUserId);
 
       if (_shop != null) {
         var shopCategory = _shopCategoryProvider.shopCategories
@@ -66,11 +72,16 @@ class CustomerShopDetailScreenState extends State<CustomerShopDetailScreen> {
         _category = _categoryProvider.categories
             .firstWhere((c) => c.catId == shopCategory.catId);
 
-        _area = _areaProvider.areas.firstWhere(
-          (a) => a.areaId == _shop!.areaId,
-          orElse: () => Area(areaId: -1, areaName: "No Area"),
-        );
+        _area =
+            _areaProvider.areas.firstWhere((a) => a.areaId == _shop!.areaId);
       }
+
+      // Fetch the favorite status for the shop
+      _favoriteShopProvider.isFavorite(widget.shopId).then((value) {
+        setState(() {
+          isFavorite = value;
+        });
+      });
 
       _isLoading = false;
     });
@@ -85,6 +96,30 @@ class CustomerShopDetailScreenState extends State<CustomerShopDetailScreen> {
         backgroundColor: Colors.blueAccent,
         centerTitle: true,
         iconTheme: const IconThemeData(color: Colors.white),
+        actions: [
+          IconButton(
+            icon: Icon(
+              isFavorite ? Icons.favorite : Icons.favorite_border_outlined,
+              color: isFavorite
+                  ? Colors.red
+                  : Colors.white, // Update color based on favorite status
+            ),
+            onPressed: () async {
+              await _favoriteShopProvider.toggleFavoriteShop(widget.shopId);
+
+              final message =
+                  isFavorite ? 'Removed from favorites' : 'Added to favorites';
+
+              // Fetch the updated favorite status and update the UI
+              setState(() {
+                isFavorite = !isFavorite;
+              });
+
+              ScaffoldMessenger.of(context)
+                  .showSnackBar(SnackBar(content: Text(message)));
+            },
+          ),
+        ],
       ),
       body: _isLoading
           ? const Center(child: CircularProgressIndicator())
@@ -166,7 +201,6 @@ class CustomerShopDetailScreenState extends State<CustomerShopDetailScreen> {
             _buildInfoRow(
                 Icons.location_on, 'Address', _shop!.address ?? 'No Address'),
             _buildInfoRow(Icons.map, 'Area', _area?.areaName ?? 'No Area'),
-            // Display Area Name
           ],
         ),
       ),

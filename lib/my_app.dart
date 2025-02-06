@@ -1,5 +1,6 @@
 import 'package:find_shop/providers/area_provider.dart';
 import 'package:find_shop/providers/category_provider.dart';
+import 'package:find_shop/providers/favorite_shop_provider.dart';
 import 'package:find_shop/providers/shop_category_provider.dart';
 import 'package:find_shop/providers/shop_provider.dart';
 import 'package:find_shop/screens/admin/area/area_list_screen.dart';
@@ -39,6 +40,7 @@ class MyApp extends StatelessWidget {
         ChangeNotifierProvider(create: (_) => ShopProvider()),
         ChangeNotifierProvider(create: (_) => CategoryProvider()),
         ChangeNotifierProvider(create: (_) => ShopCategoryProvider()),
+        ChangeNotifierProvider(create: (_) => FavoriteShopProvider()),
       ],
       child: MaterialApp(
         title: 'Find Shop',

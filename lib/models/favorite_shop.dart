@@ -1,14 +1,14 @@
 class FavoriteShop {
-  final int favId;
+  int? favId;
   final int userId;
   final int shopId;
-  final String addedAt;
+  String? addedAt;
 
   FavoriteShop({
-    required this.favId,
+    this.favId,
     required this.userId,
     required this.shopId,
-    required this.addedAt,
+    this.addedAt,
   });
 
   factory FavoriteShop.fromMap(Map<String, dynamic> map) {

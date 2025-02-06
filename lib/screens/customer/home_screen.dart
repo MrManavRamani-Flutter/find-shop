@@ -187,7 +187,7 @@ class _CustomerHomeScreenState extends State<CustomerHomeScreen> {
               context,
               MaterialPageRoute(
                 builder: (context) => CustomerShopDetailScreen(
-                    shopId: shop.shopId!, userId: shop.userId!),
+                    shopId: shop.shopId!, shopUserId: shop.userId!),
               ),
             );
           },
@@ -257,6 +257,8 @@ class _CustomerHomeScreenState extends State<CustomerHomeScreen> {
               Icons.location_on, 'Area List', '/customer_area_list', context),
           _buildDrawerItem(Icons.storefront_rounded, 'Shop List',
               '/customer_shop_list', context),
+          _buildDrawerItem(
+              Icons.account_box, 'Profile', '/customer_profile', context),
           const Spacer(),
           _buildLogoutItem(context),
         ],
@@ -269,14 +271,19 @@ class _CustomerHomeScreenState extends State<CustomerHomeScreen> {
     return Consumer<UserProvider>(
       builder: (context, userLoginProvider, child) {
         final loggedInUser = userLoginProvider.loggedInUser;
-        return UserAccountsDrawerHeader(
-          decoration: const BoxDecoration(color: Colors.blue),
-          accountName: Text(loggedInUser?.username ?? 'Guest',
-              style:
-                  const TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
-          accountEmail: Text(loggedInUser?.email ?? 'No email'),
-          currentAccountPicture: const CircleAvatar(
-              backgroundImage: AssetImage('assets/logo/user.png')),
+        return InkWell(
+          onTap: () {
+            Navigator.of(context).pushNamed('/customer_profile');
+          },
+          child: UserAccountsDrawerHeader(
+            decoration: const BoxDecoration(color: Colors.blue),
+            accountName: Text(loggedInUser?.username ?? 'Guest',
+                style:
+                    const TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
+            accountEmail: Text(loggedInUser?.email ?? 'No email'),
+            currentAccountPicture: const CircleAvatar(
+                backgroundImage: AssetImage('assets/logo/user.png')),
+          ),
         );
       },
     );
@@ -303,8 +310,16 @@ class _CustomerHomeScreenState extends State<CustomerHomeScreen> {
   // Logout item in drawer
   Widget _buildLogoutItem(BuildContext context) {
     return ListTile(
-      title: const Text('Logout', style: TextStyle(color: Colors.white)),
+      title: const Text(
+        'Logout',
+        style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+        textAlign: TextAlign.center,
+      ),
       tileColor: Colors.red,
+      trailing: const Icon(
+        Icons.logout_outlined,
+        color: Colors.white,
+      ),
       onTap: () async {
         await SharedPreferencesHelper().clearUserData();
         await SharedPreferencesHelper().clearAuthToken();

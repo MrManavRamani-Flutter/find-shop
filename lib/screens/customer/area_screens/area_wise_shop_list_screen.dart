@@ -1,3 +1,4 @@
+import 'package:find_shop/providers/favorite_shop_provider.dart';
 import 'package:find_shop/screens/customer/shops/shop_detail_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -19,11 +20,14 @@ class AreaWiseShopListScreen extends StatefulWidget {
 class AreaWiseShopListScreenState extends State<AreaWiseShopListScreen> {
   final TextEditingController _searchController = TextEditingController();
   List<Shop> filteredShops = [];
+  late FavoriteShopProvider _favoriteShopProvider;
 
   @override
   void initState() {
     super.initState();
     _fetchShops();
+    _favoriteShopProvider =
+        Provider.of<FavoriteShopProvider>(context, listen: false);
     _searchController.addListener(() {
       _filterShops(_searchController.text);
     });
@@ -45,6 +49,12 @@ class AreaWiseShopListScreenState extends State<AreaWiseShopListScreen> {
             (user.status == 1 || user.status == 3);
       }).toList();
     });
+  }
+
+  // Check if the shop is in the favorites list
+  bool isShopFavorite(int shopId) {
+    return _favoriteShopProvider.favoriteShops
+        .any((favorite) => favorite.shopId == shopId);
   }
 
   void _filterShops(String query) {
@@ -113,6 +123,7 @@ class AreaWiseShopListScreenState extends State<AreaWiseShopListScreen> {
                     itemCount: filteredShops.length,
                     itemBuilder: (context, index) {
                       final shop = filteredShops[index];
+                      bool isFavorite = isShopFavorite(shop.shopId!);
                       return Card(
                         elevation: 4,
                         margin: const EdgeInsets.all(10),
@@ -121,12 +132,39 @@ class AreaWiseShopListScreenState extends State<AreaWiseShopListScreen> {
                               color: Colors.blue),
                           title: Text(shop.shopName ?? 'Unknown Shop'),
                           subtitle: Text(shop.address ?? 'No Address'),
+                          trailing: IconButton(
+                            icon: Icon(
+                              isFavorite
+                                  ? Icons.favorite
+                                  : Icons.favorite_border_outlined,
+                              color: isFavorite
+                                  ? Colors.red
+                                  : Colors
+                                      .black, // Update color based on favorite status
+                            ),
+                            onPressed: () async {
+                              // Toggle the favorite status of the shop
+                              await _favoriteShopProvider
+                                  .toggleFavoriteShop(shop.shopId!);
+
+                              // Fetch the updated favorite list
+                              setState(() {});
+
+                              // Show snack bar message
+                              final message = isFavorite
+                                  ? 'Removed from favorites'
+                                  : 'Added to favorites';
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                  SnackBar(content: Text(message)));
+                            },
+                          ),
                           onTap: () {
                             Navigator.push(
                               context,
                               MaterialPageRoute(
                                 builder: (context) => CustomerShopDetailScreen(
-                                    shopId: shop.shopId!, userId: shop.userId!),
+                                    shopId: shop.shopId!,
+                                    shopUserId: shop.userId!),
                               ),
                             );
                           },

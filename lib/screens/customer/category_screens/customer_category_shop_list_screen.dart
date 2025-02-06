@@ -1,8 +1,10 @@
 import 'package:find_shop/database/shop_database_helper.dart';
 import 'package:find_shop/models/category.dart';
 import 'package:find_shop/models/shop.dart';
+import 'package:find_shop/providers/favorite_shop_provider.dart';
 import 'package:find_shop/screens/customer/shops/shop_detail_screen.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 class CustomerCategoryShopListScreen extends StatefulWidget {
   final Category selectedCategory;
@@ -23,11 +25,14 @@ class _CustomerCategoryShopListScreenState
   List<Shop> _filteredShops = [];
   bool _isLoading = true;
   final TextEditingController _searchController = TextEditingController();
+  late FavoriteShopProvider _favoriteShopProvider;
 
   @override
   void initState() {
     super.initState();
     _fetchShopsByCategory();
+    _favoriteShopProvider =
+        Provider.of<FavoriteShopProvider>(context, listen: false);
     _searchController.addListener(_filterShops);
   }
 
@@ -46,6 +51,11 @@ class _CustomerCategoryShopListScreenState
       _filteredShops = shops;
       _isLoading = false;
     });
+  }
+
+  bool isShopFavorite(int shopId) {
+    return _favoriteShopProvider.favoriteShops
+        .any((favorite) => favorite.shopId == shopId);
   }
 
   void _filterShops() {
@@ -113,6 +123,7 @@ class _CustomerCategoryShopListScreenState
                           itemCount: _filteredShops.length,
                           itemBuilder: (context, index) {
                             final shop = _filteredShops[index];
+                            bool isFavorite = isShopFavorite(shop.shopId!);
                             return Card(
                               shape: RoundedRectangleBorder(
                                   borderRadius: BorderRadius.circular(12.0)),
@@ -128,6 +139,32 @@ class _CustomerCategoryShopListScreenState
                                 subtitle: Text(
                                     shop.address ?? 'No address available',
                                     style: const TextStyle(color: Colors.grey)),
+                                trailing: IconButton(
+                                  icon: Icon(
+                                    isFavorite
+                                        ? Icons.favorite
+                                        : Icons.favorite_border_outlined,
+                                    color: isFavorite
+                                        ? Colors.red
+                                        : Colors
+                                            .black, // Update color based on favorite status
+                                  ),
+                                  onPressed: () async {
+                                    // Toggle the favorite status of the shop
+                                    await _favoriteShopProvider
+                                        .toggleFavoriteShop(shop.shopId!);
+
+                                    // Fetch the updated favorite list
+                                    setState(() {});
+
+                                    // Show snack bar message
+                                    final message = isFavorite
+                                        ? 'Removed from favorites'
+                                        : 'Added to favorites';
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                        SnackBar(content: Text(message)));
+                                  },
+                                ),
                                 onTap: () {
                                   Navigator.push(
                                     context,
@@ -135,7 +172,7 @@ class _CustomerCategoryShopListScreenState
                                       builder: (context) =>
                                           CustomerShopDetailScreen(
                                               shopId: shop.shopId!,
-                                              userId: shop.userId!),
+                                              shopUserId: shop.userId!),
                                     ),
                                   );
                                 },

@@ -1,3 +1,4 @@
+import 'package:find_shop/providers/favorite_shop_provider.dart';
 import 'package:find_shop/screens/customer/shops/shop_detail_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -17,29 +18,39 @@ class _CustomerShopListScreenState extends State<CustomerShopListScreen> {
   final TextEditingController _searchController = TextEditingController();
   String _searchQuery = '';
   List<Shop> filteredShops = [];
+  late FavoriteShopProvider _favoriteShopProvider;
+  late ShopProvider _shopProvider;
+  late UserProvider _userProvider;
 
   @override
   void initState() {
     super.initState();
+    _favoriteShopProvider =
+        Provider.of<FavoriteShopProvider>(context, listen: false);
+    _shopProvider = Provider.of<ShopProvider>(context, listen: false);
+    _userProvider = Provider.of<UserProvider>(context, listen: false);
     fetchShops();
   }
 
   // Fetching and filtering shops based on user status
   void fetchShops() async {
-    final shopProvider = Provider.of<ShopProvider>(context, listen: false);
-    final userProvider = Provider.of<UserProvider>(context, listen: false);
-
     await Future.wait([
-      shopProvider.fetchShops(),
-      userProvider.fetchUsers(),
+      _shopProvider.fetchShops(),
+      _userProvider.fetchUsers(),
     ]);
 
     setState(() {
-      filteredShops = shopProvider.shops.where((shop) {
-        final User user = userProvider.getUserByUserId(shop.userId!);
+      filteredShops = _shopProvider.shops.where((shop) {
+        final User user = _userProvider.getUserByUserId(shop.userId!);
         return user.status == 1 || user.status == 3;
       }).toList();
     });
+  }
+
+  // Check if the shop is in the favorites list
+  bool isShopFavorite(int shopId) {
+    return _favoriteShopProvider.favoriteShops
+        .any((favorite) => favorite.shopId == shopId);
   }
 
   @override
@@ -117,6 +128,8 @@ class _CustomerShopListScreenState extends State<CustomerShopListScreen> {
       itemCount: filteredList.length,
       itemBuilder: (context, index) {
         final shop = filteredList[index];
+        bool isFavorite =
+            isShopFavorite(shop.shopId!); // Check if the shop is a favorite
         return Card(
           elevation: 2,
           margin: const EdgeInsets.symmetric(vertical: 8),
@@ -126,13 +139,35 @@ class _CustomerShopListScreenState extends State<CustomerShopListScreen> {
               shop.shopName ?? 'No Name',
               style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
             ),
+            trailing: IconButton(
+              icon: Icon(
+                isFavorite ? Icons.favorite : Icons.favorite_border_outlined,
+                color: isFavorite
+                    ? Colors.red
+                    : Colors.black, // Update color based on favorite status
+              ),
+              onPressed: () async {
+                // Toggle the favorite status of the shop
+                await _favoriteShopProvider.toggleFavoriteShop(shop.shopId!);
+
+                // Fetch the updated favorite list
+                setState(() {});
+
+                // Show snack bar message
+                final message = isFavorite
+                    ? 'Removed from favorites'
+                    : 'Added to favorites';
+                ScaffoldMessenger.of(context)
+                    .showSnackBar(SnackBar(content: Text(message)));
+              },
+            ),
             subtitle: Text(shop.address ?? 'No Address available'),
             onTap: () {
               Navigator.push(
                 context,
                 MaterialPageRoute(
                   builder: (context) => CustomerShopDetailScreen(
-                      shopId: shop.shopId!, userId: shop.userId!),
+                      shopId: shop.shopId!, shopUserId: shop.userId!),
                 ),
               );
             },
