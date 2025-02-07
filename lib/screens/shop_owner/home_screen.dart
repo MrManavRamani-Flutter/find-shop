@@ -1,6 +1,7 @@
 import 'package:find_shop/providers/user_provider.dart';
 import 'package:find_shop/providers/shop_provider.dart';
 import 'package:find_shop/providers/shop_review_provider.dart';
+import 'package:find_shop/providers/product_provider.dart'; // Import ProductProvider
 import 'package:find_shop/utils/shared_preferences_helper.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -27,7 +28,9 @@ class ShopOwnerHomeScreenState extends State<ShopOwnerHomeScreen> {
       final userProvider = Provider.of<UserProvider>(context, listen: false);
       final shopProvider = Provider.of<ShopProvider>(context, listen: false);
       final shopReviewProvider =
-          Provider.of<ShopReviewProvider>(context, listen: false);
+      Provider.of<ShopReviewProvider>(context, listen: false);
+      final productProvider = Provider.of<ProductProvider>(context,
+          listen: false); // ProductProvider
 
       // Fetch logged-in user
       await userProvider.fetchLoggedInUser();
@@ -37,8 +40,11 @@ class ShopOwnerHomeScreenState extends State<ShopOwnerHomeScreen> {
         await shopProvider.fetchShopByUserId(loggedInUser.userId);
         if (shopProvider.shop != null) {
           shopId = shopProvider.shop!.shopId;
-          // debugPrint("----------\n\n$shopId\n\n----------");
+          // Fetch review count
           await shopReviewProvider.fetchShopReviewCount(shopId!);
+          // Fetch product count by shopId
+          await productProvider
+              .countProductsByShopId(shopId!); // Count products
         }
       }
     } catch (e) {
@@ -74,6 +80,7 @@ class ShopOwnerHomeScreenState extends State<ShopOwnerHomeScreen> {
   Widget _buildContent(BuildContext context) {
     final userProvider = Provider.of<UserProvider>(context, listen: false);
     final loggedInUser = userProvider.loggedInUser;
+    final productProvider = Provider.of<ProductProvider>(context);
 
     if (loggedInUser == null) {
       return const Center(
@@ -91,10 +98,17 @@ class ShopOwnerHomeScreenState extends State<ShopOwnerHomeScreen> {
         children: [
           const SizedBox(height: 20),
           if (shopId != null)
-            Consumer<ShopReviewProvider>(
-              builder: (context, shopReviewProvider, child) {
-                return _buildReviewCard(shopReviewProvider.reviewCount);
-              },
+            Column(
+              children: [
+                Consumer<ShopReviewProvider>(
+                  builder: (context, shopReviewProvider, child) {
+                    return _buildReviewCard(shopReviewProvider.reviewCount);
+                  },
+                ),
+                const SizedBox(height: 16),
+                _buildProductCountCard(productProvider.productCountByShopId),
+                // Display product count card
+              ],
             )
           else
             const Text(
@@ -106,6 +120,7 @@ class ShopOwnerHomeScreenState extends State<ShopOwnerHomeScreen> {
     );
   }
 
+  // Build card for displaying total reviews
   Widget _buildReviewCard(int reviewCount) {
     return GestureDetector(
       onTap: () {
@@ -135,6 +150,50 @@ class ShopOwnerHomeScreenState extends State<ShopOwnerHomeScreen> {
                   fontSize: 22,
                   fontWeight: FontWeight.bold,
                   color: Colors.blue,
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  // Build card for displaying product count
+  Widget _buildProductCountCard(int productCount) {
+    return GestureDetector(
+      onTap: () {
+        Navigator.of(context)
+            .pushNamed('/shop_product_list', arguments: shopId)
+            .then(
+              (value) => _fetchData(), // Refresh data after navigating back
+        );
+      },
+      child: Card(
+        elevation: 4,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(12),
+        ),
+        child: Container(
+          padding: const EdgeInsets.all(16),
+          width: double.infinity,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              const Icon(Icons.production_quantity_limits,
+                  size: 40, color: Colors.green),
+              const SizedBox(height: 10),
+              const Text(
+                'Total Products',
+                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+              ),
+              const SizedBox(height: 8),
+              Text(
+                '$productCount',
+                style: const TextStyle(
+                  fontSize: 22,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.green,
                 ),
               ),
             ],
@@ -194,7 +253,8 @@ class ShopOwnerHomeScreenState extends State<ShopOwnerHomeScreen> {
         ),
         accountEmail: Text(loggedInUser?.email ?? 'No email'),
         currentAccountPicture: const CircleAvatar(
-            backgroundImage: AssetImage('assets/logo/user.png')),
+          backgroundImage: AssetImage('assets/logo/user.png'),
+        ),
       ),
     );
   }

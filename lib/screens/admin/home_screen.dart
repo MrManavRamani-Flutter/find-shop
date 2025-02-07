@@ -18,7 +18,7 @@ class AdminHomeScreen extends StatelessWidget {
         centerTitle: true,
         iconTheme: const IconThemeData(color: Colors.white),
         backgroundColor: Colors.blueAccent,
-        ),
+      ),
       drawer: AdminDrawer(userProvider: userProvider),
       body: const AdminDashboardBody(),
     );
@@ -156,6 +156,11 @@ class AdminDashboardBody extends StatelessWidget {
             title: 'Shop List',
             icon: Icons.storefront_rounded,
             onTap: () => Navigator.pushNamed(context, '/shop_list'),
+          ),
+          AdminDashboardCard(
+            title: 'Product List',
+            icon: Icons.shopping_cart,
+            onTap: () => Navigator.pushNamed(context, '/product_list'),
           ),
         ],
       ),

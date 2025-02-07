@@ -1,6 +1,7 @@
 import 'package:find_shop/providers/area_provider.dart';
 import 'package:find_shop/providers/category_provider.dart';
 import 'package:find_shop/providers/favorite_shop_provider.dart';
+import 'package:find_shop/providers/product_provider.dart';
 import 'package:find_shop/providers/shop_category_provider.dart';
 import 'package:find_shop/providers/shop_provider.dart';
 import 'package:find_shop/providers/shop_review_provider.dart';
@@ -8,6 +9,7 @@ import 'package:find_shop/screens/admin/area/area_list_screen.dart';
 import 'package:find_shop/screens/admin/category/category_list_screen.dart';
 import 'package:find_shop/screens/admin/customer/customer_list_screen.dart';
 import 'package:find_shop/screens/admin/home_screen.dart';
+import 'package:find_shop/screens/admin/product/product_list_screen.dart';
 import 'package:find_shop/screens/admin/profile_screen.dart';
 import 'package:find_shop/screens/admin/shop/shop_list_screen.dart';
 import 'package:find_shop/screens/admin/shop_owner/shop_owner_list_screen.dart';
@@ -20,6 +22,7 @@ import 'package:find_shop/screens/customer/review_screen/add_review_screen.dart'
 import 'package:find_shop/screens/customer/shops/shop_list_screen.dart';
 import 'package:find_shop/screens/register_screen.dart';
 import 'package:find_shop/screens/shop_owner/home_screen.dart';
+import 'package:find_shop/screens/shop_owner/product_screen/product_list_screen.dart';
 import 'package:find_shop/screens/shop_owner/profile_screen.dart';
 import 'package:find_shop/screens/shop_owner/review_screen/review_list_screen.dart';
 import 'package:flutter/material.dart';
@@ -46,6 +49,7 @@ class MyApp extends StatelessWidget {
         ChangeNotifierProvider(create: (_) => ShopCategoryProvider()),
         ChangeNotifierProvider(create: (_) => FavoriteShopProvider()),
         ChangeNotifierProvider(create: (_) => ShopReviewProvider()),
+        ChangeNotifierProvider(create: (_) => ProductProvider()),
       ],
       child: MaterialApp(
         title: 'Find Shop',
@@ -77,7 +81,8 @@ class MyApp extends StatelessWidget {
           // Shop Owner Screen -------
           '/shop_home': (context) => const ShopOwnerHomeScreen(),
           '/shop_profile': (context) => const ShopOwnerProfileScreen(),
-          '/shop_review_list':(context)=> const ShopReviewListScreen(),
+          '/shop_review_list': (context) => const ShopReviewListScreen(),
+          '/shop_product_list': (context) => const ShopProductListScreen(),
           // ---------------------------------------------------------------
 
           // Admin Screen --------
@@ -88,6 +93,7 @@ class MyApp extends StatelessWidget {
           '/areas_list': (context) => const AreaListScreen(),
           '/categories_list': (context) => const CategoryListScreen(),
           '/shop_list': (context) => const ShopListScreen(),
+          '/product_list': (context) => const AdminProductListScreen(),
           // ---------------------------------------------------------------
         },
         debugShowCheckedModeBanner: false,

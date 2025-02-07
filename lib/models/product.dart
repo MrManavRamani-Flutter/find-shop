@@ -1,12 +1,12 @@
 class Product {
-  int proId;
+  int? proId;
   String proName;
   String proDesc;
   double price;
   int shopId;
 
   Product({
-    required this.proId,
+     this.proId,
     required this.proName,
     required this.proDesc,
     required this.price,
