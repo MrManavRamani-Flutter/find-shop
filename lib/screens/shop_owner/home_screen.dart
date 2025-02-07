@@ -1,113 +1,212 @@
 import 'package:find_shop/providers/user_provider.dart';
+import 'package:find_shop/providers/shop_provider.dart';
+import 'package:find_shop/providers/shop_review_provider.dart';
 import 'package:find_shop/utils/shared_preferences_helper.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-class ShopOwnerHomeScreen extends StatelessWidget {
+class ShopOwnerHomeScreen extends StatefulWidget {
   const ShopOwnerHomeScreen({super.key});
 
   @override
+  ShopOwnerHomeScreenState createState() => ShopOwnerHomeScreenState();
+}
+
+class ShopOwnerHomeScreenState extends State<ShopOwnerHomeScreen> {
+  int? shopId;
+  bool isLoading = true;
+
+  @override
+  void initState() {
+    super.initState();
+    _fetchData();
+  }
+
+  Future<void> _fetchData() async {
+    try {
+      final userProvider = Provider.of<UserProvider>(context, listen: false);
+      final shopProvider = Provider.of<ShopProvider>(context, listen: false);
+      final shopReviewProvider =
+          Provider.of<ShopReviewProvider>(context, listen: false);
+
+      // Fetch logged-in user
+      await userProvider.fetchLoggedInUser();
+      final loggedInUser = userProvider.loggedInUser;
+
+      if (loggedInUser != null) {
+        await shopProvider.fetchShopByUserId(loggedInUser.userId);
+        if (shopProvider.shop != null) {
+          shopId = shopProvider.shop!.shopId;
+          // debugPrint("----------\n\n$shopId\n\n----------");
+          await shopReviewProvider.fetchShopReviewCount(shopId!);
+        }
+      }
+    } catch (e) {
+      debugPrint("Error fetching data: $e");
+    } finally {
+      setState(() {
+        isLoading = false; // Stop loading
+      });
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
-    // Fetch logged-in user data
     final userProvider = Provider.of<UserProvider>(context, listen: false);
-    userProvider.fetchLoggedInUser();
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Welcome to Find Shop'),
-      ),
-      drawer: Drawer(
-        child: Column(
-          children: <Widget>[
-            // Drawer header
-            _buildDrawerHeader(context),
-
-            // Other drawer options
-            ListTile(
-              title: const Text('Profile'),
-              onTap: () {
-                // Navigate to profile screen
-                Navigator.pushReplacementNamed(context, '/shop_profile');
-              },
-            ),
-            ListTile(
-              title: const Text('Settings'),
-              onTap: () {
-                // Navigate to settings screen
-                // Navigator.pushNamed(context, '/settings');
-              },
-            ),
-
-            // Spacer to push logout button to the bottom
-            const Spacer(),
-
-            // Logout button at the bottom
-            ListTile(
-              title: const Text(
-                'Logout',
-                style: TextStyle(color: Colors.white),
-              ),
-              tileColor: Colors.red, // Red background color
-              onTap: () async {
-                // Clear SharedPreferences data when logging out
-                SharedPreferencesHelper().clearUserData();
-                SharedPreferencesHelper().clearAuthToken();
-                SharedPreferencesHelper().clearLoginStatus();
-
-                // Log out the user by updating the user provider
-                await userProvider.logOut();
-                if (context.mounted) {
-                  // Redirect to the login screen
-                  Navigator.pushReplacementNamed(context, '/login');
-                }
-              },
-            ),
-          ],
+        title: const Text(
+          'Welcome to Find Shop',
+          style: TextStyle(color: Colors.white),
         ),
+        iconTheme: const IconThemeData(color: Colors.white),
+        backgroundColor: Colors.blueAccent,
+        centerTitle: true,
       ),
-      body: const Center(
-        child: Padding(
-          padding: EdgeInsets.all(16.0),
-          child: Text(
-            'Welcome to Our Shop',
-            style: TextStyle(
-              fontSize: 24,
-              fontWeight: FontWeight.bold,
+      drawer: _buildDrawer(context, userProvider),
+      body: isLoading
+          ? const Center(child: CircularProgressIndicator())
+          : _buildContent(context),
+    );
+  }
+
+  Widget _buildContent(BuildContext context) {
+    final userProvider = Provider.of<UserProvider>(context, listen: false);
+    final loggedInUser = userProvider.loggedInUser;
+
+    if (loggedInUser == null) {
+      return const Center(
+        child: Text(
+          'Please log in to view your shop details.',
+          style: TextStyle(fontSize: 18),
+        ),
+      );
+    }
+
+    return Padding(
+      padding: const EdgeInsets.all(16.0),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          const SizedBox(height: 20),
+          if (shopId != null)
+            Consumer<ShopReviewProvider>(
+              builder: (context, shopReviewProvider, child) {
+                return _buildReviewCard(shopReviewProvider.reviewCount);
+              },
+            )
+          else
+            const Text(
+              'No shop found for this user.',
+              style: TextStyle(fontSize: 16, color: Colors.red),
             ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildReviewCard(int reviewCount) {
+    return GestureDetector(
+      onTap: () {
+        Navigator.of(context).pushNamed('/shop_review_list');
+      },
+      child: Card(
+        elevation: 4,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(12),
+        ),
+        child: Container(
+          padding: const EdgeInsets.all(16),
+          width: double.infinity,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              const Icon(Icons.star, size: 40, color: Colors.amber),
+              const SizedBox(height: 10),
+              const Text(
+                'Total Reviews',
+                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+              ),
+              const SizedBox(height: 8),
+              Text(
+                '$reviewCount',
+                style: const TextStyle(
+                  fontSize: 22,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.blue,
+                ),
+              ),
+            ],
           ),
         ),
       ),
     );
   }
 
-  // Helper method to build the Drawer Header with Avatar and User Info
-  Widget _buildDrawerHeader(BuildContext context) {
-    return Consumer<UserProvider>(
-      builder: (context, userProvider, child) {
-        final loggedInUser = userProvider.loggedInUser;
-
-        return InkWell(
-          onTap: () {
-            if (loggedInUser != null) {
+  Widget _buildDrawer(BuildContext context, UserProvider userProvider) {
+    return Drawer(
+      child: Column(
+        children: [
+          _buildDrawerHeader(context, userProvider),
+          ListTile(
+            title: const Text('Profile'),
+            onTap: () {
               Navigator.pushReplacementNamed(context, '/shop_profile');
-            }
-          },
-          child: UserAccountsDrawerHeader(
-            decoration: const BoxDecoration(
-              color: Colors.blue,
-            ),
-            accountName: Text(
-              loggedInUser?.username ?? 'Guest',
-              style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-            ),
-            accountEmail: Text(
-              loggedInUser?.email ?? 'No email',
-            ),
-            currentAccountPicture: const CircleAvatar(
-                backgroundImage: AssetImage('assets/logo/user.png')),
+            },
           ),
-        );
-      },
+          ListTile(
+            title: const Text('Settings'),
+            onTap: () {},
+          ),
+          const Spacer(),
+          ListTile(
+            title: const Text(
+              'Logout',
+              style: TextStyle(color: Colors.white),
+            ),
+            tileColor: Colors.red,
+            onTap: () async {
+              await _logout(context, userProvider);
+            },
+          ),
+        ],
+      ),
     );
+  }
+
+  Widget _buildDrawerHeader(BuildContext context, UserProvider userProvider) {
+    final loggedInUser = userProvider.loggedInUser;
+
+    return InkWell(
+      onTap: () {
+        if (loggedInUser != null) {
+          Navigator.pushReplacementNamed(context, '/shop_profile');
+        }
+      },
+      child: UserAccountsDrawerHeader(
+        decoration: const BoxDecoration(
+          color: Colors.blue,
+        ),
+        accountName: Text(
+          loggedInUser?.username ?? 'Guest',
+          style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+        ),
+        accountEmail: Text(loggedInUser?.email ?? 'No email'),
+        currentAccountPicture: const CircleAvatar(
+            backgroundImage: AssetImage('assets/logo/user.png')),
+      ),
+    );
+  }
+
+  Future<void> _logout(BuildContext context, UserProvider userProvider) async {
+    SharedPreferencesHelper().clearUserData();
+    SharedPreferencesHelper().clearAuthToken();
+    SharedPreferencesHelper().clearLoginStatus();
+
+    await userProvider.logOut();
+    if (context.mounted) {
+      Navigator.pushReplacementNamed(context, '/login');
+    }
   }
 }

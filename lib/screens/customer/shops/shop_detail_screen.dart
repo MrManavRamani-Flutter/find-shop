@@ -26,11 +26,11 @@ class CustomerShopDetailScreen extends StatefulWidget {
   });
 
   @override
-  _CustomerShopDetailScreenState createState() =>
-      _CustomerShopDetailScreenState();
+  CustomerShopDetailScreenState createState() =>
+      CustomerShopDetailScreenState();
 }
 
-class _CustomerShopDetailScreenState extends State<CustomerShopDetailScreen> {
+class CustomerShopDetailScreenState extends State<CustomerShopDetailScreen> {
   late ShopProvider _shopProvider;
   late UserProvider _userProvider;
   late ShopCategoryProvider _shopCategoryProvider;
@@ -79,8 +79,8 @@ class _CustomerShopDetailScreenState extends State<CustomerShopDetailScreen> {
       SharedPreferencesHelper().getUserId().then((userId) {
         _shopReviewProvider.hasReviewedShop(widget.shopId).then((hasReviewed) {
           setState(() {
-            print(
-                "-----------------------\n\n $hasReviewed \n\n-------------------------------");
+            // print(
+            //     "-----------------------\n\n $hasReviewed \n\n-------------------------------");
             _isReviewAvailable = !hasReviewed;
           });
         });
@@ -240,7 +240,7 @@ class _CustomerShopDetailScreenState extends State<CustomerShopDetailScreen> {
             if (_shopReviewProvider.shopReviews.isNotEmpty)
               ..._shopReviewProvider.shopReviews.map((review) {
                 return _buildReviewCard(review);
-              }).toList()
+              })
             else
               const Center(
                 child: Text('No reviews yet. Be the first to leave a review!'),

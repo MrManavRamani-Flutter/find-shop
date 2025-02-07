@@ -5,9 +5,11 @@ import '../database/shop_review_database_helper.dart';
 
 class ShopReviewProvider with ChangeNotifier {
   List<ShopReview> _shopReviews = [];
+  int _reviewCount = 0;
   late int currentUserId;
 
   List<ShopReview> get shopReviews => _shopReviews;
+  int get reviewCount => _reviewCount;
 
   Future<void> setCurrentUserId() async {
     currentUserId = await SharedPreferencesHelper().getUserId() ?? 0;
@@ -18,6 +20,13 @@ class ShopReviewProvider with ChangeNotifier {
     await setCurrentUserId(); // Ensure user ID is loaded
     return await ShopReviewDatabaseHelper()
         .hasUserReviewedShop(currentUserId, shopId);
+  }
+
+  // Fetch the total review count for a specific shop
+  Future<void> fetchShopReviewCount(int shopId) async {
+    _reviewCount = await ShopReviewDatabaseHelper().getShopReviewCount(shopId);
+    // print("----------\n\n$_reviewCount\n\n----------");
+    notifyListeners();
   }
 
   Future<void> fetchShopReviewsByShopId(int shopId) async {

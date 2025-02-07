@@ -1,10 +1,22 @@
+import 'package:sqflite/sqflite.dart';
+
 import 'app_database.dart';
 import '../models/shop_review.dart';
 
 class ShopReviewDatabaseHelper {
   static const String tableName = 'shop_reviews';
 
-  /// Check if the current user has already reviewed a specific shop
+  // Get the total number of reviews for a specific shop
+  Future<int> getShopReviewCount(int shopId) async {
+    final db = await AppDatabase().database;
+    final result = await db.rawQuery(
+      'SELECT COUNT(*) as count FROM $tableName WHERE shop_id = ?',
+      [shopId],
+    );
+    return Sqflite.firstIntValue(result) ?? 0;
+  }
+
+  // Check if the current user has already reviewed a specific shop
   Future<bool> hasUserReviewedShop(int userId, int shopId) async {
     final db = await AppDatabase().database;
     final List<Map<String, dynamic>> result = await db.query(

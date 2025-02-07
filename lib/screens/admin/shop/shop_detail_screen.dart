@@ -1,3 +1,5 @@
+import 'package:find_shop/models/shop_review.dart';
+import 'package:find_shop/providers/shop_review_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:find_shop/providers/shop_provider.dart';
@@ -9,6 +11,8 @@ import 'package:find_shop/models/shop.dart';
 import 'package:find_shop/models/user.dart';
 import 'package:find_shop/models/category.dart';
 import 'package:find_shop/models/area.dart';
+import 'package:intl/intl.dart';
+
 
 class ShopDetailScreen extends StatefulWidget {
   final int shopId;
@@ -27,19 +31,28 @@ class ShopDetailScreenState extends State<ShopDetailScreen> {
   late ShopCategoryProvider _shopCategoryProvider;
   late CategoryProvider _categoryProvider;
   late AreaProvider _areaProvider;
+  late ShopReviewProvider _shopReviewProvider;
 
   bool _isLoading = true;
   Shop? _shop;
   User? _user;
   Category? _category;
   Area? _area;
+  List<ShopReview> reviews = [];
 
   @override
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) => _fetchData());
   }
+  String _formatDateTime(String reviewDate) {
+    final DateFormat formatter = DateFormat('yyyy-MM-dd HH:mm'); // Customize the format
 
+    // Parse the reviewDate string into a DateTime object
+    DateTime parsedDate = DateTime.tryParse(reviewDate) ?? DateTime.now(); // If parsing fails, fallback to current date/time
+
+    return formatter.format(parsedDate);
+  }
   Future<void> _fetchData() async {
     _shopProvider = Provider.of<ShopProvider>(context, listen: false);
     _userProvider = Provider.of<UserProvider>(context, listen: false);
@@ -47,16 +60,20 @@ class ShopDetailScreenState extends State<ShopDetailScreen> {
         Provider.of<ShopCategoryProvider>(context, listen: false);
     _categoryProvider = Provider.of<CategoryProvider>(context, listen: false);
     _areaProvider = Provider.of<AreaProvider>(context, listen: false);
+    _shopReviewProvider =
+        Provider.of<ShopReviewProvider>(context, listen: false);
 
     await _shopProvider.fetchShopByUserId(widget.userId);
     await _userProvider.fetchUsers();
     await _categoryProvider.fetchCategories();
     await _shopCategoryProvider.fetchCategoriesForShop(widget.shopId);
-    await _areaProvider.fetchAreas(); // Fetch areas
+    await _areaProvider.fetchAreas();
+    await _shopReviewProvider.fetchShopReviewsByShopId(widget.shopId);
 
     setState(() {
       _shop = _shopProvider.shop;
       _user = _userProvider.getUserByUserId(widget.userId);
+      reviews = _shopReviewProvider.shopReviews;
 
       if (_shop != null) {
         var shopCategory = _shopCategoryProvider.shopCategories
@@ -104,8 +121,119 @@ class ShopDetailScreenState extends State<ShopDetailScreen> {
           _user != null ? _buildOwnerInfo(_user!) : Container(),
           const SizedBox(height: 20),
           _buildShopDetails(),
+          const SizedBox(height: 20),
+          // Review Section with redesigned UI
+          _buildReviewCard(),
         ],
       ),
+    );
+  }
+
+  Widget _buildReviewCard() {
+    return Card(
+      elevation: 5,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(15),
+      ),
+      child: Padding(
+        padding: const EdgeInsets.all(12.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            _buildSectionTitle('Customer Reviews'),
+            const SizedBox(height: 10),
+            // Show a divider to separate title and reviews
+            const Divider(thickness: 1, color: Colors.grey),
+            const SizedBox(height: 10),
+            _buildReviewList(),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildReviewList() {
+    final userProvider = Provider.of<UserProvider>(context, listen: false);
+
+
+    return ListView.builder(
+      shrinkWrap: true,
+      physics: const NeverScrollableScrollPhysics(),
+      itemCount: reviews.length,
+      itemBuilder: (context, index) {
+        final review = reviews[index];
+        final user = userProvider.getUserByUserId(review.userId);
+        final username = user.username;
+
+        return Card(
+          elevation: 3,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(12),
+          ),
+          margin: const EdgeInsets.symmetric(vertical: 8.0),
+          child: Padding(
+            padding: const EdgeInsets.all(14.0),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                // User Info Row
+                Row(
+                  children: [
+                    const CircleAvatar(
+                      radius: 22,
+                      backgroundImage: AssetImage('assets/logo/user.png'),
+                    ),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: Text(
+                        username,
+                        style: const TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.w600,
+                          color: Colors.black87,
+                        ),
+                      ),
+                    ),
+                    Row(
+                      children: List.generate(
+                            review.rating.toInt(), // Convert double to int
+                            (index) => const Icon(Icons.star,
+                                color: Colors.amber, size: 18),
+                          ) +
+                          List.generate(
+                            (5 - review.rating.toInt()),
+                            (index) => const Icon(Icons.star_border,
+                                color: Colors.grey, size: 18),
+                          ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 8),
+
+                // Review Comment
+                Text(
+                  review.comment,
+                  style: const TextStyle(
+                      fontSize: 14,
+                      fontWeight: FontWeight.w500,
+                      color: Colors.black87,
+                      height: 1.5),
+                ),
+                const SizedBox(height: 12),
+                // Date of Review (can show when the review was posted)
+                Text(
+                  'Posted on: ${_formatDateTime(review.reviewDate)}',
+                  style: const TextStyle(
+                    fontSize: 12,
+                    color: Colors.grey,
+                    fontStyle: FontStyle.italic,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        );
+      },
     );
   }
 
@@ -131,7 +259,7 @@ class ShopDetailScreenState extends State<ShopDetailScreen> {
     );
   }
 
-  Widget _buildOwnerInfo(User user) {
+  Widget _buildOwnerInfo(User shopUser) {
     return Card(
       elevation: 3,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
@@ -142,9 +270,9 @@ class ShopDetailScreenState extends State<ShopDetailScreen> {
           children: [
             _buildSectionTitle('Owner Information'),
             const SizedBox(height: 10),
-            _buildInfoRow(Icons.person, 'Name', user.username),
-            _buildInfoRow(Icons.email, 'Email', user.email),
-            _buildInfoRow(Icons.phone, 'Contact', user.contact),
+            _buildInfoRow(Icons.person, 'Name', shopUser.username),
+            _buildInfoRow(Icons.email, 'Email', shopUser.email),
+            _buildInfoRow(Icons.phone, 'Contact', shopUser.contact),
           ],
         ),
       ),

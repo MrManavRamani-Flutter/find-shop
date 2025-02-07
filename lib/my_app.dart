@@ -21,6 +21,7 @@ import 'package:find_shop/screens/customer/shops/shop_list_screen.dart';
 import 'package:find_shop/screens/register_screen.dart';
 import 'package:find_shop/screens/shop_owner/home_screen.dart';
 import 'package:find_shop/screens/shop_owner/profile_screen.dart';
+import 'package:find_shop/screens/shop_owner/review_screen/review_list_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'providers/user_provider.dart';
@@ -76,6 +77,7 @@ class MyApp extends StatelessWidget {
           // Shop Owner Screen -------
           '/shop_home': (context) => const ShopOwnerHomeScreen(),
           '/shop_profile': (context) => const ShopOwnerProfileScreen(),
+          '/shop_review_list':(context)=> const ShopReviewListScreen(),
           // ---------------------------------------------------------------
 
           // Admin Screen --------

@@ -46,8 +46,9 @@ class CustomerAddReviewScreenState extends State<CustomerAddReviewScreen> {
       await Provider.of<ShopReviewProvider>(context, listen: false)
           .addShopReview(shopReview);
 
-      // After adding the review, navigate back to the previous screen
-      Navigator.pop(context);
+      if (mounted) {
+        Navigator.pop(context);
+      }
     }
   }
 
