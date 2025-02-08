@@ -68,125 +68,125 @@ class AdminProfileScreen extends StatelessWidget {
                 ),
               ),
               const SizedBox(height: 20),
-              // User Details in a Creative Card Design
-              Align(
-                alignment: Alignment.center,
-                child: Card(
-                  elevation: 10,
-                  // Increased shadow for a creative effect
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(25), // Rounded corners
-                  ),
-                  color: Colors.white,
-                  shadowColor: Colors.blueAccent.withOpacity(0.5),
-                  // Blue shadow for card
-                  child: Padding(
-                    padding: const EdgeInsets.all(20.0),
-                    // Padding inside the card
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          'Username:',
-                          style: TextStyle(
-                            fontSize: 20,
-                            fontWeight: FontWeight.bold,
-                            color: Colors.blueAccent.shade700,
-                          ),
+              // User Details in a Creative Card Design with full width
+              Card(
+                elevation: 10,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(25), // Rounded corners
+                ),
+                color: Colors.white,
+                shadowColor: Colors.blueAccent.withOpacity(0.5),
+                child: Container(
+                  width: double.infinity, // Full width for the card
+                  padding: const EdgeInsets.all(20.0),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'Username:',
+                        style: TextStyle(
+                          fontSize: 20,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.blueAccent.shade700,
                         ),
-                        const SizedBox(height: 10),
-                        Text(
-                          user!.username,
-                          style: const TextStyle(fontSize: 18),
+                      ),
+                      const SizedBox(height: 10),
+                      Text(
+                        user!.username,
+                        style: const TextStyle(fontSize: 18),
+                      ),
+                      const SizedBox(height: 20),
+                      Text(
+                        'Email:',
+                        style: TextStyle(
+                          fontSize: 20,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.blueAccent.shade700,
                         ),
-                        const SizedBox(height: 20),
-                        Text(
-                          'Email:',
-                          style: TextStyle(
-                            fontSize: 20,
-                            fontWeight: FontWeight.bold,
-                            color: Colors.blueAccent.shade700,
-                          ),
-                        ),
-                        const SizedBox(height: 10),
-                        Text(
-                          user.email,
-                          style: const TextStyle(fontSize: 18),
-                        ),
-                      ],
-                    ),
+                      ),
+                      const SizedBox(height: 10),
+                      Text(
+                        user.email,
+                        style: const TextStyle(fontSize: 18),
+                      ),
+                    ],
                   ),
                 ),
               ),
               const SizedBox(height: 40),
-              // Edit Profile Button
+              // Edit Profile Button with full width style
               Align(
                 alignment: Alignment.center,
-                child: ElevatedButton(
-                  onPressed: () {
-                    // Navigate to the profile update screen
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => UpdateProfileScreen(user: user),
+                child: SizedBox(
+                  width: double.infinity, // Full width button
+                  child: ElevatedButton(
+                    onPressed: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => UpdateProfileScreen(user: user),
+                        ),
+                      );
+                    },
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.blueAccent,
+                      // Blue background color
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 40, vertical: 18),
+                      shape: RoundedRectangleBorder(
+                        borderRadius:
+                            BorderRadius.circular(30), // Rounded button edges
                       ),
-                    );
-                  },
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.blueAccent, // Blue background color
-                    padding: const EdgeInsets.symmetric(
-                        horizontal: 40, vertical: 18),
-                    shape: RoundedRectangleBorder(
-                      borderRadius:
-                          BorderRadius.circular(30), // Rounded button edges
+                      elevation: 5, // Button shadow
                     ),
-                    elevation: 5, // Button shadow
-                  ),
-                  child: const Text(
-                    'Edit Profile',
-                    style: TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.white, // White text color
+                    child: const Text(
+                      'Edit Profile',
+                      style: TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.white, // White text color
+                      ),
                     ),
                   ),
                 ),
               ),
               const SizedBox(height: 20),
-              // Logout Button with Creative Design
+              // Logout Button with Full Width Style
               Align(
                 alignment: Alignment.center,
-                child: ElevatedButton(
-                  onPressed: () async {
-                    // Clear SharedPreferences data when logging out
-                    SharedPreferencesHelper().clearUserData();
-                    SharedPreferencesHelper().clearAuthToken();
-                    SharedPreferencesHelper().clearLoginStatus();
+                child: SizedBox(
+                  width: double.infinity, // Full width button
+                  child: ElevatedButton(
+                    onPressed: () async {
+                      // Clear SharedPreferences data when logging out
+                      SharedPreferencesHelper().clearUserData();
+                      SharedPreferencesHelper().clearAuthToken();
+                      SharedPreferencesHelper().clearLoginStatus();
 
-                    // Log out the user by updating the user provider
-                    await userProvider.logOut();
+                      // Log out the user by updating the user provider
+                      await userProvider.logOut();
 
-                    if (context.mounted) // Redirect to the login screen
-                    {
-                      Navigator.pushReplacementNamed(context, '/login');
-                    }
-                  },
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.blueAccent, // Blue background color
-                    padding: const EdgeInsets.symmetric(
-                        horizontal: 40, vertical: 18),
-                    shape: RoundedRectangleBorder(
-                      borderRadius:
-                          BorderRadius.circular(30), // Rounded button edges
+                      if (context.mounted) {
+                        Navigator.pushReplacementNamed(context, '/login');
+                      }
+                    },
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.red,
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 40, vertical: 18),
+                      shape: RoundedRectangleBorder(
+                        borderRadius:
+                            BorderRadius.circular(30), // Rounded button edges
+                      ),
+                      elevation: 5, // Button shadow
                     ),
-                    elevation: 5, // Button shadow
-                  ),
-                  child: const Text(
-                    'Logout',
-                    style: TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.white, // White text color
+                    child: const Text(
+                      'Logout',
+                      style: TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.white, // White text color
+                      ),
                     ),
                   ),
                 ),

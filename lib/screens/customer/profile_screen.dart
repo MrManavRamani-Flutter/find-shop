@@ -36,15 +36,17 @@ class CustomerProfileScreen extends StatelessWidget {
             color: Colors.white,
           ),
         ),
-
-        title: const Text('Profile',style: TextStyle(color: Colors.white),),
+        title: const Text(
+          'Profile',
+          style: TextStyle(color: Colors.white),
+        ),
         centerTitle: true,
         iconTheme: const IconThemeData(color: Colors.white),
         backgroundColor: Colors.blueAccent, // Blue accent color for app bar
       ),
       body: SingleChildScrollView(
         child: Padding(
-          padding: const EdgeInsets.all(20.0),
+          padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 30.0),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
@@ -56,7 +58,6 @@ class CustomerProfileScreen extends StatelessWidget {
                   backgroundImage: const AssetImage('assets/logo/user.png'),
                   backgroundColor: Colors.white,
                   foregroundColor: Colors.blueAccent,
-                  // Blue border for avatar
                   child: ClipOval(
                     child: Image.asset(
                       'assets/logo/user.png',
@@ -66,58 +67,55 @@ class CustomerProfileScreen extends StatelessWidget {
                 ),
               ),
               const SizedBox(height: 20),
-              // User Details in a Creative Card Design
-              Align(
-                alignment: Alignment.center,
-                child: Card(
-                  elevation: 10,
-                  // Increased shadow for a creative effect
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(25), // Rounded corners
-                  ),
-                  color: Colors.white,
-                  shadowColor: Colors.blueAccent.withOpacity(0.5),
-                  // Blue shadow for card
-                  child: Padding(
-                    padding: const EdgeInsets.all(20.0),
-                    // Padding inside the card
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          'Username:',
-                          style: TextStyle(
-                            fontSize: 20,
-                            fontWeight: FontWeight.bold,
-                            color: Colors.blueAccent.shade700,
-                          ),
+
+              // User Details in a Creative Card Design with full width
+              Card(
+                elevation: 10,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(25), // Rounded corners
+                ),
+                color: Colors.white,
+                shadowColor: Colors.blueAccent.withOpacity(0.5),
+                child: Container(
+                  width: double.infinity, // Full width for the card
+                  padding: const EdgeInsets.all(20.0),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'Username:',
+                        style: TextStyle(
+                          fontSize: 20,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.blueAccent.shade700,
                         ),
-                        const SizedBox(height: 10),
-                        Text(
-                          user!.username,
-                          style: const TextStyle(fontSize: 18),
+                      ),
+                      const SizedBox(height: 10),
+                      Text(
+                        user!.username,
+                        style: const TextStyle(fontSize: 18),
+                      ),
+                      const SizedBox(height: 20),
+                      Text(
+                        'Email:',
+                        style: TextStyle(
+                          fontSize: 20,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.blueAccent.shade700,
                         ),
-                        const SizedBox(height: 20),
-                        Text(
-                          'Email:',
-                          style: TextStyle(
-                            fontSize: 20,
-                            fontWeight: FontWeight.bold,
-                            color: Colors.blueAccent.shade700,
-                          ),
-                        ),
-                        const SizedBox(height: 10),
-                        Text(
-                          user.email,
-                          style: const TextStyle(fontSize: 18),
-                        ),
-                      ],
-                    ),
+                      ),
+                      const SizedBox(height: 10),
+                      Text(
+                        user.email,
+                        style: const TextStyle(fontSize: 18),
+                      ),
+                    ],
                   ),
                 ),
               ),
               const SizedBox(height: 40),
-              // Edit Profile Button
+
+              // Edit Profile Button with full width style
               Align(
                 alignment: Alignment.center,
                 child: ElevatedButton(
@@ -131,14 +129,17 @@ class CustomerProfileScreen extends StatelessWidget {
                     );
                   },
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.blueAccent, // Blue background color
-                    padding:
-                        const EdgeInsets.symmetric(horizontal: 40, vertical: 18),
+                    backgroundColor: Colors.blueAccent,
+                    // Blue background color
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 50, vertical: 18),
                     shape: RoundedRectangleBorder(
                       borderRadius:
                           BorderRadius.circular(30), // Rounded button edges
                     ),
-                    elevation: 5, // Button shadow
+                    elevation: 5,
+                    // Button shadow
+                    minimumSize: const Size(double.infinity, 50), // Full width
                   ),
                   child: const Text(
                     'Edit Profile',
@@ -151,6 +152,7 @@ class CustomerProfileScreen extends StatelessWidget {
                 ),
               ),
               const SizedBox(height: 20),
+
               // Logout Button with Creative Design
               Align(
                 alignment: Alignment.center,
@@ -160,24 +162,26 @@ class CustomerProfileScreen extends StatelessWidget {
                     SharedPreferencesHelper().clearUserData();
                     SharedPreferencesHelper().clearAuthToken();
                     SharedPreferencesHelper().clearLoginStatus();
-        
+
                     // Log out the user by updating the user provider
                     await userProvider.logOut();
-        
-                    if (context.mounted) // Redirect to the login screen
-                    {
+
+                    if (context.mounted) {
                       Navigator.pushReplacementNamed(context, '/login');
                     }
                   },
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.blueAccent, // Blue background color
-                    padding:
-                        const EdgeInsets.symmetric(horizontal: 40, vertical: 18),
+                    backgroundColor: Colors.red,
+                    // Blue background color
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 50, vertical: 18),
                     shape: RoundedRectangleBorder(
                       borderRadius:
                           BorderRadius.circular(30), // Rounded button edges
                     ),
-                    elevation: 5, // Button shadow
+                    elevation: 5,
+                    // Button shadow
+                    minimumSize: const Size(double.infinity, 50), // Full width
                   ),
                   child: const Text(
                     'Logout',
