@@ -255,6 +255,8 @@ class _CustomerHomeScreenState extends State<CustomerHomeScreen> {
       child: Column(
         children: [
           _buildDrawerHeader(context),
+          _buildDrawerItem(Icons.shopping_cart, 'Product List',
+              '/customer_product_list', context),
           _buildDrawerItem(Icons.storefront_rounded, 'Shop List',
               '/customer_shop_list', context),
           _buildDrawerItem(Icons.category, 'Category List',

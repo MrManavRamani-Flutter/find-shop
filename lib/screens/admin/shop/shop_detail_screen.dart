@@ -18,13 +18,14 @@ class AdminShopDetailScreen extends StatefulWidget {
   final int shopId;
   final int userId;
 
-  const AdminShopDetailScreen({Key? key, required this.shopId, required this.userId}) : super(key: key);
+  const AdminShopDetailScreen(
+      {super.key, required this.shopId, required this.userId});
 
   @override
-  _AdminShopDetailScreenState createState() => _AdminShopDetailScreenState();
+  AdminShopDetailScreenState createState() => AdminShopDetailScreenState();
 }
 
-class _AdminShopDetailScreenState extends State<AdminShopDetailScreen> {
+class AdminShopDetailScreenState extends State<AdminShopDetailScreen> {
   late ShopProvider _shopProvider;
   late UserProvider _userProvider;
   late ShopCategoryProvider _shopCategoryProvider;
@@ -54,10 +55,12 @@ class _AdminShopDetailScreenState extends State<AdminShopDetailScreen> {
   Future<void> _fetchData() async {
     _shopProvider = Provider.of<ShopProvider>(context, listen: false);
     _userProvider = Provider.of<UserProvider>(context, listen: false);
-    _shopCategoryProvider = Provider.of<ShopCategoryProvider>(context, listen: false);
+    _shopCategoryProvider =
+        Provider.of<ShopCategoryProvider>(context, listen: false);
     _categoryProvider = Provider.of<CategoryProvider>(context, listen: false);
     _areaProvider = Provider.of<AreaProvider>(context, listen: false);
-    _shopReviewProvider = Provider.of<ShopReviewProvider>(context, listen: false);
+    _shopReviewProvider =
+        Provider.of<ShopReviewProvider>(context, listen: false);
 
     await _shopProvider.fetchShopByUserId(widget.userId);
     await _userProvider.fetchUsers();
@@ -72,10 +75,12 @@ class _AdminShopDetailScreenState extends State<AdminShopDetailScreen> {
       reviews = _shopReviewProvider.shopReviews;
 
       if (_shop != null) {
-        var shopCategory = _shopCategoryProvider.shopCategories.firstWhere((sc) => sc.shopId == _shop!.shopId);
-        _category = _categoryProvider.categories.firstWhere((c) => c.catId == shopCategory.catId);
+        var shopCategory = _shopCategoryProvider.shopCategories
+            .firstWhere((sc) => sc.shopId == _shop!.shopId);
+        _category = _categoryProvider.categories
+            .firstWhere((c) => c.catId == shopCategory.catId);
         _area = _areaProvider.areas.firstWhere(
-              (a) => a.areaId == _shop!.areaId,
+          (a) => a.areaId == _shop!.areaId,
           orElse: () => Area(areaId: -1, areaName: "No Area"),
         );
       }
@@ -88,7 +93,8 @@ class _AdminShopDetailScreenState extends State<AdminShopDetailScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Shop Profile', style: TextStyle(color: Colors.white)),
+        title:
+            const Text('Shop Profile', style: TextStyle(color: Colors.white)),
         backgroundColor: Colors.blueAccent,
         centerTitle: true,
         iconTheme: const IconThemeData(color: Colors.white),
@@ -96,8 +102,8 @@ class _AdminShopDetailScreenState extends State<AdminShopDetailScreen> {
       body: _isLoading
           ? const Center(child: CircularProgressIndicator())
           : _shop == null || _shop!.shopId == -1
-          ? const Center(child: Text('Shop details not available'))
-          : _buildShopProfile(),
+              ? const Center(child: Text('Shop details not available'))
+              : _buildShopProfile(),
     );
   }
 
@@ -161,7 +167,8 @@ class _AdminShopDetailScreenState extends State<AdminShopDetailScreen> {
           },
           child: Card(
             elevation: 3,
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+            shape:
+                RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
             margin: const EdgeInsets.symmetric(vertical: 8.0),
             child: Padding(
               padding: const EdgeInsets.all(14.0),
@@ -178,17 +185,22 @@ class _AdminShopDetailScreenState extends State<AdminShopDetailScreen> {
                       Expanded(
                         child: Text(
                           username,
-                          style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w600, color: Colors.black87),
+                          style: const TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.w600,
+                              color: Colors.black87),
                         ),
                       ),
                       Row(
                         children: List.generate(
-                          review.rating.toInt(),
-                              (index) => const Icon(Icons.star, color: Colors.amber, size: 18),
-                        ) +
+                              review.rating.toInt(),
+                              (index) => const Icon(Icons.star,
+                                  color: Colors.amber, size: 18),
+                            ) +
                             List.generate(
                               (5 - review.rating.toInt()),
-                                  (index) => const Icon(Icons.star_border, color: Colors.grey, size: 18),
+                              (index) => const Icon(Icons.star_border,
+                                  color: Colors.grey, size: 18),
                             ),
                       ),
                     ],
@@ -196,14 +208,21 @@ class _AdminShopDetailScreenState extends State<AdminShopDetailScreen> {
                   const SizedBox(height: 8),
                   Text(
                     review.comment,
-                    style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w500, color: Colors.black87, height: 1.5),
+                    style: const TextStyle(
+                        fontSize: 14,
+                        fontWeight: FontWeight.w500,
+                        color: Colors.black87,
+                        height: 1.5),
                   ),
                   const SizedBox(height: 12),
                   Container(
                     alignment: Alignment.centerRight,
                     child: Text(
                       'Posted on: ${_formatDateTime(review.reviewDate)}',
-                      style: const TextStyle(fontSize: 12, color: Colors.grey, fontStyle: FontStyle.italic),
+                      style: const TextStyle(
+                          fontSize: 12,
+                          color: Colors.grey,
+                          fontStyle: FontStyle.italic),
                     ),
                   ),
                 ],
@@ -268,7 +287,8 @@ class _AdminShopDetailScreenState extends State<AdminShopDetailScreen> {
           children: [
             _buildSectionTitle('Shop Details'),
             const SizedBox(height: 10),
-            _buildInfoRow(Icons.location_on, 'Address', _shop!.address ?? 'No Address'),
+            _buildInfoRow(
+                Icons.location_on, 'Address', _shop!.address ?? 'No Address'),
             _buildInfoRow(Icons.map, 'Area', _area?.areaName ?? 'No Area'),
           ],
         ),

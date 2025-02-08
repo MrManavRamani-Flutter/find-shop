@@ -52,7 +52,7 @@ class ProductDatabaseHelper {
       [shopId],
     );
 
-    return Sqflite.firstIntValue(result) ?? 0; // Return 0 if no products found
+    return Sqflite.firstIntValue(result) ?? 0;
   }
 
   // Fetch all products by shop_id

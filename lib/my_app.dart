@@ -17,6 +17,7 @@ import 'package:find_shop/screens/customer/area_screens/area_list_screen.dart';
 import 'package:find_shop/screens/customer/category_screens/category_list_screen.dart';
 import 'package:find_shop/screens/customer/favorite_screens/favorite_shop_list_screen.dart';
 import 'package:find_shop/screens/customer/home_screen.dart';
+import 'package:find_shop/screens/customer/product_screen/product_list_screen.dart';
 import 'package:find_shop/screens/customer/profile_screen.dart';
 import 'package:find_shop/screens/customer/review_screen/add_review_screen.dart';
 import 'package:find_shop/screens/customer/shops/shop_list_screen.dart';
@@ -72,6 +73,7 @@ class MyApp extends StatelessWidget {
           '/customer_category_list': (context) =>
               const CustomerCategoryListScreen(),
           '/customer_shop_list': (context) => const CustomerShopListScreen(),
+          '/customer_product_list': (context) => const CustomerProductListScreen(),
           '/customer_favorite_list': (context) =>
               const CustomerFavoriteShopListScreen(),
           '/customer_add_review': (context) => CustomerAddReviewScreen(
