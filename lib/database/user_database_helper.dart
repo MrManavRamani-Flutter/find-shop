@@ -4,7 +4,6 @@ import '../models/user.dart';
 class UserDatabaseHelper {
   static const String tableName = 'users';
 
-  // Insert a new user into the database
   Future<int> insertUser(User user) async {
     final db = await AppDatabase().database;
     try {
@@ -69,7 +68,7 @@ class UserDatabaseHelper {
     try {
       return await db.update(
         tableName,
-        {'status': status}, // Update only the status column
+        {'status': status},
         where: 'user_id = ?',
         whereArgs: [userId],
       );
@@ -98,8 +97,8 @@ class UserDatabaseHelper {
     try {
       final result = await db.query(
         tableName,
-        where: 'username = ?',
-        whereArgs: [username],
+        where: 'username = ? OR email = ?',
+        whereArgs: [username, username],
       );
 
       // If user is found, return the user object
@@ -109,7 +108,7 @@ class UserDatabaseHelper {
         return null; // Return null if no user found
       }
     } catch (e) {
-      throw Exception('Error fetching user by username: $e');
+      throw Exception('Error fetching user by username or email: $e');
     }
   }
 }

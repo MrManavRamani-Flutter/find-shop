@@ -115,16 +115,6 @@ class AppDatabase {
     ''');
 
     await db.execute('''
-    CREATE TABLE search (
-      search_id INTEGER PRIMARY KEY AUTOINCREMENT,
-      query TEXT NOT NULL,
-      user_id INTEGER,
-      searched_at TEXT,
-      FOREIGN KEY (user_id) REFERENCES users(user_id)
-    );
-    ''');
-
-    await db.execute('''
     CREATE TABLE shop_reviews (
       rev_id INTEGER PRIMARY KEY AUTOINCREMENT,
       comment TEXT,
@@ -136,5 +126,47 @@ class AppDatabase {
       FOREIGN KEY (user_id) REFERENCES users(user_id)
     );
     ''');
+    // Insert default users with their roles
+    final customerRole = await db
+        .query('roles', where: 'role_name = ?', whereArgs: ['Customer']);
+    final shopOwnerRole = await db
+        .query('roles', where: 'role_name = ?', whereArgs: ['Shop Owner']);
+    final adminRole =
+        await db.query('roles', where: 'role_name = ?', whereArgs: ['Admin']);
+
+    // Insert 3 users with different roles
+    if (customerRole.isNotEmpty &&
+        shopOwnerRole.isNotEmpty &&
+        adminRole.isNotEmpty) {
+      await db.insert('users', {
+        'username': 'customer1',
+        'email': 'customer1@gmail.com',
+        'password': 'password123',
+        'contact': '1234567890',
+        'role_id': customerRole.first['role_id'],
+        'status': 1,
+        'created_at': DateTime.now().toIso8601String(),
+      });
+
+      await db.insert('users', {
+        'username': 'shopowner1',
+        'email': 'shopowner1@gmail.com',
+        'password': 'password123',
+        'contact': '0987654321',
+        'role_id': shopOwnerRole.first['role_id'],
+        'status': 0,
+        'created_at': DateTime.now().toIso8601String(),
+      });
+
+      await db.insert('users', {
+        'username': 'admin',
+        'email': 'admin@gmail.com',
+        'password': 'admin123',
+        'contact': '1122334455',
+        'role_id': adminRole.first['role_id'],
+        'status': 1,
+        'created_at': DateTime.now().toIso8601String(),
+      });
+    }
   }
 }

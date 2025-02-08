@@ -150,9 +150,9 @@ class UserProvider with ChangeNotifier {
       final userId = await SharedPreferencesHelper().getUserId();
       final user = await UserDatabaseHelper().getUserById(userId!);
       _loggedInUser = user;
-      notifyListeners(); // Notify listeners about the change
+      notifyListeners();
     } else {
-      _loggedInUser = null; // If not logged in, set to null
+      _loggedInUser = null;
       notifyListeners();
     }
   }

@@ -101,6 +101,7 @@ class RegisterScreenState extends State<RegisterScreen> {
                       const SizedBox(height: 16),
                       TextFormField(
                         controller: _emailController,
+                        keyboardType: TextInputType.emailAddress,
                         decoration: const InputDecoration(
                           labelText: 'Email',
                           prefixIcon: Icon(Icons.email),
@@ -149,9 +150,12 @@ class RegisterScreenState extends State<RegisterScreen> {
                           prefixIcon: Icon(Icons.phone),
                           border: OutlineInputBorder(),
                         ),
+                        keyboardType: TextInputType.phone,
                         validator: (value) {
                           if (value == null || value.isEmpty) {
                             return 'Please enter your contact number';
+                          } else if (value.length != 10) {
+                            return 'Contact number must be 10 digits';
                           }
                           return null;
                         },
@@ -180,9 +184,10 @@ class RegisterScreenState extends State<RegisterScreen> {
                                 shadowColor: Colors.deepPurple,
                                 minimumSize: const Size(double.infinity, 50),
                                 shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(12),
-                                  side: BorderSide(color: Colors.deepPurpleAccent.withOpacity(0.2))
-                                ),
+                                    borderRadius: BorderRadius.circular(12),
+                                    side: BorderSide(
+                                        color: Colors.deepPurpleAccent
+                                            .withOpacity(0.2))),
                               ),
                               child: const Text('Register'),
                             ),
