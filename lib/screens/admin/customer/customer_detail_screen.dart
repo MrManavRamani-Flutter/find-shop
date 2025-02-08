@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:find_shop/models/user.dart';
 import 'package:find_shop/providers/user_provider.dart';
+import 'package:find_shop/providers/shop_review_provider.dart';
 import 'package:provider/provider.dart';
+import 'package:intl/intl.dart'; // Import the intl package
 
 class CustomerDetailScreen extends StatefulWidget {
   final User user;
@@ -19,6 +21,11 @@ class CustomerDetailScreenState extends State<CustomerDetailScreen> {
   void initState() {
     super.initState();
     _user = widget.user;
+
+    // Fetch reviews when the screen loads
+    final shopReviewProvider =
+    Provider.of<ShopReviewProvider>(context, listen: false);
+    shopReviewProvider.fetchShopReviewsByUserId(_user.userId);
   }
 
   void _toggleBlockStatus() async {
@@ -82,6 +89,8 @@ class CustomerDetailScreenState extends State<CustomerDetailScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final shopReviewProvider = Provider.of<ShopReviewProvider>(context);
+
     return Scaffold(
       appBar: AppBar(
         title: const Text('Customer Details',
@@ -122,7 +131,7 @@ class CustomerDetailScreenState extends State<CustomerDetailScreen> {
                       children: [
                         Icon(Icons.verified,
                             color:
-                                _user.status == 1 ? Colors.green : Colors.red),
+                            _user.status == 1 ? Colors.green : Colors.red),
                         const SizedBox(width: 8),
                         Text(
                           _user.status == 1 ? "Active" : "Blocked",
@@ -147,7 +156,7 @@ class CustomerDetailScreenState extends State<CustomerDetailScreen> {
                 onPressed: _toggleBlockStatus,
                 style: ElevatedButton.styleFrom(
                   backgroundColor:
-                      _user.status == 1 ? Colors.red : Colors.green,
+                  _user.status == 1 ? Colors.red : Colors.green,
                   shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(12)),
                   padding: const EdgeInsets.symmetric(vertical: 14),
@@ -159,6 +168,81 @@ class CustomerDetailScreenState extends State<CustomerDetailScreen> {
                       fontWeight: FontWeight.bold,
                       color: Colors.white),
                 ),
+              ),
+            ),
+            const SizedBox(height: 20),
+            // Display reviews section
+            const SizedBox(height: 12),
+            const Text(
+              "Customer Reviews",
+              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+            ),
+            const SizedBox(height: 10),
+            // List reviews if available
+            Expanded(
+              child: shopReviewProvider.userReviews.isEmpty
+                  ? const Center(
+                child: Text(
+                  'No reviews available.',
+                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.grey),
+                ),
+              )
+                  : ListView.builder(
+                itemCount: shopReviewProvider.userReviews.length,
+                itemBuilder: (context, index) {
+                  final review = shopReviewProvider.userReviews[index];
+                  final formattedDate = _formatDate(review.reviewDate); // Format the review date
+                  return Card(
+                    elevation: 5,
+                    margin: const EdgeInsets.symmetric(vertical: 8, horizontal: 10),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    child: Padding(
+                      padding: const EdgeInsets.all(16.0),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Row(
+                            children: [
+                              const Icon(
+                                Icons.star,
+                                color: Colors.amber,
+                                size: 22,
+                              ),
+                              const SizedBox(width: 8),
+                              Text(
+                                '${review.rating}',
+                                style: const TextStyle(
+                                  fontWeight: FontWeight.w600,
+                                  fontSize: 18,
+                                  color: Colors.black,
+                                ),
+                              ),
+                            ],
+                          ),
+                          const SizedBox(height: 8),
+                          Text(
+                            review.comment,
+                            style: const TextStyle(fontSize: 16, color: Colors.black87),
+                          ),
+                          const SizedBox(height: 10),
+                          Align(
+                            alignment: Alignment.bottomRight,
+                            child: Text(
+                              'Posted on: $formattedDate', // Display the formatted date
+                              style: const TextStyle(
+                                fontSize: 12,
+                                color: Colors.grey,
+                                fontStyle: FontStyle.italic,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  );
+                },
               ),
             ),
           ],
@@ -189,5 +273,12 @@ class CustomerDetailScreenState extends State<CustomerDetailScreen> {
         ],
       ),
     );
+  }
+
+  // Method to format the date
+  String _formatDate(String date) {
+    final DateFormat formatter = DateFormat('dd/MM/yyyy');
+    final DateTime parsedDate = DateTime.parse(date);
+    return formatter.format(parsedDate);
   }
 }

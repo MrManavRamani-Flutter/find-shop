@@ -50,7 +50,7 @@ class ShopListScreen extends StatelessWidget {
                         onTap: () {
                           Navigator.of(context).push(
                             MaterialPageRoute(
-                              builder: (context) => ShopDetailScreen(
+                              builder: (context) => AdminShopDetailScreen(
                                   shopId: shop.shopId!, userId: shop.userId!),
                             ),
                           );

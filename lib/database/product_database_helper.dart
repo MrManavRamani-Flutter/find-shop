@@ -5,6 +5,44 @@ import '../models/product.dart';
 
 class ProductDatabaseHelper {
   static const String tableName = 'products';
+  static const String productTable = 'products';
+  static const String shopTable = 'shops';
+  static const String userTable = 'users';
+
+  Future<Map<String, dynamic>?> getUserAndShopByProductId(int productId) async {
+    final db = await AppDatabase().database;
+
+    final List<Map<String, dynamic>> result = await db.rawQuery('''
+    SELECT 
+      s.shop_id, s.user_id
+    FROM $productTable p
+    INNER JOIN $shopTable s ON p.shop_id = s.shop_id
+    INNER JOIN $userTable u ON s.user_id = u.user_id
+    WHERE p.pro_id = ?
+  ''', [productId]);
+
+    if (result.isNotEmpty) {
+      return result.first;
+    }
+
+    return null;
+  }
+
+  Future<List<Map<String, dynamic>>> getProductWithShopAndUser() async {
+    final db = await AppDatabase().database;
+
+    final List<Map<String, dynamic>> result = await db.rawQuery('''
+      SELECT 
+        p.pro_id, p.pro_name, p.pro_desc, p.price, p.shop_id,
+        s.shop_name, s.address, s.map_address, s.user_id,
+        u.username, u.email, u.contact
+      FROM $productTable p
+      INNER JOIN $shopTable s ON p.shop_id = s.shop_id
+      INNER JOIN $userTable u ON s.user_id = u.user_id
+    ''');
+
+    return result;
+  }
 
   // Get the count of products added by each shop_id
   Future<int> countProductsByShopId(int shopId) async {

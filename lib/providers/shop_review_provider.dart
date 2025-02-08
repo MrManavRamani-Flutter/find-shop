@@ -5,10 +5,14 @@ import '../database/shop_review_database_helper.dart';
 
 class ShopReviewProvider with ChangeNotifier {
   List<ShopReview> _shopReviews = [];
+  List<ShopReview> _userReviews = [];
   int _reviewCount = 0;
   late int currentUserId;
 
   List<ShopReview> get shopReviews => _shopReviews;
+
+  List<ShopReview> get userReviews => _userReviews;
+
   int get reviewCount => _reviewCount;
 
   Future<void> setCurrentUserId() async {
@@ -33,6 +37,13 @@ class ShopReviewProvider with ChangeNotifier {
     final shopReviewsList =
         await ShopReviewDatabaseHelper().getShopReviewsByShopId(shopId);
     _shopReviews = shopReviewsList;
+    notifyListeners();
+  }
+
+  Future<void> fetchShopReviewsByUserId(int userId) async {
+    final userReviewsList =
+        await ShopReviewDatabaseHelper().getShopReviewsByUserId(userId);
+    _userReviews = userReviewsList;
     notifyListeners();
   }
 

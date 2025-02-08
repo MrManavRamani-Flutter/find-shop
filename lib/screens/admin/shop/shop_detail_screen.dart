@@ -1,5 +1,6 @@
 import 'package:find_shop/models/shop_review.dart';
 import 'package:find_shop/providers/shop_review_provider.dart';
+import 'package:find_shop/screens/admin/customer/customer_detail_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:find_shop/providers/shop_provider.dart';
@@ -13,19 +14,17 @@ import 'package:find_shop/models/category.dart';
 import 'package:find_shop/models/area.dart';
 import 'package:intl/intl.dart';
 
-
-class ShopDetailScreen extends StatefulWidget {
+class AdminShopDetailScreen extends StatefulWidget {
   final int shopId;
   final int userId;
 
-  const ShopDetailScreen(
-      {super.key, required this.shopId, required this.userId});
+  const AdminShopDetailScreen({Key? key, required this.shopId, required this.userId}) : super(key: key);
 
   @override
-  ShopDetailScreenState createState() => ShopDetailScreenState();
+  _AdminShopDetailScreenState createState() => _AdminShopDetailScreenState();
 }
 
-class ShopDetailScreenState extends State<ShopDetailScreen> {
+class _AdminShopDetailScreenState extends State<AdminShopDetailScreen> {
   late ShopProvider _shopProvider;
   late UserProvider _userProvider;
   late ShopCategoryProvider _shopCategoryProvider;
@@ -45,23 +44,20 @@ class ShopDetailScreenState extends State<ShopDetailScreen> {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) => _fetchData());
   }
+
   String _formatDateTime(String reviewDate) {
-    final DateFormat formatter = DateFormat('yyyy-MM-dd HH:mm'); // Customize the format
-
-    // Parse the reviewDate string into a DateTime object
-    DateTime parsedDate = DateTime.tryParse(reviewDate) ?? DateTime.now(); // If parsing fails, fallback to current date/time
-
+    final DateFormat formatter = DateFormat('yyyy-MM-dd HH:mm');
+    DateTime parsedDate = DateTime.tryParse(reviewDate) ?? DateTime.now();
     return formatter.format(parsedDate);
   }
+
   Future<void> _fetchData() async {
     _shopProvider = Provider.of<ShopProvider>(context, listen: false);
     _userProvider = Provider.of<UserProvider>(context, listen: false);
-    _shopCategoryProvider =
-        Provider.of<ShopCategoryProvider>(context, listen: false);
+    _shopCategoryProvider = Provider.of<ShopCategoryProvider>(context, listen: false);
     _categoryProvider = Provider.of<CategoryProvider>(context, listen: false);
     _areaProvider = Provider.of<AreaProvider>(context, listen: false);
-    _shopReviewProvider =
-        Provider.of<ShopReviewProvider>(context, listen: false);
+    _shopReviewProvider = Provider.of<ShopReviewProvider>(context, listen: false);
 
     await _shopProvider.fetchShopByUserId(widget.userId);
     await _userProvider.fetchUsers();
@@ -76,14 +72,10 @@ class ShopDetailScreenState extends State<ShopDetailScreen> {
       reviews = _shopReviewProvider.shopReviews;
 
       if (_shop != null) {
-        var shopCategory = _shopCategoryProvider.shopCategories
-            .firstWhere((sc) => sc.shopId == _shop!.shopId);
-
-        _category = _categoryProvider.categories
-            .firstWhere((c) => c.catId == shopCategory.catId);
-
+        var shopCategory = _shopCategoryProvider.shopCategories.firstWhere((sc) => sc.shopId == _shop!.shopId);
+        _category = _categoryProvider.categories.firstWhere((c) => c.catId == shopCategory.catId);
         _area = _areaProvider.areas.firstWhere(
-          (a) => a.areaId == _shop!.areaId,
+              (a) => a.areaId == _shop!.areaId,
           orElse: () => Area(areaId: -1, areaName: "No Area"),
         );
       }
@@ -96,8 +88,7 @@ class ShopDetailScreenState extends State<ShopDetailScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title:
-            const Text('Shop Profile', style: TextStyle(color: Colors.white)),
+        title: const Text('Shop Profile', style: TextStyle(color: Colors.white)),
         backgroundColor: Colors.blueAccent,
         centerTitle: true,
         iconTheme: const IconThemeData(color: Colors.white),
@@ -105,8 +96,8 @@ class ShopDetailScreenState extends State<ShopDetailScreen> {
       body: _isLoading
           ? const Center(child: CircularProgressIndicator())
           : _shop == null || _shop!.shopId == -1
-              ? const Center(child: Text('Shop details not available'))
-              : _buildShopProfile(),
+          ? const Center(child: Text('Shop details not available'))
+          : _buildShopProfile(),
     );
   }
 
@@ -122,7 +113,6 @@ class ShopDetailScreenState extends State<ShopDetailScreen> {
           const SizedBox(height: 20),
           _buildShopDetails(),
           const SizedBox(height: 20),
-          // Review Section with redesigned UI
           _buildReviewCard(),
         ],
       ),
@@ -132,9 +122,7 @@ class ShopDetailScreenState extends State<ShopDetailScreen> {
   Widget _buildReviewCard() {
     return Card(
       elevation: 5,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(15),
-      ),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
       child: Padding(
         padding: const EdgeInsets.all(12.0),
         child: Column(
@@ -142,7 +130,6 @@ class ShopDetailScreenState extends State<ShopDetailScreen> {
           children: [
             _buildSectionTitle('Customer Reviews'),
             const SizedBox(height: 10),
-            // Show a divider to separate title and reviews
             const Divider(thickness: 1, color: Colors.grey),
             const SizedBox(height: 10),
             _buildReviewList(),
@@ -155,7 +142,6 @@ class ShopDetailScreenState extends State<ShopDetailScreen> {
   Widget _buildReviewList() {
     final userProvider = Provider.of<UserProvider>(context, listen: false);
 
-
     return ListView.builder(
       shrinkWrap: true,
       physics: const NeverScrollableScrollPhysics(),
@@ -165,71 +151,63 @@ class ShopDetailScreenState extends State<ShopDetailScreen> {
         final user = userProvider.getUserByUserId(review.userId);
         final username = user.username;
 
-        return Card(
-          elevation: 3,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(12),
-          ),
-          margin: const EdgeInsets.symmetric(vertical: 8.0),
-          child: Padding(
-            padding: const EdgeInsets.all(14.0),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                // User Info Row
-                Row(
-                  children: [
-                    const CircleAvatar(
-                      radius: 22,
-                      backgroundImage: AssetImage('assets/logo/user.png'),
-                    ),
-                    const SizedBox(width: 12),
-                    Expanded(
-                      child: Text(
-                        username,
-                        style: const TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.w600,
-                          color: Colors.black87,
+        return GestureDetector(
+          onTap: () {
+            Navigator.of(context).push(
+              MaterialPageRoute(
+                builder: (context) => CustomerDetailScreen(user: user),
+              ),
+            );
+          },
+          child: Card(
+            elevation: 3,
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+            margin: const EdgeInsets.symmetric(vertical: 8.0),
+            child: Padding(
+              padding: const EdgeInsets.all(14.0),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    children: [
+                      const CircleAvatar(
+                        radius: 22,
+                        backgroundImage: AssetImage('assets/logo/user.png'),
+                      ),
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: Text(
+                          username,
+                          style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w600, color: Colors.black87),
                         ),
                       ),
-                    ),
-                    Row(
-                      children: List.generate(
-                            review.rating.toInt(), // Convert double to int
-                            (index) => const Icon(Icons.star,
-                                color: Colors.amber, size: 18),
-                          ) +
-                          List.generate(
-                            (5 - review.rating.toInt()),
-                            (index) => const Icon(Icons.star_border,
-                                color: Colors.grey, size: 18),
-                          ),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 8),
-
-                // Review Comment
-                Text(
-                  review.comment,
-                  style: const TextStyle(
-                      fontSize: 14,
-                      fontWeight: FontWeight.w500,
-                      color: Colors.black87,
-                      height: 1.5),
-                ),
-                const SizedBox(height: 12),
-                // Date of Review (can show when the review was posted)
-                Text(
-                  'Posted on: ${_formatDateTime(review.reviewDate)}',
-                  style: const TextStyle(
-                    fontSize: 12,
-                    color: Colors.grey,
-                    fontStyle: FontStyle.italic,
+                      Row(
+                        children: List.generate(
+                          review.rating.toInt(),
+                              (index) => const Icon(Icons.star, color: Colors.amber, size: 18),
+                        ) +
+                            List.generate(
+                              (5 - review.rating.toInt()),
+                                  (index) => const Icon(Icons.star_border, color: Colors.grey, size: 18),
+                            ),
+                      ),
+                    ],
                   ),
-                ),
-              ],
+                  const SizedBox(height: 8),
+                  Text(
+                    review.comment,
+                    style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w500, color: Colors.black87, height: 1.5),
+                  ),
+                  const SizedBox(height: 12),
+                  Container(
+                    alignment: Alignment.centerRight,
+                    child: Text(
+                      'Posted on: ${_formatDateTime(review.reviewDate)}',
+                      style: const TextStyle(fontSize: 12, color: Colors.grey, fontStyle: FontStyle.italic),
+                    ),
+                  ),
+                ],
+              ),
             ),
           ),
         );
@@ -290,10 +268,8 @@ class ShopDetailScreenState extends State<ShopDetailScreen> {
           children: [
             _buildSectionTitle('Shop Details'),
             const SizedBox(height: 10),
-            _buildInfoRow(
-                Icons.location_on, 'Address', _shop!.address ?? 'No Address'),
+            _buildInfoRow(Icons.location_on, 'Address', _shop!.address ?? 'No Address'),
             _buildInfoRow(Icons.map, 'Area', _area?.areaName ?? 'No Area'),
-            // Display Area Name
           ],
         ),
       ),

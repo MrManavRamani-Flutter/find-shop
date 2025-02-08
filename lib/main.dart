@@ -5,12 +5,11 @@ import 'utils/shared_preferences_helper.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-
-  // Initialize the database
   await AppDatabase().database;
-
-  // Initialize SharedPreferences and check if the user is logged in
   bool isLoggedIn = await SharedPreferencesHelper().isLoggedIn();
-
-  runApp(MyApp(isLoggedIn: isLoggedIn));
+  runApp(
+    MyApp(
+      isLoggedIn: isLoggedIn,
+    ),
+  );
 }
