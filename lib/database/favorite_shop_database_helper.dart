@@ -7,19 +7,15 @@ class FavoriteShopDatabaseHelper {
   // Insert a favorite shop into the database
   Future<int> insertFavoriteShop(FavoriteShop favoriteShop) async {
     final db = await AppDatabase().database;
-
-    return await db.insert(
-      tableName,
-      favoriteShop.toMap(),
-    );
+    return await db.insert(tableName, favoriteShop.toMap());
   }
 
-  // Get all favorite shops for a user
+  // Get all favorite shops for a specific user
   Future<List<FavoriteShop>> getFavoriteShops(int userId) async {
     final db = await AppDatabase().database;
     final List<Map<String, dynamic>> maps = await db.query(
       tableName,
-      where: 'user_id = ?', // Query for specific userId
+      where: 'user_id = ?', // Filter results by userId
       whereArgs: [userId],
     );
     return List.generate(maps.length, (i) {
@@ -32,8 +28,7 @@ class FavoriteShopDatabaseHelper {
     final db = await AppDatabase().database;
     return await db.delete(
       tableName,
-      where: 'shop_id = ? AND user_id = ?',
-      // Delete based on both shopId and userId
+      where: 'shop_id = ? AND user_id = ?', // Ensure correct shop and user
       whereArgs: [shopId, userId],
     );
   }
@@ -41,14 +36,11 @@ class FavoriteShopDatabaseHelper {
   // Check if a shop is a favorite for a specific user
   Future<bool> isShopFavoriteForUser(int shopId, int userId) async {
     final db = await AppDatabase().database;
-
-    // Query the database to check if the favorite exists for the given shopId and userId
     List<Map<String, dynamic>> result = await db.query(
       tableName,
       where: 'shop_id = ? AND user_id = ?',
       whereArgs: [shopId, userId],
     );
-
-    return result.isNotEmpty;
+    return result.isNotEmpty; // Returns true if the shop is marked as favorite
   }
 }

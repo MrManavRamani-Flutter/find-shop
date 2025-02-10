@@ -11,12 +11,12 @@ class FavoriteShopProvider with ChangeNotifier {
 
   List<FavoriteShop> get favoriteShops => _favoriteShops;
 
-  // Fetch favorite shops for a specific user
+  // Fetch favorite shops for the current user based on their user ID
   Future<void> fetchFavoriteShopsByUserId() async {
     final userId = await _sharedPrefsHelper.getUserId();
     if (userId != null) {
       _favoriteShops = await _dbHelper.getFavoriteShops(userId);
-      notifyListeners();
+      notifyListeners(); // Notify listeners to update the UI
     }
   }
 
@@ -29,21 +29,21 @@ class FavoriteShopProvider with ChangeNotifier {
     return false;
   }
 
-  // Toggle a shop's favorite status (add or remove)
+  // Toggle a shop's favorite status (add or remove from favorites)
   Future<void> toggleFavoriteShop(int shopId) async {
     final userId = await _sharedPrefsHelper.getUserId();
     if (userId != null) {
       bool isShopFavorite = await isFavorite(shopId);
 
       if (isShopFavorite) {
-        await _deleteFavoriteShop(shopId, userId);
+        await _deleteFavoriteShop(shopId, userId); // Remove from favorites
       } else {
-        await _addFavoriteShop(shopId, userId);
+        await _addFavoriteShop(shopId, userId); // Add to favorites
       }
     }
   }
 
-  // Add a shop to the favorites list
+  // Add a shop to the favorites list and update the list
   Future<void> _addFavoriteShop(int shopId, int userId) async {
     String currentTime = DateTime.now().toIso8601String();
     // Create a new FavoriteShop instance with the addedAt field
@@ -53,17 +53,17 @@ class FavoriteShopProvider with ChangeNotifier {
       addedAt: currentTime, // Set addedAt to the current time
     );
 
-    await _dbHelper.insertFavoriteShop(favoriteShop);
-    _favoriteShops.add(favoriteShop);
-    notifyListeners();
+    await _dbHelper.insertFavoriteShop(favoriteShop); // Insert into DB
+    _favoriteShops.add(favoriteShop); // Update the list
+    notifyListeners(); // Notify listeners to update the UI
   }
 
-  // Remove a shop from the favorites list
+  // Remove a shop from the favorites list and update the list
   Future<void> _deleteFavoriteShop(int shopId, int userId) async {
-    await _dbHelper.deleteFavoriteShop(shopId, userId);
+    await _dbHelper.deleteFavoriteShop(shopId, userId); // Delete from DB
     _favoriteShops.removeWhere(
-      (favShop) => favShop.shopId == shopId && favShop.userId == userId,
-    );
-    notifyListeners();
+          (favShop) => favShop.shopId == shopId && favShop.userId == userId,
+    ); // Remove from local list
+    notifyListeners(); // Notify listeners to update the UI
   }
 }

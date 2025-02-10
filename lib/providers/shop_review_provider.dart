@@ -10,16 +10,16 @@ class ShopReviewProvider with ChangeNotifier {
   late int currentUserId;
 
   List<ShopReview> get shopReviews => _shopReviews;
-
   List<ShopReview> get userReviews => _userReviews;
-
   int get reviewCount => _reviewCount;
 
+  // Set the current user ID from shared preferences
   Future<void> setCurrentUserId() async {
     currentUserId = await SharedPreferencesHelper().getUserId() ?? 0;
-    notifyListeners();
+    notifyListeners(); // Notify listeners to update UI
   }
 
+  // Check if the user has already reviewed the shop
   Future<bool> hasReviewedShop(int shopId) async {
     await setCurrentUserId(); // Ensure user ID is loaded
     return await ShopReviewDatabaseHelper()
@@ -29,42 +29,47 @@ class ShopReviewProvider with ChangeNotifier {
   // Fetch the total review count for a specific shop
   Future<void> fetchShopReviewCount(int shopId) async {
     _reviewCount = await ShopReviewDatabaseHelper().getShopReviewCount(shopId);
-    // print("----------\n\n$_reviewCount\n\n----------");
-    notifyListeners();
+    notifyListeners(); // Notify listeners to update UI
   }
 
+  // Fetch reviews for a specific shop by shopId
   Future<void> fetchShopReviewsByShopId(int shopId) async {
     final shopReviewsList =
-        await ShopReviewDatabaseHelper().getShopReviewsByShopId(shopId);
+    await ShopReviewDatabaseHelper().getShopReviewsByShopId(shopId);
     _shopReviews = shopReviewsList;
-    notifyListeners();
+    notifyListeners(); // Notify listeners to update UI
   }
 
+  // Fetch reviews by userId
   Future<void> fetchShopReviewsByUserId(int userId) async {
     final userReviewsList =
-        await ShopReviewDatabaseHelper().getShopReviewsByUserId(userId);
+    await ShopReviewDatabaseHelper().getShopReviewsByUserId(userId);
     _userReviews = userReviewsList;
-    notifyListeners();
+    notifyListeners(); // Notify listeners to update UI
   }
 
+  // Fetch all shop reviews
   Future<void> fetchShopReviews() async {
     final shopReviewsList = await ShopReviewDatabaseHelper().getShopReviews();
     _shopReviews = shopReviewsList;
-    notifyListeners();
+    notifyListeners(); // Notify listeners to update UI
   }
 
+  // Add a new shop review and refresh the review list
   Future<void> addShopReview(ShopReview shopReview) async {
     await ShopReviewDatabaseHelper().insertShopReview(shopReview);
-    await fetchShopReviews();
+    await fetchShopReviews(); // Refresh reviews after adding
   }
 
+  // Update an existing shop review and refresh the review list
   Future<void> updateShopReview(ShopReview shopReview) async {
     await ShopReviewDatabaseHelper().updateShopReview(shopReview);
-    await fetchShopReviews();
+    await fetchShopReviews(); // Refresh reviews after updating
   }
 
+  // Delete a shop review and refresh the review list
   Future<void> deleteShopReview(int revId) async {
     await ShopReviewDatabaseHelper().deleteShopReview(revId);
-    await fetchShopReviews();
+    await fetchShopReviews(); // Refresh reviews after deletion
   }
 }

@@ -4,6 +4,7 @@ import '../models/user.dart';
 class UserDatabaseHelper {
   static const String tableName = 'users';
 
+  // Insert a new user into the database
   Future<int> insertUser(User user) async {
     final db = await AppDatabase().database;
     try {
@@ -36,18 +37,13 @@ class UserDatabaseHelper {
         whereArgs: [userId],
       );
 
-      // If a user is found, return the user object
-      if (result.isNotEmpty) {
-        return User.fromMap(result.first);
-      } else {
-        return null; // Return null if user is not found
-      }
+      return result.isNotEmpty ? User.fromMap(result.first) : null;
     } catch (e) {
       throw Exception('Error fetching user by ID: $e');
     }
   }
 
-  // Update an existing user in the database
+  // Update an existing user's details
   Future<int> updateUser(User user) async {
     final db = await AppDatabase().database;
     try {
@@ -62,7 +58,7 @@ class UserDatabaseHelper {
     }
   }
 
-  // Update the user's status in the database
+  // Update only the user's status
   Future<int> updateUserStatus(int userId, int status) async {
     final db = await AppDatabase().database;
     try {
@@ -91,7 +87,7 @@ class UserDatabaseHelper {
     }
   }
 
-  // Fetch a user by their username
+  // Fetch a user by their username or email
   Future<User?> getUserByUsername(String username) async {
     final db = await AppDatabase().database;
     try {
@@ -101,12 +97,7 @@ class UserDatabaseHelper {
         whereArgs: [username, username],
       );
 
-      // If user is found, return the user object
-      if (result.isNotEmpty) {
-        return User.fromMap(result.first);
-      } else {
-        return null; // Return null if no user found
-      }
+      return result.isNotEmpty ? User.fromMap(result.first) : null;
     } catch (e) {
       throw Exception('Error fetching user by username or email: $e');
     }

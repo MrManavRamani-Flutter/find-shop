@@ -4,11 +4,13 @@ import '../models/area.dart';
 class AreaDatabaseHelper {
   static const String tableName = 'areas';
 
+  // Insert a new area into the database
   Future<int> insertArea(Area area) async {
     final db = await AppDatabase().database;
     return await db.insert(tableName, area.toMap());
   }
 
+  // Fetch all areas from the database
   Future<List<Area>> getAreas() async {
     final db = await AppDatabase().database;
     final List<Map<String, dynamic>> maps = await db.query(tableName);
@@ -17,7 +19,7 @@ class AreaDatabaseHelper {
     });
   }
 
-  // Fetch a area by their ID
+  // Fetch an area by its ID
   Future<Area?> getAreaById(int areaId) async {
     final db = await AppDatabase().database;
     try {
@@ -27,7 +29,7 @@ class AreaDatabaseHelper {
         whereArgs: [areaId],
       );
 
-      // If a area is found, return the area object
+      // If an area is found, return the area object
       if (result.isNotEmpty) {
         return Area.fromMap(result.first);
       } else {
@@ -38,11 +40,13 @@ class AreaDatabaseHelper {
     }
   }
 
+  // Update an existing area in the database
   Future<int> updateArea(Area area) async {
     final db = await AppDatabase().database;
     return await db.update(tableName, area.toMap(), where: 'area_id = ?', whereArgs: [area.areaId]);
   }
 
+  // Delete an area from the database by its ID
   Future<int> deleteArea(int areaId) async {
     final db = await AppDatabase().database;
     return await db.delete(tableName, where: 'area_id = ?', whereArgs: [areaId]);

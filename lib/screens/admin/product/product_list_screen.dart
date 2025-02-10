@@ -85,7 +85,7 @@ class AdminProductListScreenState extends State<AdminProductListScreen> {
 
   Widget _buildProductList() {
     if (_filteredProducts.isEmpty) {
-      return const Center(child: CircularProgressIndicator());
+      return const Center(child: Text("No products found"));
     }
 
     return Expanded(

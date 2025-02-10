@@ -16,7 +16,7 @@ class ShopReviewDatabaseHelper {
     return Sqflite.firstIntValue(result) ?? 0;
   }
 
-  // Check if the current user has already reviewed a specific shop
+  // Check if a user has already reviewed a specific shop
   Future<bool> hasUserReviewedShop(int userId, int shopId) async {
     final db = await AppDatabase().database;
     final List<Map<String, dynamic>> result = await db.query(
@@ -27,12 +27,13 @@ class ShopReviewDatabaseHelper {
     return result.isNotEmpty;
   }
 
+  // Insert a new shop review into the database
   Future<int> insertShopReview(ShopReview shopReview) async {
     final db = await AppDatabase().database;
     return await db.insert(tableName, shopReview.toMap());
   }
 
-  // Modify the method to filter reviews based on userId
+  // Get all reviews written by a specific user
   Future<List<ShopReview>> getShopReviewsByUserId(int userId) async {
     final db = await AppDatabase().database;
     final List<Map<String, dynamic>> maps = await db.query(
@@ -45,7 +46,7 @@ class ShopReviewDatabaseHelper {
     });
   }
 
-  // Modify the method to filter reviews based on shopId
+  // Get all reviews for a specific shop
   Future<List<ShopReview>> getShopReviewsByShopId(int shopId) async {
     final db = await AppDatabase().database;
     final List<Map<String, dynamic>> maps = await db.query(
@@ -58,6 +59,7 @@ class ShopReviewDatabaseHelper {
     });
   }
 
+  // Get all shop reviews from the database
   Future<List<ShopReview>> getShopReviews() async {
     final db = await AppDatabase().database;
     final List<Map<String, dynamic>> maps = await db.query(tableName);
@@ -66,14 +68,24 @@ class ShopReviewDatabaseHelper {
     });
   }
 
+  // Update an existing shop review
   Future<int> updateShopReview(ShopReview shopReview) async {
     final db = await AppDatabase().database;
-    return await db.update(tableName, shopReview.toMap(),
-        where: 'rev_id = ?', whereArgs: [shopReview.revId]);
+    return await db.update(
+      tableName,
+      shopReview.toMap(),
+      where: 'rev_id = ?',
+      whereArgs: [shopReview.revId],
+    );
   }
 
+  // Delete a shop review by its ID
   Future<int> deleteShopReview(int revId) async {
     final db = await AppDatabase().database;
-    return await db.delete(tableName, where: 'rev_id = ?', whereArgs: [revId]);
+    return await db.delete(
+      tableName,
+      where: 'rev_id = ?',
+      whereArgs: [revId],
+    );
   }
 }

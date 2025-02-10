@@ -9,12 +9,14 @@ class ShopProvider with ChangeNotifier {
 
   List<Shop> get shops => _shops;
 
+  // Fetch all shops from the database
   Future<void> fetchShops() async {
     final shopsList = await ShopDatabaseHelper().getShops();
     _shops = shopsList;
-    notifyListeners();
+    notifyListeners(); // Notify listeners to update the UI
   }
 
+  // Fetch shops filtered by users with roleId == 2 and status == 1
   Future<void> fetchShopsByUserStatus() async {
     final allShops = await ShopDatabaseHelper().getShops();
     final allUsers = await UserDatabaseHelper().getUsers(); // Fetch all users
@@ -29,13 +31,13 @@ class ShopProvider with ChangeNotifier {
     _shops =
         allShops.where((shop) => validUserIds.contains(shop.userId)).toList();
 
-    notifyListeners();
+    notifyListeners(); // Notify listeners to update the UI
   }
 
-// Fetch a specific shop by userId
+  // Get a specific shop by userId
   Shop getShopByUserId(int userId) {
     return _shops.firstWhere(
-      (shop) => shop.userId == userId,
+          (shop) => shop.userId == userId,
       orElse: () => Shop(
         shopId: -1,
         shopName: 'No Shop Found',
@@ -44,6 +46,7 @@ class ShopProvider with ChangeNotifier {
     );
   }
 
+  // Fetch shop by userId from the database
   Future<void> fetchShopByUserId(int userId) async {
     final fetchedShop = await ShopDatabaseHelper().getShopByUserID(userId);
     if (fetchedShop != null) {
@@ -52,19 +55,22 @@ class ShopProvider with ChangeNotifier {
     }
   }
 
+  // Add a new shop and refresh the list of shops
   Future<int> addShop(Shop shop) async {
     final shopId = await ShopDatabaseHelper().insertShop(shop);
-    await fetchShops();
+    await fetchShops(); // Refresh the list after adding
     return shopId;
   }
 
+  // Update an existing shop and refresh the list of shops
   Future<void> updateShop(Shop shop) async {
     await ShopDatabaseHelper().updateShop(shop);
-    await fetchShops();
+    await fetchShops(); // Refresh the list after updating
   }
 
+  // Delete a shop and refresh the list of shops
   Future<void> deleteShop(int shopId) async {
     await ShopDatabaseHelper().deleteShop(shopId);
-    await fetchShops();
+    await fetchShops(); // Refresh the list after deletion
   }
 }

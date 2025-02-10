@@ -57,37 +57,35 @@ class MyApp extends StatelessWidget {
         theme: ThemeData(
           primarySwatch: Colors.blue,
         ),
-        // Navigate based on login status
+        // Initial route based on the login status
         initialRoute: isLoggedIn ? '/splash' : '/login',
         routes: {
-          // basic screen -------
+          // Splash and login screens
           '/splash': (context) => const SplashScreen(),
           '/login': (context) => const LoginScreen(),
           '/register': (context) => const RegisterScreen(),
-          // ---------------------------------------------------------------
 
-          // Customer Screen --------
+          // Customer Screens
           '/customer_home': (context) => const CustomerHomeScreen(),
           '/customer_profile': (context) => const CustomerProfileScreen(),
           '/customer_area_list': (context) => const CustomerAreaListScreen(),
           '/customer_category_list': (context) =>
               const CustomerCategoryListScreen(),
           '/customer_shop_list': (context) => const CustomerShopListScreen(),
-          '/customer_product_list': (context) => const CustomerProductListScreen(),
+          '/customer_product_list': (context) =>
+              const CustomerProductListScreen(),
           '/customer_favorite_list': (context) =>
               const CustomerFavoriteShopListScreen(),
           '/customer_add_review': (context) => CustomerAddReviewScreen(
               shopId: ModalRoute.of(context)!.settings.arguments as int),
-          // ---------------------------------------------------------------
 
-          // Shop Owner Screen -------
+          // Shop Owner Screens
           '/shop_home': (context) => const ShopOwnerHomeScreen(),
           '/shop_profile': (context) => const ShopOwnerProfileScreen(),
           '/shop_review_list': (context) => const ShopReviewListScreen(),
           '/shop_product_list': (context) => const ShopProductListScreen(),
-          // ---------------------------------------------------------------
 
-          // Admin Screen --------
+          // Admin Screens
           '/dashboard': (context) => const AdminHomeScreen(),
           '/admin_profile': (context) => const AdminProfileScreen(),
           '/customers_list': (context) => const CustomersListScreen(),
@@ -96,7 +94,6 @@ class MyApp extends StatelessWidget {
           '/categories_list': (context) => const CategoryListScreen(),
           '/shop_list': (context) => const ShopListScreen(),
           '/product_list': (context) => const AdminProductListScreen(),
-          // ---------------------------------------------------------------
         },
         debugShowCheckedModeBanner: false,
       ),

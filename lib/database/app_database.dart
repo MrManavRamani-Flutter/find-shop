@@ -11,17 +11,20 @@ class AppDatabase {
 
   AppDatabase._internal();
 
+  // Getter to retrieve the database instance
   Future<Database> get database async {
     if (_database != null) return _database!;
     _database = await _initDatabase();
     return _database!;
   }
 
+  // Initialize the database
   Future<Database> _initDatabase() async {
     String path = join(await getDatabasesPath(), 'find_shop.db');
     return openDatabase(path, version: 1, onCreate: _onCreate);
   }
 
+  // Create tables when the database is created
   Future<void> _onCreate(Database db, int version) async {
     await db.execute('''
     CREATE TABLE roles (
@@ -30,10 +33,9 @@ class AppDatabase {
     );
     ''');
 
-    // Insert default roles if they do not exist
+    // Insert default roles
     final roleCount = await db.query('roles', columns: ['role_id']);
     if (roleCount.isEmpty) {
-      // Insert default roles
       await db.insert('roles', {'role_name': 'Customer'});
       await db.insert('roles', {'role_name': 'Shop Owner'});
       await db.insert('roles', {'role_name': 'Admin'});
@@ -126,18 +128,13 @@ class AppDatabase {
       FOREIGN KEY (user_id) REFERENCES users(user_id)
     );
     ''');
-    // Insert default users with their roles
-    final customerRole = await db
-        .query('roles', where: 'role_name = ?', whereArgs: ['Customer']);
-    final shopOwnerRole = await db
-        .query('roles', where: 'role_name = ?', whereArgs: ['Shop Owner']);
-    final adminRole =
-        await db.query('roles', where: 'role_name = ?', whereArgs: ['Admin']);
 
-    // Insert 3 users with different roles
-    if (customerRole.isNotEmpty &&
-        shopOwnerRole.isNotEmpty &&
-        adminRole.isNotEmpty) {
+    // Insert default users with different roles
+    final customerRole = await db.query('roles', where: 'role_name = ?', whereArgs: ['Customer']);
+    final shopOwnerRole = await db.query('roles', where: 'role_name = ?', whereArgs: ['Shop Owner']);
+    final adminRole = await db.query('roles', where: 'role_name = ?', whereArgs: ['Admin']);
+
+    if (customerRole.isNotEmpty && shopOwnerRole.isNotEmpty && adminRole.isNotEmpty) {
       await db.insert('users', {
         'username': 'customer1',
         'email': 'customer1@gmail.com',

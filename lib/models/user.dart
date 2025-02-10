@@ -19,7 +19,7 @@ class User {
     required this.createdAt,
   });
 
-  // Setters
+  // Setters to update individual fields
   set setUsername(String newUsername) {
     username = newUsername;
   }
@@ -44,7 +44,7 @@ class User {
     createdAt = newCreatedAt;
   }
 
-  // CopyWith method to create a copy of the user with optional modifications
+  // CopyWith method to create a copy of the User object with optional changes
   User copyWith({
     int? userId,
     String? username,
@@ -56,7 +56,7 @@ class User {
     String? createdAt,
   }) {
     return User(
-      userId: userId ?? this.userId,
+      userId: userId ?? this.userId, // Use new userId if provided, otherwise keep the old one
       username: username ?? this.username,
       email: email ?? this.email,
       password: password ?? this.password,
@@ -67,6 +67,7 @@ class User {
     );
   }
 
+  // Factory constructor to create a User from a map (e.g., for fetching from a database)
   factory User.fromMap(Map<String, dynamic> map) {
     return User(
       userId: map['user_id'],
@@ -80,6 +81,7 @@ class User {
     );
   }
 
+  // Methods to update individual fields (optional, not necessary for setters)
   void updateUsername(String newUsername) {
     username = newUsername;
   }
@@ -88,6 +90,7 @@ class User {
     email = newEmail;
   }
 
+  // Convert User object to a map (e.g., for saving to a database)
   Map<String, dynamic> toMap() {
     return {
       'user_id': userId,
