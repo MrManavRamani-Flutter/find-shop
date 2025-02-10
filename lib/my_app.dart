@@ -5,6 +5,7 @@ import 'package:find_shop/providers/product_provider.dart';
 import 'package:find_shop/providers/shop_category_provider.dart';
 import 'package:find_shop/providers/shop_provider.dart';
 import 'package:find_shop/providers/shop_review_provider.dart';
+import 'package:find_shop/providers/upload_provider/upload_provider.dart';
 import 'package:find_shop/screens/admin/area/area_list_screen.dart';
 import 'package:find_shop/screens/admin/category/category_list_screen.dart';
 import 'package:find_shop/screens/admin/customer/customer_list_screen.dart';
@@ -13,6 +14,7 @@ import 'package:find_shop/screens/admin/product/product_list_screen.dart';
 import 'package:find_shop/screens/admin/profile_screen.dart';
 import 'package:find_shop/screens/admin/shop/shop_list_screen.dart';
 import 'package:find_shop/screens/admin/shop_owner/shop_owner_list_screen.dart';
+import 'package:find_shop/screens/admin/upload_data/upload_data_screen.dart';
 import 'package:find_shop/screens/customer/area_screens/area_list_screen.dart';
 import 'package:find_shop/screens/customer/category_screens/category_list_screen.dart';
 import 'package:find_shop/screens/customer/favorite_screens/favorite_shop_list_screen.dart';
@@ -42,6 +44,9 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MultiProvider(
       providers: [
+        // Upload Data using excel file
+        ChangeNotifierProvider(create: (_) => UploadProvider()),
+        // Database Tables..
         ChangeNotifierProvider(create: (_) => AreaProvider()),
         ChangeNotifierProvider(create: (_) => RoleProvider()),
         ChangeNotifierProvider(create: (_) => UserProvider()),
@@ -94,6 +99,7 @@ class MyApp extends StatelessWidget {
           '/categories_list': (context) => const CategoryListScreen(),
           '/shop_list': (context) => const ShopListScreen(),
           '/product_list': (context) => const AdminProductListScreen(),
+          '/upload_data': (context) => const UploadDataScreen(),
         },
         debugShowCheckedModeBanner: false,
       ),

@@ -36,19 +36,30 @@ class AdminDrawer extends StatelessWidget {
       child: Column(
         children: [
           AdminDrawerHeader(userProvider: userProvider),
+          const Divider(thickness: 1, color: Colors.grey),
           Expanded(
             child: ListView(
               padding: EdgeInsets.zero,
               children: [
-                _buildDrawerItem(context, 'Dashboard', '/dashboard'),
-                _buildDrawerItem(context, 'Profile', '/admin_profile'),
-                _buildDrawerItem(context, 'Customers', '/customers_list'),
-                _buildDrawerItem(context, 'Shop Owners', '/shop_owners_list'),
-                _buildDrawerItem(context, 'Registered Areas', '/areas_list'),
-                _buildDrawerItem(context, 'Shop Category', '/categories_list'),
-                _buildDrawerItem(context, 'Shop List', '/shop_list'),
-                _buildDrawerItem(context, 'Product List', '/product_list'),
-                // _buildDrawerItem(context, 'Settings', '/settings'),
+                _buildDrawerItem(
+                    context, Icons.dashboard, 'Dashboard', '/dashboard'),
+                _buildDrawerItem(
+                    context, Icons.person, 'Profile', '/admin_profile'),
+                _buildDrawerItem(
+                    context, Icons.upload_file, 'Upload Data', '/upload_data'),
+                _buildDrawerItem(
+                    context, Icons.people, 'Customers', '/customers_list'),
+                _buildDrawerItem(
+                    context, Icons.store, 'Shop Owners', '/shop_owners_list'),
+                _buildDrawerItem(context, Icons.location_on, 'Registered Areas',
+                    '/areas_list'),
+                _buildDrawerItem(context, Icons.category, 'Shop Category',
+                    '/categories_list'),
+                _buildDrawerItem(
+                    context, Icons.shop, 'Shop List', '/shop_list'),
+                _buildDrawerItem(
+                    context, Icons.list, 'Product List', '/product_list'),
+                // _buildDrawerItem(context, Icons.settings, 'Settings', '/settings'),
               ],
             ),
           ),
@@ -58,9 +69,12 @@ class AdminDrawer extends StatelessWidget {
     );
   }
 
-  Widget _buildDrawerItem(BuildContext context, String title, String route) {
+  Widget _buildDrawerItem(
+      BuildContext context, IconData icon, String title, String route) {
     return ListTile(
-      title: Text(title),
+      leading: Icon(icon, color: Colors.blueAccent),
+      title: Text(title,
+          style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w500)),
       onTap: () => Navigator.pushReplacementNamed(context, route),
     );
   }
@@ -68,9 +82,11 @@ class AdminDrawer extends StatelessWidget {
   Widget _buildLogoutButton(BuildContext context, UserProvider userProvider) {
     return Container(
       width: double.infinity,
-      color: Colors.red,
+      color: Colors.redAccent,
       child: ListTile(
-        title: const Text('Logout', style: TextStyle(color: Colors.white)),
+        leading: const Icon(Icons.exit_to_app, color: Colors.white),
+        title: const Text('Logout',
+            style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
         onTap: () async {
           await SharedPreferencesHelper().clearUserData();
           await SharedPreferencesHelper().clearAuthToken();
@@ -94,29 +110,31 @@ class AdminDrawerHeader extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Consumer<UserProvider>(
-      builder: (context, userProvider, child) {
-        final loggedInUser = userProvider.loggedInUser;
-        return InkWell(
-          onTap: () {
-            if (loggedInUser != null) {
-              Navigator.pushReplacementNamed(context, '/admin_profile');
-            }
-          },
-          child: UserAccountsDrawerHeader(
-            decoration: const BoxDecoration(color: Colors.blue),
-            accountName: Text(
-              loggedInUser?.username ?? 'Guest',
-              style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-            ),
-            accountEmail: Text(loggedInUser?.email ?? 'No email'),
-            currentAccountPicture: const CircleAvatar(
-              backgroundImage: AssetImage('assets/logo/user.png'),
-            ),
+    return Consumer<UserProvider>(builder: (context, userProvider, child) {
+      final loggedInUser = userProvider.loggedInUser;
+      return InkWell(
+        onTap: () {
+          if (loggedInUser != null) {
+            Navigator.pushReplacementNamed(context, '/admin_profile');
+          }
+        },
+        child: UserAccountsDrawerHeader(
+          decoration: const BoxDecoration(color: Colors.blueAccent),
+          accountName: Text(
+            loggedInUser?.username ?? 'Guest',
+            style: const TextStyle(
+                fontSize: 20, fontWeight: FontWeight.bold, color: Colors.white),
           ),
-        );
-      },
-    );
+          accountEmail: Text(
+            loggedInUser?.email ?? 'No email',
+            style: const TextStyle(color: Colors.white70),
+          ),
+          currentAccountPicture: const CircleAvatar(
+            backgroundImage: AssetImage('assets/logo/user.png'),
+          ),
+        ),
+      );
+    });
   }
 }
 
