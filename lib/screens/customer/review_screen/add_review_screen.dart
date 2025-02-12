@@ -56,7 +56,13 @@ class CustomerAddReviewScreenState extends State<CustomerAddReviewScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Add Review'),
+        title: const Text(
+          'Add Review',
+          style: TextStyle(color: Colors.white),
+        ),
+        iconTheme: const IconThemeData(color: Colors.white),
+        backgroundColor: Colors.blueAccent,
+        centerTitle: true,
       ),
       body: FutureBuilder<void>(
         future: Provider.of<ShopReviewProvider>(context, listen: false)

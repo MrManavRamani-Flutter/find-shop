@@ -116,7 +116,7 @@ class _CustomerCategoryShopListScreenState
                       ? const Center(
                           child: Text(
                             'No shops found in this category',
-                            style: TextStyle(fontSize: 18, color: Colors.grey),
+                            style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
                           ),
                         )
                       : ListView.builder(

@@ -130,7 +130,13 @@ class _AreaWiseShopListScreenState extends State<AreaWiseShopListScreen> {
           _buildSearchBar(),
           Expanded(
             child: filteredShops.isEmpty
-                ? const Center(child: Text("No shops found"))
+                ? const Center(
+                    child: Text(
+                      "No shops found",
+                      style:
+                          TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
+                    ),
+                  )
                 : ListView.builder(
                     itemCount: filteredShops.length,
                     itemBuilder: (context, index) {

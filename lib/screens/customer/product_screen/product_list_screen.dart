@@ -62,7 +62,7 @@ class CustomerProductListScreenState extends State<CustomerProductListScreen> {
           children: [
             _buildSearchBar(),
             const SizedBox(height: 10),
-            _buildProductList(),
+            Expanded(child: _buildProductList()),
           ],
         ),
       ),
@@ -85,7 +85,12 @@ class CustomerProductListScreenState extends State<CustomerProductListScreen> {
 
   Widget _buildProductList() {
     if (_filteredProducts.isEmpty) {
-      return const Center(child: CircularProgressIndicator());
+      return const Center(
+        child: Text(
+          'No Product found',
+          style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
+        ),
+      );
     }
 
     return Expanded(

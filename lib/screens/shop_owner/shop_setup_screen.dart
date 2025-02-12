@@ -1,12 +1,13 @@
+import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:find_shop/models/shop.dart';
 import 'package:find_shop/models/shop_category.dart';
 import 'package:find_shop/providers/area_provider.dart';
 import 'package:find_shop/providers/category_provider.dart';
 import 'package:find_shop/providers/shop_category_provider.dart';
 import 'package:find_shop/providers/shop_provider.dart';
+import 'package:find_shop/providers/user_provider.dart';
 import 'package:find_shop/utils/shared_preferences_helper.dart';
-import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class ShopSetupScreen extends StatefulWidget {
@@ -30,13 +31,21 @@ class ShopSetupScreenState extends State<ShopSetupScreen> {
   void initState() {
     super.initState();
     _fetchUserId();
+    _fetchData();
+  }
+
+  void _fetchData() async {
+    final areaProvider = Provider.of<AreaProvider>(context, listen: false);
+    final categoryProvider =
+        Provider.of<CategoryProvider>(context, listen: false);
+
+    await areaProvider.fetchAreas(); // Fetch latest areas
+    await categoryProvider.fetchCategories(); // Fetch latest categories
   }
 
   Future<void> _fetchUserId() async {
     final prefs = await SharedPreferences.getInstance();
-    setState(() {
-      _userId = prefs.getInt('user_id');
-    });
+    setState(() => _userId = prefs.getInt('user_id'));
   }
 
   Future<void> _saveShop() async {
@@ -64,18 +73,17 @@ class ShopSetupScreenState extends State<ShopSetupScreen> {
       final shopCategoryProvider =
           Provider.of<ShopCategoryProvider>(context, listen: false);
       await shopCategoryProvider.addShopCategory(
-        ShopCategory(shopId: shopId, catId: _selectedCategoryId!),
-      );
+          ShopCategory(shopId: shopId, catId: _selectedCategoryId!));
     }
+
     await SharedPreferencesHelper().updateUserStatus(3);
 
     setState(() => _isLoading = false);
+
     if (mounted) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Shop added successfully!')),
       );
-    }
-    if (mounted) {
       Navigator.pushReplacementNamed(context, '/shop_home');
     }
   }
@@ -84,64 +92,117 @@ class ShopSetupScreenState extends State<ShopSetupScreen> {
   Widget build(BuildContext context) {
     final areas = Provider.of<AreaProvider>(context).areas;
     final categories = Provider.of<CategoryProvider>(context).categories;
+    final userProvider = Provider.of<UserProvider>(context, listen: false);
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Shop Profile Setup')),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Form(
-          key: _formKey,
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              TextFormField(
-                controller: _shopNameController,
-                decoration: const InputDecoration(labelText: 'Shop Name'),
-                validator: (value) => value!.isEmpty ? 'Enter shop name' : null,
-              ),
-              TextFormField(
-                controller: _addressController,
-                decoration: const InputDecoration(labelText: 'Address'),
-                validator: (value) => value!.isEmpty ? 'Enter address' : null,
-              ),
-              DropdownButtonFormField<int>(
-                value: _selectedAreaId,
-                decoration: const InputDecoration(labelText: 'Select Area'),
-                items: areas.map((area) {
-                  return DropdownMenuItem<int>(
-                    value: area.areaId,
-                    child: Text(area.areaName),
-                  );
-                }).toList(),
-                onChanged: (value) => setState(() => _selectedAreaId = value),
-                validator: (value) => value == null ? 'Select an area' : null,
-              ),
-              DropdownButtonFormField<int>(
-                value: _selectedCategoryId,
-                decoration: const InputDecoration(labelText: 'Select Category'),
-                items: categories.map((category) {
-                  return DropdownMenuItem<int>(
-                    value: category.catId,
-                    child: Text(category.catName),
-                  );
-                }).toList(),
-                onChanged: (value) =>
-                    setState(() => _selectedCategoryId = value),
-                validator: (value) =>
-                    value == null ? 'Select a category' : null,
-              ),
-              const SizedBox(height: 20),
-              if (_isLoading)
-                const Center(child: CircularProgressIndicator())
-              else
-                ElevatedButton(
-                  onPressed: _saveShop,
-                  child: const Text('Save Shop'),
-                ),
-            ],
-          ),
+      appBar: AppBar(
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back),
+          onPressed: () async {
+            SharedPreferencesHelper().clearUserData();
+            SharedPreferencesHelper().clearAuthToken();
+            SharedPreferencesHelper().clearLoginStatus();
+            await userProvider.logOut();
+            if (context.mounted) {
+              Navigator.pushReplacementNamed(context, '/login');
+            }
+          },
         ),
+        title: const Text(
+          'Shop Profile Setup',
+          style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+        ),
+        backgroundColor: Colors.blueAccent,
+        iconTheme: const IconThemeData(color: Colors.white),
+        centerTitle: true,
       ),
+      body: Padding(
+        padding: const EdgeInsets.all(20.0),
+        child: areas.isEmpty || categories.isEmpty
+            ? const Center(
+                child: Text(
+                  "Contact This App Admin",
+                  style: TextStyle(fontSize: 18),
+                ),
+              )
+            : Form(
+                key: _formKey,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    _buildTextField(_shopNameController, 'Shop Name'),
+                    const SizedBox(height: 15),
+                    _buildTextField(_addressController, 'Address'),
+                    const SizedBox(height: 15),
+                    _buildDropdownField(
+                        'Select Area',
+                        _selectedAreaId,
+                        areas
+                            .map(
+                              (area) => DropdownMenuItem(
+                                value: area.areaId,
+                                child: Text(area.areaName),
+                              ),
+                            )
+                            .toList(),
+                        (value) => setState(() => _selectedAreaId = value)),
+                    const SizedBox(height: 15),
+                    _buildDropdownField(
+                        'Select Category',
+                        _selectedCategoryId,
+                        categories
+                            .map(
+                              (category) => DropdownMenuItem(
+                                value: category.catId,
+                                child: Text(category.catName),
+                              ),
+                            )
+                            .toList(),
+                        (value) => setState(() => _selectedCategoryId = value)),
+                    const SizedBox(height: 25),
+                    _isLoading
+                        ? const Center(child: CircularProgressIndicator())
+                        : ElevatedButton(
+                            style: ElevatedButton.styleFrom(
+                              padding: const EdgeInsets.symmetric(vertical: 15),
+                              shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(10)),
+                              backgroundColor: Colors.blueAccent,
+                            ),
+                            onPressed: _saveShop,
+                            child: const Text('Save Shop',
+                                style: TextStyle(
+                                    fontSize: 16, color: Colors.white)),
+                          ),
+                  ],
+                ),
+              ),
+      ),
+    );
+  }
+
+  Widget _buildTextField(TextEditingController controller, String label) {
+    return TextFormField(
+      controller: controller,
+      decoration: InputDecoration(
+        labelText: label,
+        border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
+      ),
+      validator: (value) => value!.isEmpty ? 'Enter $label' : null,
+    );
+  }
+
+  Widget _buildDropdownField(String label, int? selectedValue,
+      List<DropdownMenuItem<int>> items, ValueChanged<int?> onChanged) {
+    return DropdownButtonFormField<int>(
+      value: selectedValue,
+      decoration: InputDecoration(
+        labelText: label,
+        border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
+      ),
+      items: items,
+      onChanged: onChanged,
+      validator: (value) => value == null ? 'Select $label' : null,
     );
   }
 }

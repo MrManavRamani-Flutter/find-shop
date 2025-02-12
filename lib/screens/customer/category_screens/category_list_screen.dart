@@ -88,7 +88,7 @@ class _CustomerCategoryListScreenState
           return const Center(
             child: Text(
               'No categories found',
-              style: TextStyle(fontSize: 18, color: Colors.grey),
+              style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
             ),
           );
         }
