@@ -57,34 +57,51 @@ class ShopOwnerDetailScreen extends StatelessWidget {
                     Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        ElevatedButton(
-                          onPressed: () {
-                            _updateUserStatus(
-                                context, userProvider, 1); // Approved
-                          },
-                          child: const Text("Approve"),
-                        ),
+                        (owner.status != 1)
+                            ? ElevatedButton(
+                                style: const ButtonStyle(
+                                    backgroundColor:
+                                        WidgetStatePropertyAll(Colors.green)),
+                                onPressed: () {
+                                  _updateUserStatus(
+                                      context, userProvider, 1); // Approved
+                                },
+                                child: const Text(
+                                  "Approve",
+                                  style: TextStyle(color: Colors.white),
+                                ),
+                              )
+                            : const SizedBox(),
                         const SizedBox(width: 10),
-                        ElevatedButton(
-                          onPressed: () {
-                            _updateUserStatus(
-                                context, userProvider, 2); // Rejected
-                          },
-                          child: const Text("Reject"),
-                        ),
+                        (owner.status != 2)
+                            ? ElevatedButton(
+                                style: const ButtonStyle(
+                                  backgroundColor:
+                                      WidgetStatePropertyAll(Colors.red),
+                                ),
+                                onPressed: () {
+                                  _updateUserStatus(
+                                      context, userProvider, 2); // Rejected
+                                },
+                                child: const Text(
+                                  "Reject",
+                                  style: TextStyle(color: Colors.white),
+                                ),
+                              )
+                            : const SizedBox(),
                       ],
                     ),
                     const SizedBox(height: 20),
 
                     // Update Map Address Option (if needed)
-                    Center(
-                      child: ElevatedButton(
-                        onPressed: () {
-                          // You can implement update map address functionality here if needed
-                        },
-                        child: const Text("Update Map Address"),
-                      ),
-                    ),
+                    // Center(
+                    //   child: ElevatedButton(
+                    //     onPressed: () {
+                    //       // You can implement update map address functionality here if needed
+                    //     },
+                    //     child: const Text("Update Map Address"),
+                    //   ),
+                    // ),
                   ],
                 ),
               ),

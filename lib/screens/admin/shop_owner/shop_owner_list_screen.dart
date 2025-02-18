@@ -112,7 +112,7 @@ class ShopOwnerCard extends StatelessWidget {
           style: const TextStyle(color: Colors.black54, fontSize: 14),
         ),
         onTap: () {
-          if (owner.status == 3) {
+          if (owner.status != 0) {
             // Navigate only for pending users
             Navigator.push(
               context,
