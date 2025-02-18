@@ -112,6 +112,7 @@ class CustomerShopDetailScreenState extends State<CustomerShopDetailScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+
         title:
             const Text('Shop Profile', style: TextStyle(color: Colors.white)),
         backgroundColor: Colors.blueAccent,

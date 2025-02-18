@@ -52,19 +52,15 @@ class _CustomerFavoriteShopListScreenState
     if (_isLoading) {
       return const Center(child: CircularProgressIndicator());
     }
-    // this code not proper design.....*
-
-    // if (_favoriteShopList.isEmpty) {
-    //   return const Center(
-    //     child: Text(
-    //       'No favorite shops yet',
-    //       style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
-    //     ),
-    //   );
-    // }
 
     return Scaffold(
       appBar: AppBar(
+        leading: InkWell(
+          onTap: () {
+            Navigator.of(context).pushReplacementNamed('/customer_home');
+          },
+          child: const Icon(Icons.arrow_back),
+        ),
         title: const Text(
           'Favorite Shops',
           style: TextStyle(color: Colors.white),

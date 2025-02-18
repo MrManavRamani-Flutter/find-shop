@@ -308,13 +308,7 @@ class _CustomerHomeScreenState extends State<CustomerHomeScreen> {
         title: Text(title),
         onTap: () {
           if (mounted) {
-            Navigator.pushNamed(context, route).then(
-              (value) {
-                if (context.mounted) {
-                  Navigator.pop(context);
-                }
-              },
-            );
+            Navigator.pushReplacementNamed (context, route);
           }
         },
       ),

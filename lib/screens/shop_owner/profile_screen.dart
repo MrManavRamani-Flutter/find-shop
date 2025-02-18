@@ -73,7 +73,13 @@ class ShopOwnerProfileScreen extends StatelessWidget {
           },
           child: const Icon(Icons.arrow_back),
         ),
-        title: const Text('Profile', style: TextStyle(color: Colors.white)),
+        title: const Text(
+          'Profile',
+          style: TextStyle(
+            color: Colors.white,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
         backgroundColor: Colors.blueAccent,
         centerTitle: true,
         iconTheme: const IconThemeData(color: Colors.white),

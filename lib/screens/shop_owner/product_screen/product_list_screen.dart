@@ -28,9 +28,18 @@ class _ShopProductListScreenState extends State<ShopProductListScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        leading: InkWell(
+          onTap: () {
+            Navigator.of(context).pushReplacementNamed('/shop_home');
+          },
+          child: const Icon(Icons.arrow_back),
+        ),
         title: const Text(
           'Product List',
-          style: TextStyle(color: Colors.white),
+          style: TextStyle(
+            color: Colors.white,
+            fontWeight: FontWeight.bold,
+          ),
         ),
         iconTheme: const IconThemeData(color: Colors.white),
         backgroundColor: Colors.blueAccent,

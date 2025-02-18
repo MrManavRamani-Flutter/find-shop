@@ -36,7 +36,10 @@ class UpdateProfileScreenState extends State<UpdateProfileScreen> {
       appBar: AppBar(
         title: const Text(
           'Update Profile',
-          style: TextStyle(color: Colors.white),
+          style: TextStyle(
+            color: Colors.white,
+            fontWeight: FontWeight.bold,
+          ),
         ),
         centerTitle: true,
         iconTheme: const IconThemeData(color: Colors.white),

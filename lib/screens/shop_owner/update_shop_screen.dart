@@ -64,8 +64,13 @@ class UpdateShopScreenState extends State<UpdateShopScreen> {
           onTap: () => Navigator.pop(context),
           child: const Icon(Icons.arrow_back),
         ),
-        title: const Text('Update Shop'),
-        backgroundColor: Colors.green,
+        title: const Text(
+          'Update Shop',
+          style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+        ),
+        iconTheme: const IconThemeData(color: Colors.white),
+        backgroundColor: Colors.blueAccent,
+        centerTitle: true,
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),

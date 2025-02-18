@@ -50,6 +50,12 @@ class CustomerProductListScreenState extends State<CustomerProductListScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        leading: InkWell(
+          onTap: () {
+            Navigator.of(context).pushReplacementNamed('/customer_home');
+          },
+          child: const Icon(Icons.arrow_back),
+        ),
         title:
             const Text('Product List', style: TextStyle(color: Colors.white)),
         centerTitle: true,

@@ -24,6 +24,12 @@ class _CustomerAreaListScreenState extends State<CustomerAreaListScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        leading: InkWell(
+          onTap: () {
+            Navigator.of(context).pushReplacementNamed('/customer_home');
+          },
+          child: const Icon(Icons.arrow_back),
+        ),
         title: const Text(
           'Available Areas',
           style: TextStyle(color: Colors.white),

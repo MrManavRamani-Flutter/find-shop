@@ -28,7 +28,7 @@ class ShopOwnerHomeScreenState extends State<ShopOwnerHomeScreen> {
       final userProvider = Provider.of<UserProvider>(context, listen: false);
       final shopProvider = Provider.of<ShopProvider>(context, listen: false);
       final shopReviewProvider =
-      Provider.of<ShopReviewProvider>(context, listen: false);
+          Provider.of<ShopReviewProvider>(context, listen: false);
       final productProvider = Provider.of<ProductProvider>(context,
           listen: false); // ProductProvider
 
@@ -64,7 +64,10 @@ class ShopOwnerHomeScreenState extends State<ShopOwnerHomeScreen> {
       appBar: AppBar(
         title: const Text(
           'Welcome to Find Shop',
-          style: TextStyle(color: Colors.white),
+          style: TextStyle(
+            color: Colors.white,
+            fontWeight: FontWeight.bold,
+          ),
         ),
         iconTheme: const IconThemeData(color: Colors.white),
         backgroundColor: Colors.blueAccent,
@@ -167,7 +170,7 @@ class ShopOwnerHomeScreenState extends State<ShopOwnerHomeScreen> {
             .pushNamed('/shop_product_list', arguments: shopId)
             .then(
               (value) => _fetchData(), // Refresh data after navigating back
-        );
+            );
       },
       child: Card(
         elevation: 4,

@@ -57,6 +57,12 @@ class _CustomerShopListScreenState extends State<CustomerShopListScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        leading: InkWell(
+          onTap: () {
+            Navigator.of(context).pushReplacementNamed('/customer_home');
+          },
+          child: const Icon(Icons.arrow_back),
+        ),
         title: const Text(
           'Available Shops',
           style: TextStyle(color: Colors.white),
