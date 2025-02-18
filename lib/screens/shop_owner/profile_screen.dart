@@ -52,17 +52,17 @@ class ShopOwnerProfileScreen extends StatelessWidget {
     final user = userProvider.loggedInUser!;
     final shop = shopProvider.getShopByUserId(user.userId);
     final area = areaProvider.areas.firstWhere(
-            (area) => area.areaId == shop.areaId,
+        (area) => area.areaId == shop.areaId,
         orElse: () => Area(areaId: 0, areaName: 'No Area'));
 
     // Find the ShopCategory for this shop
     final shopCategory = shopCategoryProvider.shopCategories.firstWhere(
-            (category) => category.shopId == shop.shopId,
+        (category) => category.shopId == shop.shopId,
         orElse: () => ShopCategory(shopCatId: 0, shopId: 0, catId: 0));
 
     // Find the Category based on the catId in ShopCategory
     final category = categoryProvider.categories.firstWhere(
-            (cat) => cat.catId == shopCategory.catId,
+        (cat) => cat.catId == shopCategory.catId,
         orElse: () => Category(catId: 0, catName: 'Unknown', catDesc: ''));
 
     return Scaffold(
@@ -128,17 +128,26 @@ class ShopOwnerProfileScreen extends StatelessWidget {
                       mainAxisAlignment: MainAxisAlignment.start,
                       children: [
                         Icon(Icons.verified,
-                            color:
-                            user.status == 1 ? Colors.green : Colors.red),
+                            color: user.status == 1
+                                ? Colors.green
+                                : (user.status == 3)
+                                    ? Colors.orange
+                                    : Colors.red),
                         const SizedBox(width: 8),
                         Text(
-                          user.status == 1 ? "Approved" : "Blocked",
+                          user.status == 1
+                              ? "Approved"
+                              : (user.status == 3)
+                                  ? "Pending"
+                                  : "Blocked",
                           style: TextStyle(
                             fontSize: 16,
                             fontWeight: FontWeight.bold,
                             color: user.status == 1
                                 ? Colors.green[700]
-                                : Colors.red[700],
+                                : (user.status == 3)
+                                    ? Colors.orange[700]
+                                    : Colors.red[700],
                           ),
                         ),
                       ],
