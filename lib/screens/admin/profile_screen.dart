@@ -27,7 +27,7 @@ class AdminProfileScreen extends StatelessWidget {
 
     return Scaffold(
       appBar: AppBar(
-        leading: GestureDetector(
+        leading: InkWell(
           onTap: () {
             Navigator.pushReplacementNamed(context, '/dashboard');
           },

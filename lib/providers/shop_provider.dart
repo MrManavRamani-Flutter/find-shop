@@ -37,7 +37,7 @@ class ShopProvider with ChangeNotifier {
   // Get a specific shop by userId
   Shop getShopByUserId(int userId) {
     return _shops.firstWhere(
-          (shop) => shop.userId == userId,
+      (shop) => shop.userId == userId,
       orElse: () => Shop(
         shopId: -1,
         shopName: 'No Shop Found',
@@ -66,6 +66,23 @@ class ShopProvider with ChangeNotifier {
   Future<void> updateShop(Shop shop) async {
     await ShopDatabaseHelper().updateShop(shop);
     await fetchShops(); // Refresh the list after updating
+  }
+
+  // Update map address for a shop
+  Future<void> updateShopMapAddress(int shopId, String newMapAddress) async {
+    final currentShop = await ShopDatabaseHelper().getShopByUserID(shopId);
+
+    if (currentShop != null) {
+      final updatedShop = currentShop.copyWith(mapAddress: newMapAddress);
+
+      await ShopDatabaseHelper().updateShop(updatedShop);
+
+      if (shop?.shopId == shopId) {
+        shop = updatedShop;
+      }
+      await fetchShops();
+      notifyListeners(); // Notify the UI to rebuild.
+    }
   }
 
   // Delete a shop and refresh the list of shops

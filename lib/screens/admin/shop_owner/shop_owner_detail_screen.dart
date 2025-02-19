@@ -1,114 +1,196 @@
 import 'package:find_shop/models/user.dart';
+import 'package:find_shop/providers/shop_provider.dart';
 import 'package:find_shop/providers/user_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:url_launcher/url_launcher.dart';
 
-class ShopOwnerDetailScreen extends StatelessWidget {
+class ShopOwnerDetailScreen extends StatefulWidget {
   final User owner;
 
   const ShopOwnerDetailScreen({super.key, required this.owner});
 
   @override
+  State<ShopOwnerDetailScreen> createState() => _ShopOwnerDetailScreenState();
+}
+
+class _ShopOwnerDetailScreenState extends State<ShopOwnerDetailScreen> {
+  bool _isLoading = true;
+  final _formKey = GlobalKey<FormState>();
+  String? _newMapAddress;
+
+  @override
+  void initState() {
+    super.initState();
+    _fetchShopData();
+  }
+
+  Future<void> _fetchShopData() async {
+    setState(() {
+      _isLoading = true;
+    });
+    final shopProvider = Provider.of<ShopProvider>(context, listen: false);
+    await shopProvider.fetchShopByUserId(widget.owner.userId);
+    setState(() {
+      _isLoading = false;
+    });
+  }
+
+  @override
   Widget build(BuildContext context) {
-    // Get UserProvider instance
+    final shopProvider = Provider.of<ShopProvider>(context);
+    final shop = shopProvider.shop;
     final userProvider = Provider.of<UserProvider>(context, listen: true);
 
     return Scaffold(
-      appBar: AppBar(title: Text(owner.username)),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: [
-            // Shop Logo (representative)
-            Center(
-              child: CircleAvatar(
-                radius: 50,
-                backgroundColor: Colors.orangeAccent.withOpacity(0.3),
-                child: const Icon(
-                  Icons.storefront,
-                  size: 70,
-                  color: Colors.orange,
-                ),
+      appBar: AppBar(
+        title: Text(widget.owner.username),
+      ),
+      body: _isLoading
+          ? const Center(child: CircularProgressIndicator())
+          : SingleChildScrollView(
+              padding: const EdgeInsets.all(16.0),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  Center(
+                    child: CircleAvatar(
+                      radius: 60,
+                      backgroundColor: Colors.orangeAccent.withOpacity(0.3),
+                      child: const Icon(
+                        Icons.storefront,
+                        size: 70,
+                        color: Colors.orange,
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 24),
+                  Card(
+                    elevation: 6,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(16),
+                    ),
+                    child: Padding(
+                      padding: const EdgeInsets.all(20.0),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          _buildDetailRow("Owner Name", widget.owner.username),
+                          _buildDetailRow("Shop Name", shop?.shopName ?? 'N/A'),
+                          const SizedBox(height: 16),
+                          const Divider(),
+                          const SizedBox(height: 16),
+                          _buildDetailRow("Address", shop?.address ?? 'N/A'),
+                          _buildDetailRow("Email", widget.owner.email),
+                          _buildDetailRow("Contact", widget.owner.contact),
+                          _buildDetailRow(
+                              "Status", _getStatusText(widget.owner.status)),
+                          const SizedBox(height: 16),
+                          if (widget.owner.contact.isNotEmpty)
+                            Center(
+                              child: _buildCallButton(widget.owner.contact),
+                            ),
+                          if (shop == null) const SizedBox(height: 16),
+                        ],
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 24),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    children: [
+                      _buildActionButton(
+                        label: "Approve",
+                        color: Colors.green,
+                        onPressed: widget.owner.status != 1
+                            ? () {
+                                _updateUserStatus(context, userProvider, 1);
+                              }
+                            : null,
+                      ),
+                      _buildActionButton(
+                        label: "Reject",
+                        color: Colors.red,
+                        onPressed: widget.owner.status != 2
+                            ? () {
+                                _updateUserStatus(context, userProvider, 2);
+                              }
+                            : null,
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 20),
+                  Center(
+                    child: _buildSecondaryButton(
+                      label: "Update Map Address",
+                      onPressed: () {
+                        _showUpdateMapAddressDialog(shopProvider);
+                      },
+                    ),
+                  ),
+                ],
               ),
             ),
-            const SizedBox(height: 20),
+    );
+  }
 
-            // Shop Details Card
-            Card(
-              elevation: 4,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(12),
-              ),
-              child: Padding(
-                padding: const EdgeInsets.all(16.0),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    _buildDetailRow("Shop Name", owner.username),
-                    // Assuming shop name is same as username for now
-                    _buildDetailRow("Owner Name", owner.username),
-                    _buildDetailRow("Email", owner.email),
-                    _buildDetailRow("Contact", owner.contact),
-                    _buildDetailRow("Status", _getStatusText(owner.status)),
-                    const SizedBox(height: 20),
+  Future<void> _showUpdateMapAddressDialog(ShopProvider shopProvider) async {
+    _newMapAddress = null;
 
-                    // Approve or Reject buttons
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        (owner.status != 1)
-                            ? ElevatedButton(
-                                style: const ButtonStyle(
-                                    backgroundColor:
-                                        WidgetStatePropertyAll(Colors.green)),
-                                onPressed: () {
-                                  _updateUserStatus(
-                                      context, userProvider, 1); // Approved
-                                },
-                                child: const Text(
-                                  "Approve",
-                                  style: TextStyle(color: Colors.white),
-                                ),
-                              )
-                            : const SizedBox(),
-                        const SizedBox(width: 10),
-                        (owner.status != 2)
-                            ? ElevatedButton(
-                                style: const ButtonStyle(
-                                  backgroundColor:
-                                      WidgetStatePropertyAll(Colors.red),
-                                ),
-                                onPressed: () {
-                                  _updateUserStatus(
-                                      context, userProvider, 2); // Rejected
-                                },
-                                child: const Text(
-                                  "Reject",
-                                  style: TextStyle(color: Colors.white),
-                                ),
-                              )
-                            : const SizedBox(),
-                      ],
-                    ),
-                    const SizedBox(height: 20),
+    await showDialog<void>(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Update Map Address'),
+          content: Form(
+            key: _formKey,
+            child: TextFormField(
+              decoration: const InputDecoration(labelText: 'New Map Address'),
+              keyboardType: TextInputType.text,
+              validator: (value) {
+                if (value == null || value.isEmpty) {
+                  return 'Please enter a map address.';
+                }
+                return null;
+              },
+              onSaved: (newValue) {
+                _newMapAddress = newValue;
+              },
+            ),
+          ),
+          actions: [
+            TextButton(
+              child: const Text('Cancel'),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+            ElevatedButton(
+              child: const Text('Save'),
+              onPressed: () async {
+                if (_formKey.currentState!.validate()) {
+                  _formKey.currentState!.save();
 
-                    // Update Map Address Option (if needed)
-                    // Center(
-                    //   child: ElevatedButton(
-                    //     onPressed: () {
-                    //       // You can implement update map address functionality here if needed
-                    //     },
-                    //     child: const Text("Update Map Address"),
-                    //   ),
-                    // ),
-                  ],
-                ),
-              ),
+                  if (_newMapAddress != null && _newMapAddress!.isNotEmpty) {
+                    await shopProvider.updateShopMapAddress(
+                        widget.owner.userId, _newMapAddress!);
+                    if (context.mounted) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(
+                          content: Text("Map address updated successfully!"),
+                        ),
+                      );
+                    }
+                  }
+                  if (context.mounted) {
+                    Navigator.of(context).pop();
+                  }
+                }
+              },
             ),
           ],
-        ),
-      ),
+        );
+      },
     );
   }
 
@@ -120,13 +202,78 @@ class ShopOwnerDetailScreen extends StatelessWidget {
         children: [
           Text(
             title,
-            style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+            style: const TextStyle(
+              fontSize: 16,
+              fontWeight: FontWeight.bold,
+            ),
           ),
-          Text(
-            value,
-            style: const TextStyle(fontSize: 16, color: Colors.black87),
+          Flexible(
+            child: Text(
+              value,
+              style: const TextStyle(fontSize: 16, color: Colors.black87),
+              textAlign: TextAlign.right,
+            ),
           ),
         ],
+      ),
+    );
+  }
+
+  Widget _buildCallButton(String phoneNumber) {
+    return ElevatedButton.icon(
+      icon: const Icon(Icons.call, color: Colors.white),
+      label: const Text("Call", style: TextStyle(color: Colors.white)),
+      style: ElevatedButton.styleFrom(
+        backgroundColor: Colors.blue,
+        padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(12),
+        ),
+        elevation: 4,
+      ),
+      onPressed: () {
+        _launchPhoneCall(phoneNumber);
+      },
+    );
+  }
+
+  Widget _buildActionButton({
+    required String label,
+    required Color color,
+    required VoidCallback? onPressed,
+  }) {
+    return ElevatedButton(
+      style: ElevatedButton.styleFrom(
+        backgroundColor: color,
+        padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(12),
+        ),
+      ),
+      onPressed: onPressed,
+      child: Text(
+        label,
+        style: const TextStyle(color: Colors.white, fontSize: 16),
+      ),
+    );
+  }
+
+  Widget _buildSecondaryButton({
+    required String label,
+    required VoidCallback? onPressed,
+  }) {
+    return OutlinedButton(
+      style: OutlinedButton.styleFrom(
+        padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(12),
+        ),
+        side: const BorderSide(color: Colors.blue, width: 2),
+      ),
+      onPressed: onPressed,
+      child: Text(
+        label,
+        style: const TextStyle(color: Colors.blue, fontSize: 16),
       ),
     );
   }
@@ -146,14 +293,10 @@ class ShopOwnerDetailScreen extends StatelessWidget {
     }
   }
 
-  // Method to update user status (Approve or Reject)
-  void _updateUserStatus(
+  Future<void> _updateUserStatus(
       BuildContext context, UserProvider userProvider, int newStatus) async {
-    final updatedOwner =
-        owner.copyWith(status: newStatus); // Create a copy with updated status
-
-    await userProvider
-        .updateUser(updatedOwner); // Update user status in the database
+    final updatedOwner = widget.owner.copyWith(status: newStatus);
+    await userProvider.updateUser(updatedOwner);
     if (context.mounted) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
@@ -162,6 +305,21 @@ class ShopOwnerDetailScreen extends StatelessWidget {
           ),
         ),
       );
+    }
+  }
+
+  Future<void> _launchPhoneCall(String phoneNumber) async {
+    final Uri callLaunchUri = Uri(scheme: 'tel', path: phoneNumber);
+    if (await canLaunchUrl(callLaunchUri)) {
+      await launchUrl(callLaunchUri);
+    } else {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Could not launch phone call.'),
+          ),
+        );
+      }
     }
   }
 }

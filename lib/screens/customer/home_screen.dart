@@ -126,11 +126,12 @@ class _CustomerHomeScreenState extends State<CustomerHomeScreen> {
       height: 80,
       child: ListView.builder(
         scrollDirection: Axis.horizontal,
+        padding: const EdgeInsets.symmetric(horizontal: 13),
         itemCount: categories.length,
         itemBuilder: (context, index) {
           final category = categories[index];
           return Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 8.0),
+            padding: const EdgeInsets.all(5),
             child: InkWell(
               onTap: () {
                 Navigator.push(
@@ -308,7 +309,7 @@ class _CustomerHomeScreenState extends State<CustomerHomeScreen> {
         title: Text(title),
         onTap: () {
           if (mounted) {
-            Navigator.pushReplacementNamed (context, route);
+            Navigator.pushReplacementNamed(context, route);
           }
         },
       ),

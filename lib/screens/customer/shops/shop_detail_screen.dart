@@ -14,13 +14,14 @@ import 'package:find_shop/models/user.dart';
 import 'package:find_shop/models/category.dart';
 import 'package:find_shop/models/area.dart';
 import 'package:find_shop/models/shop_review.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class CustomerShopDetailScreen extends StatefulWidget {
   final int shopId;
   final int shopUserId;
 
   const CustomerShopDetailScreen({
-    super.key,
+    super.key, // Added Key?
     required this.shopId,
     required this.shopUserId,
   });
@@ -65,12 +66,29 @@ class CustomerShopDetailScreenState extends State<CustomerShopDetailScreen> {
     _categoryProvider = Provider.of<CategoryProvider>(context, listen: false);
     _areaProvider = Provider.of<AreaProvider>(context, listen: false);
 
-    await _shopProvider.fetchShopByUserId(widget.shopUserId);
-    await _userProvider.fetchUsers();
-    await _categoryProvider.fetchCategories();
-    await _shopCategoryProvider.fetchCategoriesForShop(widget.shopId);
-    await _areaProvider.fetchAreas();
-    await _shopReviewProvider.fetchShopReviewsByShopId(widget.shopId);
+    try {
+      await Future.wait([
+        _shopProvider.fetchShopByUserId(widget.shopUserId),
+        _userProvider.fetchUsers(),
+        _categoryProvider.fetchCategories(),
+        _shopCategoryProvider.fetchCategoriesForShop(widget.shopId),
+        _areaProvider.fetchAreas(),
+        _shopReviewProvider.fetchShopReviewsByShopId(widget.shopId),
+      ]);
+    } catch (e) {
+      // Handle any errors that might occur during data fetching.
+      debugPrint('Error fetching data: $e'); // Log the error for debugging.
+      if (mounted) {
+        // Check if the widget is still mounted.
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Failed to load shop details.')),
+        );
+      }
+      setState(() {
+        _isLoading = false; // Stop the loading indicator.
+      });
+      return; // Exit the function if there's an error.
+    }
 
     setState(() {
       _shop = _shopProvider.shop;
@@ -79,23 +97,27 @@ class CustomerShopDetailScreenState extends State<CustomerShopDetailScreen> {
       SharedPreferencesHelper().getUserId().then((userId) {
         _shopReviewProvider.hasReviewedShop(widget.shopId).then((hasReviewed) {
           setState(() {
-            // print(
-            //     "-----------------------\n\n $hasReviewed \n\n-------------------------------");
             _isReviewAvailable = !hasReviewed;
           });
         });
       });
 
       if (_shop != null) {
-        var shopCategory = _shopCategoryProvider.shopCategories.firstWhere(
-          (sc) => sc.shopId == _shop!.shopId,
-        );
-        _category = _categoryProvider.categories.firstWhere(
-          (c) => c.catId == shopCategory.catId,
-        );
-        _area = _areaProvider.areas.firstWhere(
-          (a) => a.areaId == _shop!.areaId,
-        );
+        try {
+          var shopCategory = _shopCategoryProvider.shopCategories.firstWhere(
+            (sc) => sc.shopId == _shop!.shopId,
+          );
+          _category = _categoryProvider.categories.firstWhere(
+            (c) => c.catId == shopCategory.catId,
+          );
+          _area = _areaProvider.areas.firstWhere(
+            (a) => a.areaId == _shop!.areaId,
+          );
+        } catch (e) {
+          // Handle the case where related data is not found.
+          debugPrint('Error finding related data: $e');
+          // You might want to set _category or _area to a default value or show an error message.
+        }
       }
 
       _favoriteShopProvider.isFavorite(widget.shopId).then((value) {
@@ -112,10 +134,12 @@ class CustomerShopDetailScreenState extends State<CustomerShopDetailScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-
-        title:
-            const Text('Shop Profile', style: TextStyle(color: Colors.white)),
-        backgroundColor: Colors.blueAccent,
+        title: const Text(
+          'Shop Profile',
+          style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+        ),
+        backgroundColor: Colors.blue,
+        // Changed to a more modern blue
         centerTitle: true,
         iconTheme: const IconThemeData(color: Colors.white),
         actions: [
@@ -132,8 +156,14 @@ class CustomerShopDetailScreenState extends State<CustomerShopDetailScreen> {
                 _isFavorite = !_isFavorite;
               });
               if (context.mounted) {
-                ScaffoldMessenger.of(context)
-                    .showSnackBar(SnackBar(content: Text(message)));
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: Text(message),
+                    duration: const Duration(
+                        milliseconds:
+                            1500), // Added a duration to the snackbar.
+                  ),
+                );
               }
             },
           ),
@@ -151,7 +181,7 @@ class CustomerShopDetailScreenState extends State<CustomerShopDetailScreen> {
     return SingleChildScrollView(
       padding: const EdgeInsets.all(16.0),
       child: Column(
-        crossAxisAlignment: CrossAxisAlignment.center,
+        crossAxisAlignment: CrossAxisAlignment.start, // Changed to start.
         children: [
           _buildProfileHeader(),
           const SizedBox(height: 20),
@@ -160,44 +190,70 @@ class CustomerShopDetailScreenState extends State<CustomerShopDetailScreen> {
           _buildShopDetails(),
           const SizedBox(height: 20),
           _buildShopReviews(),
+          const SizedBox(height: 20),
+          _buildContactButtons(),
         ],
       ),
     );
   }
 
   Widget _buildProfileHeader() {
-    return Column(
-      children: [
-        CircleAvatar(
-          radius: 50,
-          backgroundColor: Colors.grey[200],
-          child: const Icon(Icons.store, size: 50, color: Colors.blueAccent),
-        ),
-        const SizedBox(height: 10),
-        Text(
-          _shop!.shopName ?? 'No Name',
-          style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
-        ),
-        const SizedBox(height: 5),
-        Text(
-          _category != null ? _category!.catName : "No Category",
-          style: const TextStyle(fontSize: 16, color: Colors.grey),
-        ),
-      ],
+    return Center(
+      // Center the header content.
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          CircleAvatar(
+            radius: 60, // Increased the radius for a larger avatar.
+            backgroundColor: Colors.grey[300], // Slightly lighter grey.
+            child: const Icon(Icons.store,
+                size: 60, color: Colors.blue), // Increased icon size.
+          ),
+          const SizedBox(height: 12), // Reduced space.
+          Text(
+            _shop!.shopName ?? 'No Name',
+            style: const TextStyle(
+              fontSize: 28, // Increased font size.
+              fontWeight: FontWeight.bold,
+              color: Colors.black87, // Slightly darker text.
+            ),
+            textAlign: TextAlign.center, // Center-align the text.
+          ),
+          const SizedBox(height: 8), // Reduced space.
+          Text(
+            _category != null ? _category!.catName : "No Category",
+            style: const TextStyle(
+              fontSize: 16,
+              color: Colors.grey,
+            ),
+            textAlign: TextAlign.center, // Center-align the text.
+          ),
+        ],
+      ),
     );
   }
 
   Widget _buildOwnerInfo(User user) {
     return Card(
-      elevation: 3,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+      elevation: 4, // Increased elevation for a stronger shadow.
+      margin: const EdgeInsets.symmetric(horizontal: 8), // Added margin.
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(12), // Rounded corners.
+      ),
       child: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            _buildSectionTitle('Owner Information'),
-            const SizedBox(height: 10),
+            Text(
+              'Owner Information',
+              style: TextStyle(
+                fontSize: 20,
+                fontWeight: FontWeight.w600, // Semi-bold.
+                color: Colors.blue[800], // A deeper blue for the title.
+              ),
+            ),
+            const SizedBox(height: 12),
             _buildInfoRow(Icons.person, 'Name', user.username),
             _buildInfoRow(Icons.email, 'Email', user.email),
             _buildInfoRow(Icons.phone, 'Contact', user.contact),
@@ -209,18 +265,35 @@ class CustomerShopDetailScreenState extends State<CustomerShopDetailScreen> {
 
   Widget _buildShopDetails() {
     return Card(
-      elevation: 3,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+      elevation: 4,
+      margin: const EdgeInsets.symmetric(horizontal: 8), // Added margin.
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(12),
+      ),
       child: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            _buildSectionTitle('Shop Details'),
-            const SizedBox(height: 10),
+            Text(
+              'Shop Details',
+              style: TextStyle(
+                fontSize: 20,
+                fontWeight: FontWeight.w600, // Semi-bold.
+                color: Colors.blue[800], // A deeper blue.
+              ),
+            ),
+            const SizedBox(height: 12),
             _buildInfoRow(
-                Icons.location_on, 'Address', _shop!.address ?? 'No Address'),
-            _buildInfoRow(Icons.map, 'Area', _area?.areaName ?? 'No Area'),
+              Icons.location_on,
+              'Address',
+              _shop!.address ?? 'No Address',
+            ),
+            _buildInfoRow(
+              Icons.map,
+              'Area',
+              _area?.areaName ?? 'No Area',
+            ),
           ],
         ),
       ),
@@ -229,24 +302,40 @@ class CustomerShopDetailScreenState extends State<CustomerShopDetailScreen> {
 
   Widget _buildShopReviews() {
     return Card(
-      elevation: 3,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+      elevation: 4,
+      margin: const EdgeInsets.symmetric(horizontal: 8), // Added margin.
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(12),
+      ),
       child: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            _buildSectionTitle('Reviews'),
-            const SizedBox(height: 10),
+            Text(
+              'Reviews',
+              style: TextStyle(
+                fontSize: 20,
+                fontWeight: FontWeight.w600, // Semi-bold.
+                color: Colors.blue[800], // A deeper blue.
+              ),
+            ),
+            const SizedBox(height: 12),
             if (_shopReviewProvider.shopReviews.isNotEmpty)
               ..._shopReviewProvider.shopReviews.map((review) {
                 return _buildReviewCard(review);
               })
             else
               const Center(
-                child: Text('No reviews yet. Be the first to leave a review!'),
+                child: Text(
+                  'No reviews yet. Be the first to leave a review!',
+                  style: TextStyle(
+                    fontSize: 16,
+                    color: Colors.grey,
+                  ),
+                ),
               ),
-            const SizedBox(height: 10),
+            const SizedBox(height: 12),
             _buildAddReviewButton(),
           ],
         ),
@@ -254,24 +343,49 @@ class CustomerShopDetailScreenState extends State<CustomerShopDetailScreen> {
     );
   }
 
-  Widget _buildSectionTitle(String title) {
-    return Text(
-      title,
-      style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-    );
-  }
+  // Widget _buildSectionTitle(String title) {
+  //   return Text(
+  //     title,
+  //     style: const TextStyle(
+  //       fontSize: 18,
+  //       fontWeight: FontWeight.bold,
+  //     ),
+  //   );
+  // }
 
   Widget _buildInfoRow(IconData icon, String label, String value) {
     return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 5),
+      padding: const EdgeInsets.symmetric(vertical: 8), // Increased spacing.
       child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Icon(icon, color: Colors.blueAccent, size: 20),
-          const SizedBox(width: 10),
+          Icon(
+            icon,
+            color: Colors.blue, // Changed to a more consistent blue.
+            size: 24, // Increased icon size.
+          ),
+          const SizedBox(width: 16), // Increased spacing.
           Expanded(
-            child: Text(
-              '$label: $value',
-              style: const TextStyle(fontSize: 16),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  label,
+                  style: const TextStyle(
+                    fontSize: 16,
+                    color: Colors.grey, // Subtle color.
+                  ),
+                ),
+                const SizedBox(height: 4), // Reduced space.
+                Text(
+                  value,
+                  style: const TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.w500,
+                    color: Colors.black87, // Darker text.
+                  ),
+                ),
+              ],
             ),
           ),
         ],
@@ -283,23 +397,39 @@ class CustomerShopDetailScreenState extends State<CustomerShopDetailScreen> {
     final reviewer = _userProvider.getUserByUserId(review.userId);
     return Container(
       margin: const EdgeInsets.symmetric(vertical: 8),
-      padding: const EdgeInsets.all(12.0),
+      padding: const EdgeInsets.all(16.0), // Increased padding.
       decoration: BoxDecoration(
-        color: Colors.blue[50],
-        borderRadius: BorderRadius.circular(12),
-        boxShadow: const [
-          BoxShadow(color: Colors.black26, blurRadius: 4, spreadRadius: 1),
+        color: Colors.blue[50], // Lighter shade of blue.
+        borderRadius: BorderRadius.circular(16), // More rounded corners.
+        boxShadow: [
+          BoxShadow(
+            color: Colors.grey.withOpacity(0.2), // Subtle shadow.
+            spreadRadius: 1,
+            blurRadius: 5,
+            offset: const Offset(0, 2), // changes position of shadow
+          ),
         ],
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          ListTile(
-            leading: const CircleAvatar(
-              backgroundImage: AssetImage('assets/logo/user.png'),
-            ),
-            title: Text(reviewer.username),
+          Row(
+            children: [
+              const CircleAvatar(
+                backgroundImage: AssetImage('assets/logo/user.png'),
+              ),
+              const SizedBox(width: 12),
+              Text(
+                reviewer.username,
+                style: const TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.w600,
+                  color: Colors.black87, // Darker text.
+                ),
+              ),
+            ],
           ),
+          const SizedBox(height: 8),
           RatingBarIndicator(
             rating: review.rating,
             itemBuilder: (context, index) => const Icon(
@@ -310,10 +440,13 @@ class CustomerShopDetailScreenState extends State<CustomerShopDetailScreen> {
             itemSize: 20,
             direction: Axis.horizontal,
           ),
-          const SizedBox(height: 8),
+          const SizedBox(height: 12),
           Text(
             review.comment,
-            style: const TextStyle(fontSize: 16),
+            style: const TextStyle(
+              fontSize: 16,
+              color: Colors.black87,
+            ),
           ),
         ],
       ),
@@ -321,20 +454,135 @@ class CustomerShopDetailScreenState extends State<CustomerShopDetailScreen> {
   }
 
   Widget _buildAddReviewButton() {
-    if (_isReviewAvailable) {
-      return ElevatedButton(
-        onPressed: () {
+    return ElevatedButton(
+      onPressed: () {
+        if (_isReviewAvailable) {
           Navigator.pushNamed(context, '/customer_add_review',
                   arguments: widget.shopId)
               .then((value) => _fetchData());
-        },
-        style: ElevatedButton.styleFrom(
-          minimumSize: const Size(double.infinity, 50),
-          backgroundColor: Colors.blueAccent,
+        } else {
+          // Optionally, display a message that the user has already reviewed.
+          if (context.mounted) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(
+                  content: Text('You have already reviewed this shop.')),
+            );
+          }
+        }
+      },
+      style: ElevatedButton.styleFrom(
+        backgroundColor: Colors.blue,
+        // Changed to a more modern blue.
+        padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 24),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(12),
         ),
-        child: const Text('Add Review'),
-      );
+        elevation: 2,
+        shadowColor: Colors.black26,
+      ),
+      child: Text(
+        _isReviewAvailable ? 'Add Review' : 'Review Added',
+        // Dynamically display button text
+        style: const TextStyle(
+          color: Colors.white,
+          fontSize: 18,
+          fontWeight: FontWeight.w600,
+        ),
+      ),
+    );
+  }
+
+  Widget _buildContactButtons() {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 8),
+      // Added horizontal padding
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+        children: [
+          Expanded(
+            // Use Expanded to make buttons take equal width.
+            child: Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: ElevatedButton.icon(
+                onPressed: () {
+                  _launchPhoneCall(_user?.contact ?? '');
+                },
+                icon: const Icon(Icons.call, color: Colors.white),
+                label: const Text('Call',
+                    style: TextStyle(color: Colors.white, fontSize: 18)),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.green,
+                  padding: const EdgeInsets.symmetric(vertical: 16),
+                  // Consistent padding.
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  elevation: 2,
+                  // Subtle elevation.
+                  shadowColor: Colors.black26, // Subtle shadow.
+                ),
+              ),
+            ),
+          ),
+          (_shop!.mapAddress == null)
+              ? const SizedBox()
+              : Expanded(
+                  // Use Expanded to make buttons take equal width.
+                  child: Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: ElevatedButton.icon(
+                      onPressed: () {
+                        _launchMap(
+                            _shop?.mapAddress ?? ''); // Use the shop's address.
+                      },
+                      icon: const Icon(Icons.map, color: Colors.white),
+                      label: const Text('Map',
+                          style: TextStyle(color: Colors.white, fontSize: 18)),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.blue,
+                        padding: const EdgeInsets.symmetric(vertical: 16),
+                        // Consistent padding.
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        elevation: 2,
+                        shadowColor: Colors.black26,
+                      ),
+                    ),
+                  ),
+                ),
+        ],
+      ),
+    );
+  }
+
+  // Helper function to launch the phone call
+  Future<void> _launchPhoneCall(String phoneNumber) async {
+    final Uri launchUri = Uri(
+      scheme: 'tel',
+      path: phoneNumber,
+    );
+    if (await canLaunchUrl(launchUri)) {
+      await launchUrl(launchUri);
+    } else {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Could not launch phone call'),
+            duration: Duration(milliseconds: 1500),
+          ),
+        );
+      }
     }
-    return const SizedBox(); // Button won't show if review is already added or user is the shop owner
+  }
+
+  // Helper function to launch the map
+  Future<void> _launchMap(String address) async {
+    final Uri googleMapsUrl = Uri.parse(address);
+    if (await canLaunchUrl(googleMapsUrl)) {
+      await launchUrl(googleMapsUrl);
+    } else {
+      throw 'Could not open Google Maps';
+    }
   }
 }
