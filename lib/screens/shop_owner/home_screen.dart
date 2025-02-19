@@ -219,6 +219,24 @@ class ShopOwnerHomeScreenState extends State<ShopOwnerHomeScreen> {
             },
           ),
           ListTile(
+            leading: const Icon(Icons.production_quantity_limits),
+            // Add leading icon
+            title: const Text('Product'),
+            onTap: () {
+              Navigator.pushReplacementNamed(context, '/shop_product_list',
+                  arguments: shopId);
+            },
+          ),
+          ListTile(
+            leading: const Icon(Icons.star),
+            // Add leading icon
+            title: const Text('Review'),
+            onTap: () {
+              Navigator.pushReplacementNamed(context, '/shop_review_list',
+                  arguments: shopId);
+            },
+          ),
+          ListTile(
             leading: const Icon(Icons.info_outline), // Add leading icon
             title: const Text('About'),
             onTap: () {
