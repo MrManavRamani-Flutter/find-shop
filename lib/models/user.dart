@@ -56,7 +56,8 @@ class User {
     String? createdAt,
   }) {
     return User(
-      userId: userId ?? this.userId, // Use new userId if provided, otherwise keep the old one
+      userId: userId ?? this.userId,
+      // Use new userId if provided, otherwise keep the old one
       username: username ?? this.username,
       email: email ?? this.email,
       password: password ?? this.password,
@@ -88,6 +89,10 @@ class User {
 
   void updateEmail(String newEmail) {
     email = newEmail;
+  }
+
+  void updateContact(String newContact) {
+    contact = newContact;
   }
 
   // Convert User object to a map (e.g., for saving to a database)

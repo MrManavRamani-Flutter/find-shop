@@ -13,20 +13,24 @@ class UpdateProfileScreen extends StatefulWidget {
 }
 
 class UpdateProfileScreenState extends State<UpdateProfileScreen> {
+  final _formKey = GlobalKey<FormState>();
   final _usernameController = TextEditingController();
   final _emailController = TextEditingController();
+  final _contactController = TextEditingController();
 
   @override
   void initState() {
     super.initState();
     _usernameController.text = widget.user.username;
     _emailController.text = widget.user.email;
+    _contactController.text = widget.user.contact;
   }
 
   @override
   void dispose() {
     _usernameController.dispose();
     _emailController.dispose();
+    _contactController.dispose();
     super.dispose();
   }
 
@@ -47,92 +51,131 @@ class UpdateProfileScreenState extends State<UpdateProfileScreen> {
       ),
       body: Padding(
         padding: const EdgeInsets.all(20.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              'Username:',
-              style: TextStyle(
-                fontSize: 20,
-                fontWeight: FontWeight.bold,
-                color: Colors.blueAccent.shade700,
+        child: Form(
+          key: _formKey,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                'Username:',
+                style: TextStyle(
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.blueAccent.shade700,
+                ),
               ),
-            ),
-            TextField(
-              controller: _usernameController,
-              decoration: const InputDecoration(
-                hintText: 'Enter new username',
+              TextFormField(
+                controller: _usernameController,
+                decoration: const InputDecoration(
+                  hintText: 'Enter new username',
+                ),
+                validator: (value) {
+                  if (value == null || value.trim().isEmpty) {
+                    return 'Username cannot be empty';
+                  }
+                  if (value.trim().length < 3) {
+                    return 'Username must be at least 3 characters long';
+                  }
+                  return null;
+                },
               ),
-            ),
-            const SizedBox(height: 20),
-            Text(
-              'Email:',
-              style: TextStyle(
-                fontSize: 20,
-                fontWeight: FontWeight.bold,
-                color: Colors.blueAccent.shade700,
+              const SizedBox(height: 20),
+              Text(
+                'Email:',
+                style: TextStyle(
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.blueAccent.shade700,
+                ),
               ),
-            ),
-            TextField(
-              controller: _emailController,
-              decoration: const InputDecoration(
-                hintText: 'Enter new email',
+              TextFormField(
+                controller: _emailController,
+                decoration: const InputDecoration(
+                  hintText: 'Enter new email',
+                ),
+                keyboardType: TextInputType.emailAddress,
+                validator: (value) {
+                  if (value == null || value.trim().isEmpty) {
+                    return 'Email cannot be empty';
+                  }
+                  if (!value.trim().contains('@') ||
+                      !value.trim().contains('.')) {
+                    return 'Please enter a valid email address';
+                  }
+                  return null;
+                },
               ),
-            ),
-            const SizedBox(height: 40),
-            ElevatedButton(
-              onPressed: () async {
-                String newUsername = _usernameController.text.trim();
-                String newEmail = _emailController.text.trim();
+              const SizedBox(height: 20),
+              Text(
+                'Contact:',
+                style: TextStyle(
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.blueAccent.shade700,
+                ),
+              ),
+              TextFormField(
+                controller: _contactController,
+                decoration: const InputDecoration(
+                  hintText: 'Enter new contact number',
+                ),
+                keyboardType: TextInputType.phone,
+                validator: (value) {
+                  if (value == null || value.trim().isEmpty) {
+                    return 'Contact cannot be empty';
+                  }
+                  return null;
+                },
+              ),
+              const SizedBox(height: 40),
+              ElevatedButton(
+                onPressed: () async {
+                  if (_formKey.currentState!.validate()) {
+                    String newUsername = _usernameController.text.trim();
+                    String newEmail = _emailController.text.trim();
+                    String newContact =
+                        _contactController.text.trim(); // Get contact
 
-                // Check if values are not empty and different from current values
-                if (newUsername.isNotEmpty && newEmail.isNotEmpty) {
-                  if (newUsername != widget.user.username ||
-                      newEmail != widget.user.email) {
-                    // Update user data in the user object
-                    widget.user.updateUsername(newUsername);
-                    widget.user.updateEmail(newEmail);
+                    if (newUsername != widget.user.username ||
+                        newEmail != widget.user.email ||
+                        newContact != widget.user.contact) {
+                      widget.user.updateUsername(newUsername);
+                      widget.user.updateEmail(newEmail);
+                      widget.user.updateContact(newContact); // Update contact
 
-                    // Call the update method of UserProvider
-                    await Provider.of<UserProvider>(context, listen: false)
-                        .updateUser(widget.user);
+                      await Provider.of<UserProvider>(context, listen: false)
+                          .updateUser(widget.user);
 
-                    // After successful update, go back to the profile screen
-                    if (context.mounted) {
-                      Navigator.pop(context);
-                    }
-                  } else {
-                    // If no changes were made, just go back to the profile screen
-                    if (mounted) {
-                      Navigator.pop(context);
+                      if (context.mounted) {
+                        Navigator.pop(context);
+                      }
+                    } else {
+                      if (context.mounted) {
+                        Navigator.pop(context);
+                      }
                     }
                   }
-                } else {
-                  // Show an error if fields are empty
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(content: Text('Fields cannot be empty')),
-                  );
-                }
-              },
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.blueAccent,
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 40, vertical: 18),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(30),
+                },
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.blueAccent,
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 40, vertical: 18),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(30),
+                  ),
+                  elevation: 5,
                 ),
-                elevation: 5,
-              ),
-              child: const Text(
-                'Update Profile',
-                style: TextStyle(
-                  fontSize: 18,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.white,
+                child: const Text(
+                  'Update Profile',
+                  style: TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.white,
+                  ),
                 ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );
