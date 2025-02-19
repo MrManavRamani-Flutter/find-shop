@@ -64,7 +64,6 @@ class MyApp extends StatelessWidget {
         theme: ThemeData(
           primarySwatch: Colors.blue,
         ),
-        // Initial route based on the login status
         initialRoute: isLoggedIn ? '/splash' : '/login',
         routes: {
           // Splash and login screens
