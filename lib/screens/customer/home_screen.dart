@@ -268,6 +268,8 @@ class _CustomerHomeScreenState extends State<CustomerHomeScreen> {
               Icons.favorite, 'Favorite', '/customer_favorite_list', context),
           _buildDrawerItem(
               Icons.account_box, 'Profile', '/customer_profile', context),
+          _buildDrawerItem(
+              Icons.perm_device_info_rounded, 'About', '/about_customer', context),
           const Spacer(),
           _buildLogoutItem(context),
         ],

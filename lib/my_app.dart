@@ -6,6 +6,8 @@ import 'package:find_shop/providers/shop_category_provider.dart';
 import 'package:find_shop/providers/shop_provider.dart';
 import 'package:find_shop/providers/shop_review_provider.dart';
 import 'package:find_shop/providers/upload_provider/upload_provider.dart';
+import 'package:find_shop/screens/customer/about_screen.dart';
+import 'package:find_shop/screens/shop_owner/about_screen.dart';
 import 'package:find_shop/screens/admin/area/area_list_screen.dart';
 import 'package:find_shop/screens/admin/category/category_list_screen.dart';
 import 'package:find_shop/screens/admin/customer/customer_list_screen.dart';
@@ -69,6 +71,8 @@ class MyApp extends StatelessWidget {
           '/splash': (context) => const SplashScreen(),
           '/login': (context) => const LoginScreen(),
           '/register': (context) => const RegisterScreen(),
+          '/about_customer': (context) => const AboutScreen(),
+          '/about_shop': (context) => const AboutShopScreen(),
 
           // Customer Screens
           '/customer_home': (context) => const CustomerHomeScreen(),

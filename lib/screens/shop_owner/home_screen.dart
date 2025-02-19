@@ -212,17 +212,23 @@ class ShopOwnerHomeScreenState extends State<ShopOwnerHomeScreen> {
         children: [
           _buildDrawerHeader(context, userProvider),
           ListTile(
+            leading: const Icon(Icons.person), // Add leading icon
             title: const Text('Profile'),
             onTap: () {
               Navigator.pushReplacementNamed(context, '/shop_profile');
             },
           ),
           ListTile(
-            title: const Text('Settings'),
-            onTap: () {},
+            leading: const Icon(Icons.info_outline), // Add leading icon
+            title: const Text('About'),
+            onTap: () {
+              Navigator.pushReplacementNamed(context, '/about_shop');
+            },
           ),
           const Spacer(),
           ListTile(
+            trailing: const Icon(Icons.logout, color: Colors.white),
+            // Icon with white color
             title: const Text(
               'Logout',
               style: TextStyle(color: Colors.white),
