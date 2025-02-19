@@ -44,7 +44,13 @@ class _ShopOwnerDetailScreenState extends State<ShopOwnerDetailScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text(widget.owner.username),
+        title: Text(
+          widget.owner.username,
+          style: const TextStyle(color: Colors.white),
+        ),
+        centerTitle: true,
+        backgroundColor: Colors.blueAccent,
+        iconTheme: const IconThemeData(color: Colors.white),
       ),
       body: _isLoading
           ? const Center(child: CircularProgressIndicator())

@@ -93,8 +93,8 @@ class AdminShopDetailScreenState extends State<AdminShopDetailScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title:
-            const Text('Shop Profile', style: TextStyle(color: Colors.white)),
+        title: Text('${_shop!.shopName}',
+            style: const TextStyle(color: Colors.white)),
         backgroundColor: Colors.blueAccent,
         centerTitle: true,
         iconTheme: const IconThemeData(color: Colors.white),
