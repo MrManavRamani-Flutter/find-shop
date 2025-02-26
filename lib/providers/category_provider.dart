@@ -4,15 +4,26 @@ import 'package:find_shop/models/category.dart';
 
 class CategoryProvider with ChangeNotifier {
   final List<Category> _categories = [];
+  final List<Category> _top5categories = [];
 
   // Constructor to fetch categories asynchronously when the provider is initialized
   CategoryProvider() {
-    Future.microtask(
-            () => fetchCategories()); // Async call in constructor safely
+    Future.microtask(() => fetchCategories());
+    Future.microtask(() => fetchTop5Categories());
   }
 
   // Getter to retrieve the list of categories
   List<Category> get categories => _categories;
+
+  List<Category> get top5categories => _top5categories;
+
+  // Fetch categories from the database and update the list
+  Future<void> fetchTop5Categories() async {
+    final categoriesList = await CategoryDatabaseHelper().getTop5Categories();
+    _top5categories.clear();
+    _top5categories.addAll(categoriesList);
+    notifyListeners(); // Notify listeners when the categories are updated
+  }
 
   // Fetch categories from the database and update the list
   Future<void> fetchCategories() async {

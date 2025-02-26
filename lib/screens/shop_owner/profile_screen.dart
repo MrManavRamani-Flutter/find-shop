@@ -13,7 +13,7 @@ import 'update_shop_screen.dart';
 import 'package:provider/provider.dart';
 
 class ShopOwnerProfileScreen extends StatefulWidget {
-  const ShopOwnerProfileScreen({Key? key}) : super(key: key);
+  const ShopOwnerProfileScreen({super.key});
 
   @override
   State<ShopOwnerProfileScreen> createState() => _ShopOwnerProfileScreenState();

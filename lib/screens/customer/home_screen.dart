@@ -1,16 +1,16 @@
-import 'package:find_shop/models/category.dart';
-import 'package:find_shop/providers/category_provider.dart';
-import 'package:find_shop/screens/customer/category_screens/customer_category_shop_list_screen.dart';
 import 'package:find_shop/screens/customer/shops/shop_detail_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:find_shop/models/shop.dart';
-import 'package:find_shop/models/user.dart';
-import 'package:find_shop/providers/user_provider.dart';
-import 'package:find_shop/providers/area_provider.dart';
-import 'package:find_shop/providers/shop_provider.dart';
-import 'package:find_shop/utils/shared_preferences_helper.dart';
-import 'package:find_shop/screens/customer/area_screens/area_wise_shop_list_screen.dart';
+
+import '../../models/shop.dart';
+import '../../models/user.dart';
+import '../../providers/area_provider.dart';
+import '../../providers/category_provider.dart';
+import '../../providers/shop_provider.dart';
+import '../../providers/user_provider.dart';
+import '../../utils/shared_preferences_helper.dart';
+import 'area_screens/area_wise_shop_list_screen.dart';
+import 'category_screens/customer_category_shop_list_screen.dart';
 
 class CustomerHomeScreen extends StatefulWidget {
   const CustomerHomeScreen({super.key});
@@ -21,7 +21,6 @@ class CustomerHomeScreen extends StatefulWidget {
 
 class _CustomerHomeScreenState extends State<CustomerHomeScreen> {
   List<Shop> filteredShops = [];
-  List<Category> categories = [];
 
   @override
   void initState() {
@@ -38,18 +37,21 @@ class _CustomerHomeScreenState extends State<CustomerHomeScreen> {
 
     userLoginProvider.fetchLoggedInUser();
 
+    // Fetching data from all providers
     await Future.wait([
       shopProvider.fetchShops(),
       userProvider.fetchUsers(),
-      categoryProvider.fetchCategories(),
+      categoryProvider.fetchTop5Categories(), // Fetch top 5 categories
+      // Ensure to fetch the areas if applicable
+      // AreaProvider.fetchTop5Areas(), // Uncomment if needed
     ]);
 
     setState(() {
+      // Filter shops based on user status
       filteredShops = shopProvider.shops.where((shop) {
         final User user = userProvider.getUserByUserId(shop.userId!);
         return user.status == 1 || user.status == 3;
       }).toList();
-      categories = categoryProvider.categories;
     });
   }
 
@@ -58,18 +60,20 @@ class _CustomerHomeScreenState extends State<CustomerHomeScreen> {
     return Scaffold(
       appBar: _buildAppBar(),
       drawer: _buildDrawer(context),
-      body: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          _buildSectionTitle('Categories', '/customer_category_list'),
-          _buildCategoryList(context),
-          const SizedBox(height: 10),
-          _buildSectionTitle('Available Areas', '/customer_area_list'),
-          _buildAreaList(context),
-          const SizedBox(height: 10),
-          _buildSectionTitle('Available Shops', '/customer_shop_list'),
-          _buildShopList(context),
-        ],
+      body: SingleChildScrollView(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            _buildSectionTitle('Categories', '/customer_category_list'),
+            _buildCategoryGrid(context),
+            const SizedBox(height: 10),
+            _buildSectionTitle('Available Areas', '/customer_area_list'),
+            _buildAreaGrid(context),
+            const SizedBox(height: 10),
+            _buildSectionTitle('Available Shops', '/customer_shop_list'),
+            _buildShopGrid(context),
+          ],
+        ),
       ),
     );
   }
@@ -93,118 +97,146 @@ class _CustomerHomeScreenState extends State<CustomerHomeScreen> {
               style:
                   const TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
           const Spacer(),
+          // View All button
           if (route.isNotEmpty)
             InkWell(
               onTap: () => Navigator.of(context).pushNamed(route),
-              child: const Text('View All',
-                  style: TextStyle(
-                      fontSize: 18,
-                      color: Colors.blue,
-                      fontWeight: FontWeight.bold)),
+              child: const Text(
+                'View All',
+                style: TextStyle(
+                    fontSize: 18,
+                    color: Colors.blue,
+                    fontWeight: FontWeight.bold),
+              ),
             ),
         ],
       ),
     );
   }
 
-  // Display filtered shops based on user status
-  Widget _buildShopList(BuildContext context) {
-    return SizedBox(
-      height: 150,
-      child: ListView.builder(
-        scrollDirection: Axis.horizontal,
-        padding: const EdgeInsets.symmetric(horizontal: 16),
-        itemCount: filteredShops.length,
-        itemBuilder: (ctx, index) =>
-            _buildShopCard(filteredShops[index], context),
-      ),
-    );
-  }
-
-  Widget _buildCategoryList(BuildContext context) {
-    return SizedBox(
-      height: 80,
-      child: ListView.builder(
-        scrollDirection: Axis.horizontal,
-        padding: const EdgeInsets.symmetric(horizontal: 13),
-        itemCount: categories.length,
-        itemBuilder: (context, index) {
-          final category = categories[index];
-          return Padding(
-            padding: const EdgeInsets.all(5),
-            child: InkWell(
-              onTap: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => CustomerCategoryShopListScreen(
-                      selectedCategory: category,
-                    ),
-                  ),
-                );
-              },
-              child: Chip(
-                label: Text(category.catName),
-                backgroundColor: Colors.blueAccent,
-                labelStyle: const TextStyle(color: Colors.white),
-              ),
-            ),
-          );
-        },
-      ),
-    );
-  }
-
-  // Display areas in a horizontally scrollable list
-  Widget _buildAreaList(BuildContext context) {
-    return Consumer<AreaProvider>(
-      builder: (context, areaProvider, child) {
-        final areas = areaProvider.areas;
+  // Category Grid
+  Widget _buildCategoryGrid(BuildContext context) {
+    return Consumer<CategoryProvider>(
+      builder: (context, categoryProvider, child) {
+        final categories = categoryProvider.top5categories;
         return SizedBox(
-          height: 120,
-          child: ListView.builder(
-            scrollDirection: Axis.horizontal,
-            padding: const EdgeInsets.symmetric(horizontal: 16),
-            itemCount: areas.length,
-            itemBuilder: (context, index) =>
-                _buildAreaCard(areas[index], context),
+          height: 200,
+          child: GridView.builder(
+            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+              crossAxisCount: 3,
+              childAspectRatio: 1.5,
+              mainAxisSpacing: 10.0,
+              crossAxisSpacing: 10.0,
+            ),
+            itemCount: categories.length,
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+            itemBuilder: (context, index) {
+              final category = categories[index];
+              return InkWell(
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => CustomerCategoryShopListScreen(
+                        selectedCategory: category,
+                      ),
+                    ),
+                  );
+                },
+                child: Chip(
+                  label: Text(category.catName, textAlign: TextAlign.center),
+                  backgroundColor: Colors.blueAccent,
+                  labelStyle: const TextStyle(color: Colors.white),
+                ),
+              );
+            },
           ),
         );
       },
     );
   }
 
-  // Shop card UI
-  Widget _buildShopCard(Shop shop, BuildContext context) {
-    return Container(
-      width: 150,
-      margin: const EdgeInsets.only(right: 12),
-      child: Card(
-        elevation: 3,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-        child: InkWell(
-          onTap: () {
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (context) => CustomerShopDetailScreen(
-                    shopId: shop.shopId!, shopUserId: shop.userId!),
+  // Area Grid
+  Widget _buildAreaGrid(BuildContext context) {
+    return Consumer<AreaProvider>(
+      builder: (context, areaProvider, child) {
+        return FutureBuilder<void>(
+          future: areaProvider.fetchTop5Areas(), // Fetch top 5 areas
+          builder: (context, snapshot) {
+            // Accessing updated areas
+            final areas = areaProvider.top5areas;
+            return SizedBox(
+              height: 275,
+              child: GridView.builder(
+                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                  crossAxisCount: 3,
+                  childAspectRatio: 1,
+                  mainAxisSpacing: 10.0,
+                  crossAxisSpacing: 10.0,
+                ),
+                itemCount: areas.length,
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+                itemBuilder: (context, index) =>
+                    _buildAreaCard(areas[index], context),
               ),
             );
           },
-          child: Padding(
-            padding: const EdgeInsets.all(10),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
-                const Icon(Icons.storefront_rounded,
-                    size: 70, color: Colors.blue),
-                const SizedBox(height: 10),
-                Text(shop.shopName ?? 'No Name',
-                    textAlign: TextAlign.center,
-                    style: const TextStyle(fontWeight: FontWeight.bold)),
-              ],
+        );
+      },
+    );
+  }
+
+  // Shop Grid
+  Widget _buildShopGrid(BuildContext context) {
+    return SizedBox(
+      height: 200, // Define a fixed height
+      child: GridView.builder(
+        gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+          crossAxisCount: 2,
+          childAspectRatio: 1.3,
+          mainAxisSpacing: 10.0,
+          crossAxisSpacing: 10.0,
+        ),
+        itemCount: filteredShops.length,
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+        itemBuilder: (ctx, index) =>
+            _buildShopCard(filteredShops[index], context),
+      ),
+    );
+  }
+
+  // Shop card UI
+  Widget _buildShopCard(Shop shop, BuildContext context) {
+    return Card(
+      elevation: 3,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+      child: InkWell(
+        onTap: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => CustomerShopDetailScreen(
+                shopId: shop.shopId!,
+                shopUserId: shop.userId!,
+              ),
             ),
+          );
+        },
+        child: Padding(
+          padding: const EdgeInsets.all(10),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              const Icon(Icons.storefront_rounded,
+                  size: 70, color: Colors.blue),
+              const SizedBox(height: 10),
+              Text(
+                shop.shopName ?? 'No Name',
+                textAlign: TextAlign.center,
+                style: const TextStyle(fontWeight: FontWeight.bold),
+              ),
+            ],
           ),
         ),
       ),
@@ -213,37 +245,31 @@ class _CustomerHomeScreenState extends State<CustomerHomeScreen> {
 
   // Area card UI
   Widget _buildAreaCard(area, BuildContext context) {
-    return Container(
-      width: 150,
-      margin: const EdgeInsets.only(right: 12),
-      child: Card(
-        elevation: 3,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-        child: InkWell(
-          onTap: () {
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                  builder: (context) => AreaWiseShopListScreen(area: area)),
-            );
-          },
-          child: Padding(
-            padding: const EdgeInsets.all(10),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                const Icon(Icons.location_on, color: Colors.blue, size: 32),
-                const SizedBox(height: 8),
-                Text(
-                  area.areaName,
-                  textAlign: TextAlign.center,
-                  style: const TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-              ],
-            ),
+    return Card(
+      elevation: 3,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+      child: InkWell(
+        onTap: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+                builder: (context) => AreaWiseShopListScreen(area: area)),
+          );
+        },
+        child: Padding(
+          padding: const EdgeInsets.all(10),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              const Icon(Icons.location_on, color: Colors.blue, size: 32),
+              const SizedBox(height: 8),
+              Text(
+                area.areaName,
+                textAlign: TextAlign.center,
+                style:
+                    const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+              ),
+            ],
           ),
         ),
       ),
@@ -268,8 +294,8 @@ class _CustomerHomeScreenState extends State<CustomerHomeScreen> {
               Icons.favorite, 'Favorite', '/customer_favorite_list', context),
           _buildDrawerItem(
               Icons.account_box, 'Profile', '/customer_profile', context),
-          _buildDrawerItem(
-              Icons.perm_device_info_rounded, 'About', '/about_customer', context),
+          _buildDrawerItem(Icons.perm_device_info_rounded, 'About',
+              '/about_customer', context),
           const Spacer(),
           _buildLogoutItem(context),
         ],
@@ -288,12 +314,14 @@ class _CustomerHomeScreenState extends State<CustomerHomeScreen> {
           },
           child: UserAccountsDrawerHeader(
             decoration: const BoxDecoration(color: Colors.blue),
-            accountName: Text(loggedInUser?.username ?? 'Guest',
-                style:
-                    const TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
+            accountName: Text(
+              loggedInUser?.username ?? 'Guest',
+              style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+            ),
             accountEmail: Text(loggedInUser?.email ?? 'No email'),
             currentAccountPicture: const CircleAvatar(
-                backgroundImage: AssetImage('assets/logo/user.png')),
+              backgroundImage: AssetImage('assets/logo/user.png'),
+            ),
           ),
         );
       },
@@ -327,10 +355,7 @@ class _CustomerHomeScreenState extends State<CustomerHomeScreen> {
         textAlign: TextAlign.center,
       ),
       tileColor: Colors.red,
-      trailing: const Icon(
-        Icons.logout_outlined,
-        color: Colors.white,
-      ),
+      trailing: const Icon(Icons.logout_outlined, color: Colors.white),
       onTap: () async {
         await SharedPreferencesHelper().clearUserData();
         await SharedPreferencesHelper().clearAuthToken();

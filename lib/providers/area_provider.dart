@@ -4,6 +4,7 @@ import '../database/area_database_helper.dart';
 
 class AreaProvider with ChangeNotifier {
   List<Area> _areas = [];
+  List<Area> _top5areas = [];
 
   // Constructor to fetch areas when the provider is initialized
   AreaProvider() {
@@ -13,9 +14,20 @@ class AreaProvider with ChangeNotifier {
   // Getter to retrieve the list of areas
   List<Area> get areas => _areas;
 
+  List<Area> get top5areas => _top5areas;
+
+  Future<void> fetchTop5Areas() async {
+    final areasList = await AreaDatabaseHelper().getTop5Areas();
+    _top5areas.clear();
+
+    _top5areas = areasList;
+    notifyListeners(); // Notify listeners when the areas are updated
+  }
+
   // Fetches all areas from the database and updates the _areas list
   Future<void> fetchAreas() async {
     final areasList = await AreaDatabaseHelper().getAreas();
+    _areas.clear();
     _areas = areasList;
     notifyListeners(); // Notify listeners when the areas are updated
   }

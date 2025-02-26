@@ -15,6 +15,18 @@ class CategoryDatabaseHelper {
   }
 
   // Retrieve all categories from the database
+  Future<List<Category>> getTop5Categories() async {
+    final db = await AppDatabase().database;
+    final List<Map<String, dynamic>> maps = await db.query(
+      tableName,
+      limit: 5,
+    );
+    return List.generate(maps.length, (i) {
+      return Category.fromMap(maps[i]);
+    });
+  }
+
+  // Retrieve all categories from the database
   Future<List<Category>> getCategories() async {
     final db = await AppDatabase().database;
     final List<Map<String, dynamic>> maps = await db.query(tableName);
