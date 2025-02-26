@@ -78,41 +78,7 @@ class _CustomerHomeScreenState extends State<CustomerHomeScreen> {
     );
   }
 
-  AppBar _buildAppBar() {
-    return AppBar(
-      title: const Text('Find Shop', style: TextStyle(color: Colors.white)),
-      centerTitle: true,
-      iconTheme: const IconThemeData(color: Colors.white),
-      backgroundColor: Colors.blueAccent,
-    );
-  }
 
-  // Build section title with "View All" button
-  Widget _buildSectionTitle(String title, String route) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-      child: Row(
-        children: [
-          Text(title,
-              style:
-                  const TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
-          const Spacer(),
-          // View All button
-          if (route.isNotEmpty)
-            InkWell(
-              onTap: () => Navigator.of(context).pushNamed(route),
-              child: const Text(
-                'View All',
-                style: TextStyle(
-                    fontSize: 18,
-                    color: Colors.blue,
-                    fontWeight: FontWeight.bold),
-              ),
-            ),
-        ],
-      ),
-    );
-  }
 
   // Category Grid
   Widget _buildCategoryGrid(BuildContext context) {
@@ -187,39 +153,62 @@ class _CustomerHomeScreenState extends State<CustomerHomeScreen> {
     );
   }
 
-  // Shop Grid
+// Shop Grid
   Widget _buildShopGrid(BuildContext context) {
-    return SizedBox(
-      height: 200, // Define a fixed height
-      child: GridView.builder(
-        gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-          crossAxisCount: 3,
-          childAspectRatio: 1,
-          mainAxisSpacing: 10.0,
-          crossAxisSpacing: 10.0,
-        ),
-        itemCount: filteredShops.length,
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-        itemBuilder: (ctx, index) =>
-            _buildShopCard(filteredShops[index], context),
-      ),
+    return Consumer<ShopProvider>(
+      builder: (context, shopProvider, child) {
+        return FutureBuilder<void>(
+          future: shopProvider.fetchTop5Shops(), // Replace with your method to fetch shops
+          builder: (context, snapshot) {
+            // Accessing updated filtered shops
+            final filteredShops = shopProvider.top5shops;
+
+            return SizedBox(
+              height: 200, // Define a fixed height
+              child: GridView.builder(
+                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                  crossAxisCount: 3,
+                  childAspectRatio: 1,
+                  mainAxisSpacing: 10.0,
+                  crossAxisSpacing: 10.0,
+                ),
+                itemCount: filteredShops.length,
+                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+                itemBuilder: (ctx, index) =>
+                    _buildShopCard(shop: filteredShops[index], context: context),
+              ),
+            );
+          },
+        );
+      },
     );
   }
 
   // Shop card UI
-  Widget _buildShopCard(Shop shop, BuildContext context) {
+  Widget _buildShopCard({required Shop shop, required BuildContext context}) {
     return Card(
       elevation: 3,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
       child: InkWell(
         onTap: () {
+          if (shop.shopId == null || shop.userId == null) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(content: Text("Shop details are incomplete!")),
+            );
+            return;
+          }
+
           Navigator.push(
             context,
             MaterialPageRoute(
-              builder: (context) => CustomerShopDetailScreen(
-                shopId: shop.shopId!,
-                shopUserId: shop.userId!,
-              ),
+              builder: (context) {
+                int shopId = shop.shopId!;
+                int shopUserId = shop.userId!;
+                return CustomerShopDetailScreen(
+                  shopId: shopId,
+                  shopUserId: shopUserId,
+                );
+              },
             ),
           );
         },
@@ -370,6 +359,42 @@ class _CustomerHomeScreenState extends State<CustomerHomeScreen> {
           Navigator.pushReplacementNamed(context, '/login');
         }
       },
+    );
+  }
+
+  AppBar _buildAppBar() {
+    return AppBar(
+      title: const Text('Find Shop', style: TextStyle(color: Colors.white)),
+      centerTitle: true,
+      iconTheme: const IconThemeData(color: Colors.white),
+      backgroundColor: Colors.blueAccent,
+    );
+  }
+
+  // Build section title with "View All" button
+  Widget _buildSectionTitle(String title, String route) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+      child: Row(
+        children: [
+          Text(title,
+              style:
+              const TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+          const Spacer(),
+          // View All button
+          if (route.isNotEmpty)
+            InkWell(
+              onTap: () => Navigator.of(context).pushNamed(route),
+              child: const Text(
+                'View All',
+                style: TextStyle(
+                    fontSize: 18,
+                    color: Colors.blue,
+                    fontWeight: FontWeight.bold),
+              ),
+            ),
+        ],
+      ),
     );
   }
 }
