@@ -39,7 +39,7 @@ class _CustomerHomeScreenState extends State<CustomerHomeScreen> {
 
     // Fetching data from all providers
     await Future.wait([
-      shopProvider.fetchShops(),
+      shopProvider.fetchTop5Shops(),
       userProvider.fetchUsers(),
       categoryProvider.fetchTop5Categories(), // Fetch top 5 categories
       // Ensure to fetch the areas if applicable
@@ -48,7 +48,7 @@ class _CustomerHomeScreenState extends State<CustomerHomeScreen> {
 
     setState(() {
       // Filter shops based on user status
-      filteredShops = shopProvider.shops.where((shop) {
+      filteredShops = shopProvider.top5shops.where((shop) {
         final User user = userProvider.getUserByUserId(shop.userId!);
         return user.status == 1 || user.status == 3;
       }).toList();
@@ -193,8 +193,8 @@ class _CustomerHomeScreenState extends State<CustomerHomeScreen> {
       height: 200, // Define a fixed height
       child: GridView.builder(
         gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-          crossAxisCount: 2,
-          childAspectRatio: 1.3,
+          crossAxisCount: 3,
+          childAspectRatio: 1,
           mainAxisSpacing: 10.0,
           crossAxisSpacing: 10.0,
         ),
@@ -229,12 +229,15 @@ class _CustomerHomeScreenState extends State<CustomerHomeScreen> {
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
               const Icon(Icons.storefront_rounded,
-                  size: 70, color: Colors.blue),
+                  size: 50, color: Colors.blue),
               const SizedBox(height: 10),
               Text(
                 shop.shopName ?? 'No Name',
                 textAlign: TextAlign.center,
-                style: const TextStyle(fontWeight: FontWeight.bold),
+                style: const TextStyle(
+                  fontWeight: FontWeight.bold,
+                  fontSize: 16,
+                ),
               ),
             ],
           ),

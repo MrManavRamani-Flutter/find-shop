@@ -5,9 +5,19 @@ import '../database/shop_database_helper.dart';
 
 class ShopProvider with ChangeNotifier {
   List<Shop> _shops = [];
+  List<Shop> _top5shops = [];
   Shop? shop;
 
   List<Shop> get shops => _shops;
+
+  List<Shop> get top5shops => _top5shops;
+
+  // Fetch all shops from the database
+  Future<void> fetchTop5Shops() async {
+    final shopsList = await ShopDatabaseHelper().getTop5Shops();
+    _top5shops = shopsList;
+    notifyListeners(); // Notify listeners to update the UI
+  }
 
   // Fetch all shops from the database
   Future<void> fetchShops() async {

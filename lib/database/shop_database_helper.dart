@@ -10,6 +10,18 @@ class ShopDatabaseHelper {
     return await db.insert(tableName, shop.toMap());
   }
 
+  // Top 5 shops
+  Future<List<Shop>> getTop5Shops() async {
+    final db = await AppDatabase().database;
+    final List<Map<String, dynamic>> maps = await db.query(
+      tableName,
+      limit: 5,
+    );
+    return List.generate(maps.length, (i) {
+      return Shop.fromMap(maps[i]);
+    });
+  }
+
   // Fetch all shops from the database
   Future<List<Shop>> getShops() async {
     final db = await AppDatabase().database;
@@ -23,7 +35,7 @@ class ShopDatabaseHelper {
   Future<Shop?> getShopByUserID(int userId) async {
     final db = await AppDatabase().database;
     final List<Map<String, dynamic>> result =
-    await db.query(tableName, where: 'user_id = ?', whereArgs: [userId]);
+        await db.query(tableName, where: 'user_id = ?', whereArgs: [userId]);
 
     if (result.isNotEmpty) {
       return Shop.fromMap(result.first); // Convert first result to Shop object
