@@ -21,7 +21,10 @@ class ShopOwnerListScreen extends StatelessWidget {
           centerTitle: true,
           iconTheme: const IconThemeData(color: Colors.white),
           backgroundColor: Colors.blueAccent,
-          title: const Text('Shop Owners',style: TextStyle(color: Colors.white),),
+          title: const Text(
+            'Shop Owners',
+            style: TextStyle(color: Colors.white),
+          ),
           bottom: const TabBar(
             labelColor: Colors.white,
             unselectedLabelColor: Colors.white54,

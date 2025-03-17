@@ -70,7 +70,7 @@ class UserProvider with ChangeNotifier {
     UserDatabaseHelper dbHelper = UserDatabaseHelper();
     User? user = await dbHelper.getUserByUsername(username);
 
-    if (user != null && user.password == password) {
+    if (user != null && user.password == password && user.status != 2) {
       // Save user data in SharedPreferences after successful login
       await _saveUserData(user);
       _loggedInUser = user;

@@ -56,7 +56,7 @@ class AddProductState extends State<AddProduct> {
     }
   }
 
-  void _submitForm() {
+  void _submitForm() async {
     if (_formKey.currentState!.validate()) {
       _formKey.currentState!.save();
 
@@ -76,21 +76,23 @@ class AddProductState extends State<AddProduct> {
         shopId: _shopId!,
       );
 
+      final productProvider =
+          Provider.of<ProductProvider>(context, listen: false);
+
       if (widget.product == null) {
-        // Add new product if no product passed
-        Provider.of<ProductProvider>(context, listen: false)
-            .addProduct(newProduct);
+        await productProvider.addProduct(newProduct);
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('Product Added Successfully!')),
         );
       } else {
-        // Update existing product if a product is passed
-        Provider.of<ProductProvider>(context, listen: false)
-            .updateProduct(newProduct);
+        await productProvider.updateProduct(newProduct);
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('Product Updated Successfully!')),
         );
       }
+
+      // Fetch latest products for the shop owner
+      await productProvider.fetchProductsByShopId(_shopId!);
 
       _formKey.currentState!.reset();
       Navigator.pop(context);

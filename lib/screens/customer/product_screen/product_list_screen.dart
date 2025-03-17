@@ -99,73 +99,69 @@ class CustomerProductListScreenState extends State<CustomerProductListScreen> {
       );
     }
 
-    return Expanded(
-      child: ListView.builder(
-        itemCount: _filteredProducts.length,
-        itemBuilder: (context, index) {
-          Product product = _filteredProducts[index];
-          return Card(
-            margin: const EdgeInsets.symmetric(vertical: 8),
-            elevation: 4,
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(12),
+    return ListView.builder(
+      itemCount: _filteredProducts.length,
+      itemBuilder: (context, index) {
+        Product product = _filteredProducts[index];
+        return Card(
+          margin: const EdgeInsets.symmetric(vertical: 8),
+          elevation: 4,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(12),
+          ),
+          child: ListTile(
+            contentPadding: const EdgeInsets.all(16),
+            leading: const Icon(Icons.shopping_cart, color: Colors.blueAccent),
+            title: Text(
+              product.proName,
+              style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
             ),
-            child: ListTile(
-              contentPadding: const EdgeInsets.all(16),
-              leading:
-                  const Icon(Icons.shopping_cart, color: Colors.blueAccent),
-              title: Text(
-                product.proName,
-                style:
-                    const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-              ),
-              trailing: ElevatedButton(
-                onPressed: () async {
-                  final productShopUserData =
-                      await _getUserAndShopByProductId(product.proId!);
-                  if (productShopUserData != null) {
-                    final shopId = productShopUserData['shop_id'];
-                    final userId = productShopUserData['user_id'];
+            trailing: ElevatedButton(
+              onPressed: () async {
+                final productShopUserData =
+                    await _getUserAndShopByProductId(product.proId!);
+                if (productShopUserData != null) {
+                  final shopId = productShopUserData['shop_id'];
+                  final userId = productShopUserData['user_id'];
 
-                    if (context.mounted) {
-                      Navigator.of(context).push(
-                        MaterialPageRoute(
-                          builder: (context) => CustomerShopDetailScreen(
-                            shopId: shopId,
-                            shopUserId: userId,
-                          ),
+                  if (context.mounted) {
+                    Navigator.of(context).push(
+                      MaterialPageRoute(
+                        builder: (context) => CustomerShopDetailScreen(
+                          shopId: shopId,
+                          shopUserId: userId,
                         ),
-                      );
-                    }
+                      ),
+                    );
                   }
-                },
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.blueAccent,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                }
+              },
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.blueAccent,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(8),
                 ),
-                child: const Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Icon(Icons.store_mall_directory_outlined,
-                        color: Colors.white),
-                    SizedBox(width: 8),
-                    Text(
-                      'View Shop',
-                      style: TextStyle(color: Colors.white, fontSize: 16),
-                    ),
-                  ],
-                ),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
               ),
-              subtitle: Text('Price: \$${product.price}'),
-              onTap: () => _showProductDetailsDialog(product),
+              child: const Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Icon(Icons.store_mall_directory_outlined,
+                      color: Colors.white),
+                  SizedBox(width: 8),
+                  Text(
+                    'View Shop',
+                    style: TextStyle(color: Colors.white, fontSize: 16),
+                  ),
+                ],
+              ),
             ),
-          );
-        },
-      ),
+            subtitle: Text('Price: \$${product.price}'),
+            onTap: () => _showProductDetailsDialog(product),
+          ),
+        );
+      },
     );
   }
 

@@ -13,25 +13,54 @@ class ShopDatabaseHelper {
   // Top 5 shops
   Future<List<Shop>> getTop5Shops() async {
     final db = await AppDatabase().database;
-    final List<Map<String, dynamic>> maps = await db.query(
-      tableName,
-      limit: 5,
-    );
+    final List<Map<String, dynamic>> maps = await db.rawQuery('''
+    SELECT shops.* FROM shops
+    JOIN users ON shops.user_id = users.user_id
+    WHERE users.status != 2
+    LIMIT 5
+  ''');
+
     return List.generate(maps.length, (i) {
       return Shop.fromMap(maps[i]);
     });
   }
+
+  // Future<List<Shop>> getTop5Shops() async {
+  //   final db = await AppDatabase().database;
+  //   final List<Map<String, dynamic>> maps = await db.query(
+  //     tableName,
+  //     limit: 5,
+  //   );
+  //   return List.generate(maps.length, (i) {
+  //     return Shop.fromMap(maps[i]);
+  //   });
+  // }
 
   // Fetch all shops from the database
+
   Future<List<Shop>> getShops() async {
     final db = await AppDatabase().database;
-    final List<Map<String, dynamic>> maps = await db.query(tableName);
+    final List<Map<String, dynamic>> maps = await db.rawQuery('''
+    SELECT shops.* FROM shops
+    JOIN users ON shops.user_id = users.user_id
+    WHERE users.status != 2
+  ''');
+
     return List.generate(maps.length, (i) {
       return Shop.fromMap(maps[i]);
     });
   }
 
+  // Future<List<Shop>> getShops() async {
+  //   final db = await AppDatabase().database;
+  //   final List<Map<String, dynamic>> maps = await db.query(tableName);
+  //   return List.generate(maps.length, (i) {
+  //     return Shop.fromMap(maps[i]);
+  //   });
+  // }
+
   // Get a shop by the associated user ID
+
   Future<Shop?> getShopByUserID(int userId) async {
     final db = await AppDatabase().database;
     final List<Map<String, dynamic>> result =
@@ -48,15 +77,31 @@ class ShopDatabaseHelper {
   Future<List<Shop>> getShopsByCategory(int categoryId) async {
     final db = await AppDatabase().database;
     final List<Map<String, dynamic>> results = await db.rawQuery('''
-      SELECT shops.* FROM shops
-      INNER JOIN shop_categories ON shops.shop_id = shop_categories.shop_id
-      WHERE shop_categories.cat_id = ?
-    ''', [categoryId]);
+    SELECT shops.* FROM shops
+    INNER JOIN shop_categories ON shops.shop_id = shop_categories.shop_id
+    INNER JOIN users ON shops.user_id = users.user_id
+    WHERE shop_categories.cat_id = ? AND users.status != 2
+  ''', [categoryId]);
 
     return List.generate(results.length, (i) {
       return Shop.fromMap(results[i]);
     });
   }
+
+
+  // Future<List<Shop>> getShopsByCategory(int categoryId) async {
+  //   final db = await AppDatabase().database;
+  //   final List<Map<String, dynamic>> results = await db.rawQuery('''
+  //     SELECT shops.* FROM shops
+  //     INNER JOIN shop_categories ON shops.shop_id = shop_categories.shop_id,
+  //     INNER JOIN users ON shops.user_id = users.user_id
+  //     WHERE shop_categories.cat_id = ? and users.status != 2
+  //   ''', [categoryId]);
+  //
+  //   return List.generate(results.length, (i) {
+  //     return Shop.fromMap(results[i]);
+  //   });
+  // }
 
   // Update an existing shop by its ID
   Future<int> updateShop(Shop shop) async {

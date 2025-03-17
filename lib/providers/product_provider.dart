@@ -9,8 +9,7 @@ class ProductProvider with ChangeNotifier {
 
   List<Product> get products => _products;
 
-  List<Product> get filteredProducts =>
-      _filteredProducts; // Expose filtered products
+  List<Product> get filteredProducts => _filteredProducts;
   List<Map<String, dynamic>> _productShopUserData = [];
 
   List<Map<String, dynamic>> get productShopUserData => _productShopUserData;
@@ -20,13 +19,10 @@ class ProductProvider with ChangeNotifier {
   // Fetch product with shop and user details by productId
   Future<void> fetchProductShopUserData(int productId) async {
     final productShopUserData =
-    await ProductDatabaseHelper().getUserAndShopByProductId(productId);
-    if (productShopUserData != null) {
-      _productShopUserData = [productShopUserData]; // Store the data
-    } else {
-      _productShopUserData = [];
-    }
-    notifyListeners(); // Notify listeners to update the UI
+        await ProductDatabaseHelper().getUserAndShopByProductId(productId);
+    _productShopUserData =
+        productShopUserData != null ? [productShopUserData] : [];
+    notifyListeners();
   }
 
   // Fetch all products from the database
@@ -36,49 +32,49 @@ class ProductProvider with ChangeNotifier {
     _filteredProducts = [
       ..._products
     ]; // Initialize filtered products with all products
-    notifyListeners(); // Notify listeners to update the UI
+    notifyListeners();
   }
 
   // Search products based on the query
   void searchProducts(String query) {
     if (query.isEmpty) {
-      // If query is empty, reset filtered list to all products
       _filteredProducts = [..._products];
     } else {
-      // Filter products based on the search query
       _filteredProducts = _products.where((product) {
         return product.proName.toLowerCase().contains(query.toLowerCase());
       }).toList();
     }
-    notifyListeners(); // Notify listeners to update the UI
+    notifyListeners();
   }
 
   // Fetch products by shop_id from the database
   Future<void> fetchProductsByShopId(int shopId) async {
     final productsList =
-    await ProductDatabaseHelper().getProductsByShopId(shopId);
+        await ProductDatabaseHelper().getProductsByShopId(shopId);
     _products = productsList;
-    _filteredProducts = [..._products]; // Reset filtered list
-    notifyListeners(); // Notify listeners to update the UI
+    _filteredProducts = [..._products];
+    notifyListeners();
   }
 
   // Get the product count by shop_id
   Future<void> countProductsByShopId(int shopId) async {
     _productCountByShopId =
-    await ProductDatabaseHelper().countProductsByShopId(shopId);
-    notifyListeners(); // Notify listeners to update the UI
+        await ProductDatabaseHelper().countProductsByShopId(shopId);
+    notifyListeners();
   }
 
-  // Add a new product to the database
+  // Add a new product and fetch products based on shop ID
   Future<void> addProduct(Product product) async {
     await ProductDatabaseHelper().insertProduct(product);
-    await fetchProducts(); // Refresh the product list after adding
+    await fetchProductsByShopId(
+        product.shopId); // Fetch updated product list for the shop
   }
 
-  // Update an existing product in the database
+  // Update an existing product and fetch products by shop ID
   Future<void> updateProduct(Product product) async {
     await ProductDatabaseHelper().updateProduct(product);
-    await fetchProducts(); // Refresh the product list after update
+    await fetchProductsByShopId(
+        product.shopId); // Fetch updated product list for the shop
   }
 
   // Delete a product by its ID
