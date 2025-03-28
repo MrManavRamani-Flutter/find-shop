@@ -97,7 +97,7 @@ class AboutScreen extends StatelessWidget {
                     _buildContactRow(Icons.person, 'Name', 'Manav Ramani'),
                     const Divider(height: 15, color: Colors.grey),
                     _buildContactRow(
-                        Icons.email, 'Email', 'manavramani3402003@gmail.com'),
+                        Icons.email, 'Email', 'manavpatel13402003@gmail.com'),
                     const Divider(height: 15, color: Colors.grey),
                     _buildContactRow(Icons.phone, 'Contact', '+91 7096584269'),
                     // Include country code
@@ -114,14 +114,16 @@ class AboutScreen extends StatelessWidget {
                   _buildElevatedButton(
                     'Call',
                     Icons.call,
-                    () => launchUrl(
-                        Uri.parse('tel:+917096584269')), // Country code
+                        () =>
+                        launchUrl(
+                            Uri.parse('tel:+917096584269')), // Country code
                   ),
                   _buildElevatedButton(
                     'Email',
                     Icons.email,
-                    () => launchUrl(
-                        Uri.parse('mailto:manavramani3402003@gmail.com')),
+                        () =>
+                        launchUrl(
+                            Uri.parse('mailto:manavpatel13402003@gmail.com')),
                   ),
                 ],
               ),
@@ -156,13 +158,13 @@ class AboutScreen extends StatelessWidget {
   }
 
   // Helper function to build the styled buttons
-  Widget _buildElevatedButton(
-      String text, IconData icon, VoidCallback onPressed) {
+  Widget _buildElevatedButton(String text, IconData icon,
+      VoidCallback onPressed) {
     return ElevatedButton.icon(
       onPressed: onPressed,
       icon: Icon(icon, size: 20, color: Colors.white),
       label:
-          Text(text, style: const TextStyle(fontSize: 16, color: Colors.white)),
+      Text(text, style: const TextStyle(fontSize: 16, color: Colors.white)),
       style: ElevatedButton.styleFrom(
         backgroundColor: Colors.blueAccent,
         padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
